@@ -1,3 +1,6 @@
+import { API_URL } from './lens'
+import { createClient } from 'urql'
+/*
 import { createClient, dedupExchange, cacheExchange, fetchExchange } from 'urql'
 import { authExchange } from '@urql/exchange-auth'
 import Cookies from 'js-cookie'
@@ -6,7 +9,13 @@ import { COOKIE_ACCESS_TOKENS, COOKIE_REFRESH_TOKENS } from './storage'
 import { makeOperation } from '@urql/core'
 import refreshAuthenticate from '@graphql/authentication/refresh-authenticate'
 import getAuthToken from '@helpers/getAuthTokens'
+*/
 
+export const client = createClient({
+  url: API_URL as string,
+})
+
+/*
 const addAuthToOperation = ({ authState, operation }: any) => {
   if (!authState || !authState.token) {
     return operation
@@ -80,3 +89,5 @@ export const client = createClient({
     fetchExchange,
   ],
 })
+
+*/
