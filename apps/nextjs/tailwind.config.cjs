@@ -198,6 +198,9 @@ module.exports = {
       spacing: {
         '1ex': '1ex',
       },
+      aspectRatio: {
+        'twitter-card': '2 / 1',
+      },
     },
   },
   variants: {

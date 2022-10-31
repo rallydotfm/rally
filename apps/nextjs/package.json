@@ -42,6 +42,7 @@
     "react-html-props": "^1.0.33",
     "urql": "^3.0.3",
     "wagmi": "^0.7.5",
+    "web3.storage": "^4.4.0",
     "zod": "^3.19.1"
   },
   "devDependencies": {

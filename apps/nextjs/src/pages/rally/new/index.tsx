@@ -1,8 +1,27 @@
 import type { NextPage } from 'next'
 import Head from 'next/head'
-import FormCreateNewAudioEvent from '@components/pages/FormCreateNewAudioEvent'
+import FormAudioEvent from '@components/pages/FormAudioChat'
+import useSmartContract from '@components/pages/FormAudioChat/useSmartContract'
+import useForm from '@components/pages/FormAudioChat/useForm'
 
 const Page: NextPage = () => {
+  const { onSubmitNewAudioChat, stateNewAudioChat } = useSmartContract()
+  const { formAudioChat, apiInputRallyTags } = useForm({
+    onSubmit: onSubmitNewAudioChat,
+    initialValues: {
+      rally_is_private: false,
+      rally_has_cohosts: false,
+      rally_is_recorded: false,
+      rally_tags: [],
+      rally_cohosts: [],
+      rally_name: '',
+      rally_description: '',
+      rally_start_at: '',
+      rally_access_control_guilds: [],
+      rally_access_control_blacklist: [],
+      rally_access_control_whitelist: [],
+    },
+  })
   return (
     <>
       <Head>
@@ -16,7 +35,7 @@ const Page: NextPage = () => {
           <br />
           Who can join, when, to discuss about what and how is up to you.
         </p>
-        <FormCreateNewAudioEvent />
+        <FormAudioEvent storeForm={formAudioChat} apiInputRallyTags={apiInputRallyTags} state={stateNewAudioChat} />
       </main>
     </>
   )

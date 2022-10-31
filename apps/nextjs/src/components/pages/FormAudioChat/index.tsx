@@ -7,16 +7,16 @@ import InputCheckboxToggle from '@components/InputCheckboxToggle'
 import FormRadioGroup from '@components/FormRadioGroup'
 import { RadioGroup } from '@headlessui/react'
 import FormRadioOption from '@components/FormRadioOption'
-import useCreateAudioEvent from './useCreateAudioEvent'
-import { PlusIcon } from '@heroicons/react/20/solid'
+import { CameraIcon, PlusIcon } from '@heroicons/react/20/solid'
 import EthereumAddress from '@components/EthereumAddress'
 import CardGuild from '@components/CardGuild'
 
-export const FormCreateNewAudioEvent = () => {
+export const FormAudioChat = (props) => {
   const {
-    formAudioEvent: { form, setData, resetField, addField, data, errors },
+    state,
     apiInputRallyTags,
-  } = useCreateAudioEvent()
+    storeForm: { form, isSubmitting, setData, resetField, addField, data, errors, isValid },
+  } = props
 
   return (
     <form ref={form}>
@@ -26,14 +26,14 @@ export const FormCreateNewAudioEvent = () => {
 
           <FormField className="!mt-0">
             <FormField.InputField>
-              <FormField.Label hasError={errors()?.rally_name?.length > 0} htmlFor="rally_name">
+              <FormField.Label hasError={errors()?.rally_name?.length} htmlFor="rally_name">
                 Name
               </FormField.Label>
               <FormField.Description id="input-rally_name-description">
                 The name of your audio room.
               </FormField.Description>
               <FormInput
-                hasError={errors()?.rally_name?.length > 0}
+                hasError={errors()?.rally_name?.length}
                 placeholder="Eg: RallyDAO meeting #5"
                 name="rally_name"
                 id="rally_name"
@@ -41,14 +41,14 @@ export const FormCreateNewAudioEvent = () => {
                 aria-describedby="input-rally_name-description input-rally_name-helpblock"
               />
             </FormField.InputField>
-            <FormField.HelpBlock hasError={errors()?.rally_name?.length > 0} id="input-rally_name-helpblock">
+            <FormField.HelpBlock hasError={errors()?.rally_name?.length} id="input-rally_name-helpblock">
               Please type a name.
             </FormField.HelpBlock>
           </FormField>
 
           <FormField>
             <FormField.InputField>
-              <FormField.Label hasError={errors()?.rally_description?.length > 0} htmlFor="rally_description">
+              <FormField.Label hasError={errors()?.rally_description?.length} htmlFor="rally_description">
                 Description
               </FormField.Label>
               <FormField.Description id="input-rally_description-description">
@@ -56,31 +56,77 @@ export const FormCreateNewAudioEvent = () => {
               </FormField.Description>
               <FormTextarea
                 required
-                hasError={errors()?.rally_description?.length > 0}
+                hasError={errors()?.rally_description?.length}
                 placeholder="Eg: Community discussion about the future of Rally. Members only !"
                 name="rally_description"
                 id="rally_description"
                 aria-describedby="input-rally_description-description input-rally_description-helpblock"
               />
             </FormField.InputField>
-            <FormField.HelpBlock
-              hasError={errors()?.rally_description?.length > 0}
-              id="input-rally_description-helpblock"
-            >
+            <FormField.HelpBlock hasError={errors()?.rally_description?.length} id="input-rally_description-helpblock">
               Please type a description.
             </FormField.HelpBlock>
+          </FormField>
+          <FormField hasError={errors()?.rally_image_file?.length}>
+            <FormField.InputField>
+              <div className="flex flex-col lg:justify-between lg:flex-row lg:space-x-6">
+                <div>
+                  <FormField.Label hasError={errors()?.rally_image_file?.length} htmlFor="rally_image_file">
+                    Your rally image
+                  </FormField.Label>
+                  <FormField.Description id="input-rally_image_file-description">
+                    Click on the picture to upload an image from your files.
+                  </FormField.Description>
+                  <FormField.HelpBlock
+                    className="not-sr-only text-neutral-11 text-2xs"
+                    id="input-rally_image_file-helpblock"
+                  >
+                    Your image should have a 2:1 ratio and not be larger than 1MB.
+                  </FormField.HelpBlock>
+                </div>
+                <div className="mt-3 lg:mt-0 sw-full lg:w-96 aspect-twitter-card rounded-md overflow-hidden relative bg-neutral-1">
+                  <input
+                    onChange={(e) => {
+                      //@ts-ignore
+                      const src = URL.createObjectURL(e.target.files[0])
+                      setData('rally_image_src', src)
+                    }}
+                    className="absolute w-full h-full block inset-0 z-30 cursor-pointer opacity-0"
+                    type="file"
+                    accept="image/*"
+                    name="rally_image_file"
+                    id="rally_image_file"
+                    required
+                    aria-describedby="input-rally_image_file-description input-rally_image_file-helpblock"
+                  />
+                  <div className="absolute w-full h-full rounded-md inset-0 z-20 bg-neutral-3 bg-opacity-20 flex items-center justify-center">
+                    <CameraIcon className="w-10 text-white" />
+                  </div>
+                  {data()?.rally_image_src && (
+                    <img
+                      alt=""
+                      loading="lazy"
+                      width="112"
+                      height="112"
+                      className="absolute w-full h-full object-cover block z-10 inset-0"
+                      src={data()?.rally_image_src}
+                    />
+                  )}
+                </div>
+              </div>
+            </FormField.InputField>
           </FormField>
 
           <FormField>
             <FormField.InputField>
-              <FormField.Label hasError={errors()?.rally_start_at?.length > 0} htmlFor="rally_start_at">
+              <FormField.Label hasError={errors()?.rally_start_at?.length} htmlFor="rally_start_at">
                 Date and time
               </FormField.Label>
               <FormField.Description id="input-rally_start_at-description">
                 The date and time at which of your audio room will take place.
               </FormField.Description>
               <FormInput
-                hasError={errors()?.rally_start_at?.length > 0}
+                hasError={errors()?.rally_start_at?.length}
                 name="rally_start_at"
                 id="rally_start_at"
                 type="datetime-local"
@@ -90,26 +136,26 @@ export const FormCreateNewAudioEvent = () => {
               />
             </FormField.InputField>
             <FormField.HelpBlock
-              hasError={errors()?.rally_start_at?.length > 0}
+              hasError={errors()?.rally_start_at?.length}
               id="input-start-at-timezone-helpblock"
               className="not-sr-only pt-2 text-neutral-11 text-2xs"
             >
               Timezone: ({Intl.DateTimeFormat().resolvedOptions().timeZone})
             </FormField.HelpBlock>
-            <FormField.HelpBlock hasError={errors()?.rally_start_at?.length > 0} id="input-rally_start_at-helpblock">
+            <FormField.HelpBlock hasError={errors()?.rally_start_at?.length} id="input-rally_start_at-helpblock">
               Please pick a date.
             </FormField.HelpBlock>
           </FormField>
 
           <FormField>
             <FormField.InputField>
-              <FormField.Label hasError={errors()?.rally_tags?.length > 0} htmlFor="rally_tags">
+              <FormField.Label hasError={errors()?.rally_tags?.length} htmlFor="rally_tags">
                 Tags
               </FormField.Label>
               <FormField.Description id="input-rally_tags-description">Add some tags</FormField.Description>
               <InputTags className="w-full" api={apiInputRallyTags} />
             </FormField.InputField>
-            <FormField.HelpBlock hasError={errors()?.rally_tags?.length > 0} id="input-rally_tags-helpblock">
+            <FormField.HelpBlock hasError={errors()?.rally_tags?.length} id="input-rally_tags-helpblock">
               Please add at least 1 tag.
             </FormField.HelpBlock>
           </FormField>
@@ -158,7 +204,7 @@ export const FormCreateNewAudioEvent = () => {
                       <FormField.InputField>
                         <FormField.Label
                           className="text-xs"
-                          hasError={errors()?.[`rally_cohosts.${index}.name`]?.length > 0}
+                          hasError={errors()?.[`rally_cohosts.${index}.name`]?.length}
                           htmlFor={`rally_cohosts.${index}.name`}
                         >
                           Name
@@ -168,7 +214,7 @@ export const FormCreateNewAudioEvent = () => {
                         </FormField.Description>
                         <FormInput
                           scale="sm"
-                          hasError={errors()?.[`rally_cohosts.${index}.name`]?.length > 0}
+                          hasError={errors()?.[`rally_cohosts.${index}.name`]?.length}
                           placeholder="Eg: Lili, Koopah, DollarFifty..."
                           name={`rally_cohosts.${index}.name`}
                           id={`rally_cohosts.${index}.name`}
@@ -176,7 +222,7 @@ export const FormCreateNewAudioEvent = () => {
                         />
                       </FormField.InputField>
                       <FormField.HelpBlock
-                        hasError={errors()?.[`rally_cohosts.${index}.name`]?.length > 0}
+                        hasError={errors()?.[`rally_cohosts.${index}.name`]?.length}
                         id={`input-rally_cohosts.${index}.name-helpblock`}
                       >
                         The name that will be displayed for this co-host.
@@ -186,7 +232,7 @@ export const FormCreateNewAudioEvent = () => {
                       <FormField.InputField>
                         <FormField.Label
                           className="text-xs"
-                          hasError={errors()?.[`rally_cohosts.${index}.eth_address`]?.length > 0}
+                          hasError={errors()?.[`rally_cohosts.${index}.eth_address`]?.length}
                           htmlFor={`rally_cohosts.${index}.eth_address`}
                         >
                           Ethereum address
@@ -200,7 +246,7 @@ export const FormCreateNewAudioEvent = () => {
                         <FormInput
                           scale="sm"
                           required
-                          hasError={errors()?.[`rally_cohosts.${index}.eth_address`]?.length > 0}
+                          hasError={errors()?.[`rally_cohosts.${index}.eth_address`]?.length}
                           placeholder="A valid Ethereum address"
                           name={`rally_cohosts.${index}.eth_address`}
                           id={`rally_cohosts.${index}.eth_address`}
@@ -208,7 +254,7 @@ export const FormCreateNewAudioEvent = () => {
                         />
                       </FormField.InputField>
                       <FormField.HelpBlock
-                        hasError={errors()?.[`rally_cohosts.${index}.eth_address`]?.length > 0}
+                        hasError={errors()?.[`rally_cohosts.${index}.eth_address`]?.length}
                         id={`input-rally_cohosts.${index}.eth_address-helpblock`}
                       >
                         The address of your co-host must be a valid Ethereum address.
@@ -296,7 +342,7 @@ export const FormCreateNewAudioEvent = () => {
                         <FormField.InputField>
                           <FormField.Label
                             className="text-xs"
-                            hasError={errors()?.[`rally_access_control_guilds.${index}.guild_id`]?.length > 0}
+                            hasError={errors()?.[`rally_access_control_guilds.${index}.guild_id`]?.length}
                             htmlFor={`rally_access_control_guilds.${index}.guild_id`}
                           >
                             Guild ID
@@ -309,7 +355,7 @@ export const FormCreateNewAudioEvent = () => {
                           </FormField.Description>
                           <FormInput
                             scale="sm"
-                            hasError={errors()?.[`rally_access_control_guilds.${index}.guild_id`]?.length > 0}
+                            hasError={errors()?.[`rally_access_control_guilds.${index}.guild_id`]?.length}
                             placeholder="Eg: our-guild, layer3, lens-protocol..."
                             name={`rally_access_control_guilds.${index}.guild_id`}
                             id={`rally_access_control_guilds.${index}.guild_id`}
@@ -317,7 +363,7 @@ export const FormCreateNewAudioEvent = () => {
                           />
                         </FormField.InputField>
                         <FormField.HelpBlock
-                          hasError={errors()?.[`rally_access_control_guilds.${index}.guild_id`]?.length > 0}
+                          hasError={errors()?.[`rally_access_control_guilds.${index}.guild_id`]?.length}
                           id={`input-rally_access_control_guilds.${index}.guild_id-helpblock`}
                         >
                           The name that will be displayed for this co-host.
@@ -363,9 +409,14 @@ export const FormCreateNewAudioEvent = () => {
           )}
         </fieldset>
       </div>
-      <Button>Create my rally</Button>
+      <Button
+        isLoading={state.transaction.isLoading || state.uploadImage.isLoading || state.uploadData.isLoading}
+        disabled={!isValid || state.transaction.isLoading || state.uploadImage.isLoading || state.uploadData.isLoading}
+      >
+        Create my rally
+      </Button>
     </form>
   )
 }
 
-export default FormCreateNewAudioEvent
+export default FormAudioChat
