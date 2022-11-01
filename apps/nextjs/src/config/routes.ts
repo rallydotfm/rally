@@ -1,5 +1,10 @@
 export const ROUTE_HOME = '/'
-export const ROUTE_DASHBOARD = '/dashboard'
+
+export const PATHNAME_DASHBOARD = '/dashboard'
+export const ROUTE_DASHBOARD = '/dashboard/rallies'
+export const ROUTE_DASHBOARD_RALLIES = '/dashboard/rallies'
+export const ROUTE_DASHBOARD_RECORDINGS = '/dashboard/recordings'
+
 export const ROUTE_UPCOMING = '/upcoming'
 export const ROUTE_ABOUT = '/about'
 

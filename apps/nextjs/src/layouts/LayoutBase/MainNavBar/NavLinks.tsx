@@ -4,7 +4,7 @@ import {
   CalendarIcon as SolidCalendarIcon,
   RectangleStackIcon as SolidRectangleStackIcon,
 } from '@heroicons/react/24/solid'
-import { ROUTE_DASHBOARD, ROUTE_HOME, ROUTE_UPCOMING } from '@config/routes'
+import { PATHNAME_DASHBOARD, ROUTE_DASHBOARD, ROUTE_HOME, ROUTE_UPCOMING } from '@config/routes'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 
@@ -29,6 +29,7 @@ const routes = [
     activeIcon: SolidRectangleStackIcon,
     defaultIcon: RectangleStackIcon,
     label: 'Dashboard',
+    subpath: PATHNAME_DASHBOARD,
   },
 ]
 
@@ -37,7 +38,7 @@ export const NavLinks = () => {
   return (
     <>
       {routes.map((route) => {
-        const isActive = pathname === route.href
+        const isActive = route?.subpath ? pathname.includes(route?.subpath) : pathname === route.href
         return (
           <Link key={route.key} href={route.href}>
             <a

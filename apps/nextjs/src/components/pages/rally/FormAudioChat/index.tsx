@@ -15,7 +15,7 @@ export const FormAudioChat = (props) => {
   const {
     state,
     apiInputRallyTags,
-    storeForm: { form, isSubmitting, setData, resetField, addField, data, errors, isValid },
+    storeForm: { form, setData, resetField, addField, data, errors, isValid },
   } = props
 
   return (
@@ -410,8 +410,19 @@ export const FormAudioChat = (props) => {
         </fieldset>
       </div>
       <Button
-        isLoading={state.transaction.isLoading || state.uploadImage.isLoading || state.uploadData.isLoading}
-        disabled={!isValid || state.transaction.isLoading || state.uploadImage.isLoading || state.uploadData.isLoading}
+        isLoading={
+          (state.transaction.status === 'idle' && state.uploadData.status === 'success') ||
+          state.transaction.status === 'loading' ||
+          state.uploadImage.status === 'loading' ||
+          state.uploadData.status === 'loading'
+        }
+        disabled={
+          !isValid ||
+          (state.transaction.status === 'idle' && state.uploadData.status === 'success') ||
+          state.transaction.status === 'loading' ||
+          state.uploadImage.status === 'loading' ||
+          state.uploadData.status === 'loading'
+        }
       >
         Create my rally
       </Button>

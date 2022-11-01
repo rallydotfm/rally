@@ -1,8 +1,8 @@
 import type { NextPage } from 'next'
 import Head from 'next/head'
-import FormAudioEvent from '@components/pages/FormAudioChat'
-import useSmartContract from '@components/pages/FormAudioChat/useSmartContract'
-import useForm from '@components/pages/FormAudioChat/useForm'
+import FormAudioEvent from '@components/pages/rally/FormAudioChat'
+import useSmartContract from '@components/pages/rally/FormAudioChat/useSmartContract'
+import useForm from '@components/pages/rally/FormAudioChat/useForm'
 
 const Page: NextPage = () => {
   const { onSubmitNewAudioChat, stateNewAudioChat } = useSmartContract()
@@ -25,10 +25,10 @@ const Page: NextPage = () => {
   return (
     <>
       <Head>
-        <title>Create new audio event - Rally</title>
+        <title>Create new rally - Rally</title>
         <meta name="description" content="Rally is the place to be." />
       </Head>
-      <main>
+      <main className="animate-appear">
         <h1 className="font-bold text-2xl mb-3">Create a new rally</h1>
         <p className="text-xs mb-8 text-neutral-11">
           A rally is an online space where you and selected members of your audience can have live audio conversation.{' '}

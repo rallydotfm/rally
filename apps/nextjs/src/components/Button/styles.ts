@@ -22,6 +22,12 @@ export const button = cva(
           'text-white focus:text-primary-3',
           'border-primary-9 focus:border-primary-11',
         ],
+        'primary-ghost': [
+          'border-transparent bg-primary-10 bg-opacity-0 text-primary-10 hover:bg-opacity-10 focus:border-transparent focus:bg-opacity-100 focus:text-primary-1 focus:outline-none',
+        ],
+        'neutral-ghost': [
+          'border-transparent bg-white bg-opacity-0 text-white hover:bg-opacity-10 focus:border-transparent focus:bg-opacity-100 focus:text-black focus:outline-none',
+        ],
         'negative-ghost': [
           'border-transparent bg-negative-11 bg-opacity-0 text-negative-11 hover:bg-opacity-10 focus:border-transparent focus:bg-opacity-100 focus:text-negative-1 focus:outline-none',
         ],

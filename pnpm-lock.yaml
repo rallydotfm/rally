@@ -29,11 +29,13 @@ importers:
       '@lit-protocol/sdk-browser': ^1.1.228
       '@radix-ui/colors': ^0.1.8
       '@rainbow-me/rainbowkit': ^0.7.3
+      '@rally/abi': '*'
       '@rally/api': '*'
       '@rally/db': '*'
       '@react-hookz/web': ^16.1.0
       '@tailwindcss/typography': ^0.5.7
       '@tanstack/react-query': ^4.13.0
+      '@tanstack/react-table': ^8.5.22
       '@trpc/client': 10.0.0-proxy-beta.13
       '@trpc/next': 10.0.0-proxy-beta.13
       '@trpc/react': 10.0.0-proxy-beta.13
@@ -78,10 +80,12 @@ importers:
       '@heroicons/react': 2.0.12_react@18.2.0
       '@lit-protocol/sdk-browser': 1.1.228
       '@rainbow-me/rainbowkit': 0.7.3_cb4fkzaxwbg4l5jffcmcvy6tvq
+      '@rally/abi': link:../../packages/abi
       '@rally/api': link:../../packages/api
       '@rally/db': link:../../packages/db
       '@react-hookz/web': 16.1.0_c4fpxp3ssqyfi2gvharwwfsvcm
       '@tanstack/react-query': 4.13.0_biqbaboplfbrettd7655fr4n2y
+      '@tanstack/react-table': 8.5.22_biqbaboplfbrettd7655fr4n2y
       '@trpc/client': 10.0.0-proxy-beta.13_itipy43llokwyezwccgik4t2sm
       '@trpc/next': 10.0.0-proxy-beta.13_b4ltfpnsbqtbei6d4mjsuqjlgu
       '@trpc/react': 10.0.0-proxy-beta.13_3cietjcpahithuin5e33c34mze
@@ -123,6 +127,12 @@ importers:
       postcss: 8.4.18
       tailwindcss: 3.2.1_postcss@8.4.18
       tailwindcss-logical: 3.0.0_xkowlklhtk6sfvtndbucb3hfiy
+      typescript: 4.8.4
+
+  packages/abi:
+    specifiers:
+      typescript: ^4.8.3
+    devDependencies:
       typescript: 4.8.4
 
   packages/api:
@@ -2471,6 +2481,23 @@ packages:
       react: 18.2.0
       react-dom: 18.2.0_react@18.2.0
       use-sync-external-store: 1.2.0_react@18.2.0
+    dev: false
+
+  /@tanstack/react-table/8.5.22_biqbaboplfbrettd7655fr4n2y:
+    resolution: {integrity: sha512-01XaxQTxcI+w7g+i/YRblxdAikM9G7L1S7LwqaiD/gkKmNUs+g2BXw4GfIcuzzE75Q5t0BXlyqM7MyxxBuvQXA==}
+    engines: {node: '>=12'}
+    peerDependencies:
+      react: '>=16'
+      react-dom: '>=16'
+    dependencies:
+      '@tanstack/table-core': 8.5.22
+      react: 18.2.0
+      react-dom: 18.2.0_react@18.2.0
+    dev: false
+
+  /@tanstack/table-core/8.5.22:
+    resolution: {integrity: sha512-D3wDbVXl3Bi5PdGfle6DijhLzZxrvMyZsE1dSHH0xBsqEbu7Pkxn5EEd6CA9tGsCgXIEP1s4Yfy1cZ9xnMz1sQ==}
+    engines: {node: '>=12'}
     dev: false
 
   /@tootallnate/once/2.0.0:
