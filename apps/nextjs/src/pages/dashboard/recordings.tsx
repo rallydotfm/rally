@@ -13,7 +13,7 @@ const Page: NextPage = () => {
     </>
   )
 }
-
+//@ts-ignore
 Page.getLayout = getLayout
 
 export default Page

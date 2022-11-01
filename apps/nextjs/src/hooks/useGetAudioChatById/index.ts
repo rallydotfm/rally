@@ -30,6 +30,7 @@ export function useGetAudioChatById(idAudioChat?: `0x${string}`) {
         return {
           id: queryAudioChatByIdRawData?.data?.audioEventId,
           cid: queryAudioChatByIdRawData?.data?.cid_metadata,
+          //@ts-ignore
           state: STATES_AUDIO_CHATS[queryAudioChatByIdRawData?.data?.state],
           creator: queryAudioChatByIdRawData?.data?.creator,
           datetime_start_at: new Date(parseInt(`${queryAudioChatByIdRawData?.data?.eventTimestamp}`) * 1000),

@@ -18,6 +18,7 @@ const Page: NextPage = () => {
     query: { idRally },
     isReady,
   } = useRouter()
+  //@ts-ignore
   const { queryAudioChatByIdRawData, queryAudioChatMetadata } = useGetAudioChatById(idRally)
   const { address } = useAccount()
   return (

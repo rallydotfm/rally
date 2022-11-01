@@ -57,15 +57,17 @@ const CardGuild = (props: CardGuildProps) => {
         <div>
           <span>Roles</span>
           <ul className="flex text-2xs flex-col space-y-3 divide-y divide-neutral-4">
-            {queryGuild?.data?.roles?.map((role, key) => {
-              return (
-                <li className="py-3" key={`guild-${id}-role-${role.id}`}>
-                  <img className="w-12" src={role.imageUrl} alt="" />
-                  <span className="font-bold">{role.name}</span>
-                  <p>{role.description}</p>
-                </li>
-              )
-            })}
+            {queryGuild?.data?.roles?.map(
+              (role: { imageUrl: string; name: string; description: string; id: string }, key: number) => {
+                return (
+                  <li className="py-3" key={`guild-${id}-role-${role.id}`}>
+                    <img className="w-12" src={role.imageUrl} alt="" />
+                    <span className="font-bold">{role.name}</span>
+                    <p>{role.description}</p>
+                  </li>
+                )
+              },
+            )}
           </ul>
         </div>
       </div>

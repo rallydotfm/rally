@@ -1,6 +1,9 @@
 import { useCountdown } from './useCountdown'
 
-const CountdownOpening = (props) => {
+interface CountdownOpeningProps {
+  startsAt: Date
+}
+const CountdownOpening = (props: CountdownOpeningProps) => {
   const { startsAt } = props
   const { enabled, timeDifference } = useCountdown(startsAt)
 

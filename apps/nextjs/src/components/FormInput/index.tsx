@@ -13,6 +13,7 @@ export const FormInput = (props: FormInputProps) => {
       className={input({
         appearance: appearance ?? 'square',
         scale: scale ?? 'default',
+        //@ts-ignore
         variant: hasError === true ? 'error' : 'default',
         class: className ?? '',
       })}

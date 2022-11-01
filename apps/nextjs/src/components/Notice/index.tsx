@@ -1,6 +1,10 @@
 import notice from './styles'
-
-export const Notice = (props) => {
+import type { SystemUiNoticeProps } from './styles'
+interface NoticeProps extends SystemUiNoticeProps {
+  children: React.ReactNode
+  className?: string
+}
+export const Notice = (props: NoticeProps) => {
   const { children, className, ...rest } = props
   return (
     <div

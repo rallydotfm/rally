@@ -13,6 +13,7 @@ const Page: NextPage = () => {
     query: { idRally },
     isReady,
   } = useRouter()
+  //@ts-ignore
   const { queryAudioChatByIdRawData, queryAudioChatMetadata } = useGetAudioChatById(idRally)
 
   return (
@@ -39,6 +40,7 @@ const Page: NextPage = () => {
             ) : (
               <>
                 <FormUpdateAudioChat
+                  //@ts-ignore
                   values={{
                     ...queryAudioChatMetadata,
                   }}

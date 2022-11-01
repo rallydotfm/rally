@@ -6,5 +6,6 @@ export function getAccessToken() {
 }
 
 export function makeStorageClient() {
+  //@ts-ignore
   return new Web3Storage({ token: getAccessToken() })
 }

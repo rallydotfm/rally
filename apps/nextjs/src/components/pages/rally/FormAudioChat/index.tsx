@@ -11,7 +11,12 @@ import { CameraIcon, PlusIcon } from '@heroicons/react/20/solid'
 import EthereumAddress from '@components/EthereumAddress'
 import CardGuild from '@components/CardGuild'
 
-export const FormAudioChat = (props) => {
+interface FormAudioChatProps {
+  state: any
+  apiInputRallyTags: any
+  storeForm: any
+}
+export const FormAudioChat = (props: FormAudioChatProps) => {
   const {
     state,
     apiInputRallyTags,
@@ -67,7 +72,7 @@ export const FormAudioChat = (props) => {
               Please type a description.
             </FormField.HelpBlock>
           </FormField>
-          <FormField hasError={errors()?.rally_image_file?.length}>
+          <FormField>
             <FormField.InputField>
               <div className="flex flex-col lg:justify-between lg:flex-row lg:space-x-6">
                 <div>
@@ -78,6 +83,7 @@ export const FormAudioChat = (props) => {
                     Click on the picture to upload an image from your files.
                   </FormField.Description>
                   <FormField.HelpBlock
+                    hasError={false}
                     className="not-sr-only text-neutral-11 text-2xs"
                     id="input-rally_image_file-helpblock"
                   >
@@ -194,7 +200,7 @@ export const FormAudioChat = (props) => {
           </FormField>
           {data().rally_has_cohosts === true && (
             <div className="grid grid-cols-1 xs:grid-cols-2 gap-3 animate-appear">
-              {data().rally_cohosts.map((cohost, index) => {
+              {data().rally_cohosts.map((cohost: { key: string }, index: number) => {
                 return (
                   <div
                     className="animate-appear space-y-3 p-3 border rounded-md  bg-neutral-1 border-neutral-4"
@@ -275,7 +281,9 @@ export const FormAudioChat = (props) => {
                       className="!mt-6 w-full"
                       scale="sm"
                       onClick={() => {
-                        const updated = data()?.rally_cohosts.filter((rallyCohost) => rallyCohost.key !== cohost.key)
+                        const updated = data()?.rally_cohosts.filter(
+                          (rallyCohost: any) => rallyCohost.key !== cohost.key,
+                        )
                         setData('rally_cohosts', updated)
                         updated.length === 0 && setData('rally_has_cohosts', false)
                       }}
@@ -332,7 +340,7 @@ export const FormAudioChat = (props) => {
           {data().rally_is_private === true && (
             <>
               <div className="grid grid-cols-1 gap-3 animate-appear">
-                {data().rally_access_control_guilds.map((guild, index) => {
+                {data().rally_access_control_guilds.map((guild: { key: string }, index: number) => {
                   return (
                     <div
                       className="animate-appear space-y-3 p-3 border rounded-md  bg-neutral-1 border-neutral-4"
@@ -380,7 +388,7 @@ export const FormAudioChat = (props) => {
                         scale="sm"
                         onClick={() => {
                           const updated = data()?.rally_access_control_guilds.filter(
-                            (rallyGuild) => rallyGuild.key !== guild.key,
+                            (rallyGuild: any) => rallyGuild.key !== guild.key,
                           )
                           setData('rally_access_control_guilds', updated)
                           updated.length === 0 && setData('rally_is_private', false)

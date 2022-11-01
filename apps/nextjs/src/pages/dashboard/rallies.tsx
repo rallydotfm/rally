@@ -9,9 +9,8 @@ import button from '@components/Button/styles'
 import { ROUTE_RALLY_UPDATE, ROUTE_RALLY_VIEW } from '@config/routes'
 import { IconSpinner } from '@components/Icons'
 import { STATES_AUDIO_CHATS } from '@helpers/mappingAudioChatState'
-import { CalendarDaysIcon, CalendarIcon } from '@heroicons/react/20/solid'
-import { format, formatDistanceToNow, formatRelative, isPast, isTomorrow } from 'date-fns'
-import { isToday } from 'date-fns/esm'
+import { CalendarIcon } from '@heroicons/react/20/solid'
+import { format, formatRelative } from 'date-fns'
 
 const Page: NextPage = () => {
   const { address } = useAccount()
@@ -125,6 +124,7 @@ const Page: NextPage = () => {
   )
 }
 
+//@ts-ignore
 Page.getLayout = getLayout
 
 export default Page

@@ -18,6 +18,6 @@ export const notice = cva(['rounded-md'], {
   },
 })
 
-export type SystemUiButtonProps = VariantProps<typeof notice>
+export type SystemUiNoticeProps = VariantProps<typeof notice>
 
 export default notice

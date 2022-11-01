@@ -21,6 +21,7 @@ export function useGetAudioChatsByWalletAddress(address?: string) {
     },
   })
   const queriesAudioChatsByAddressMetadata = useQueries({
+    //@ts-ignore
     enabled: queryAudioChatsByAddressRawData?.data?.length > 0 ?? false,
     queries: queryAudioChatsByAddressRawData?.data?.length
       ? queryAudioChatsByAddressRawData?.data?.map((audioChat) => {
@@ -34,7 +35,8 @@ export function useGetAudioChatsByWalletAddress(address?: string) {
                 return {
                   id: audioChat.audioEventId,
                   cid: audioChat.cid_metadata,
-                  state: STATES_AUDIO_CHATS[audioChat.state],
+                  //@ts-ignore
+                  state: STATES_AUDIO_CHATS[audioChat?.state],
                   creator: audioChat.creator,
                   epoch_time_start_at: parseInt(`${audioChat.eventTimestamp}`) * 1000,
                   epoch_time_created_at: parseInt(`${audioChat.createdAt}`) * 1000,

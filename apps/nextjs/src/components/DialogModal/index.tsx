@@ -1,6 +1,6 @@
 import { IconClose } from '@components/Icons'
 import { Dialog } from '@headlessui/react'
-import { ArrowLeftIcon } from '@heroicons/react/outline'
+import { ArrowLeftIcon } from '@heroicons/react/20/solid'
 
 export interface DialogModalProps {
   isOpen: boolean

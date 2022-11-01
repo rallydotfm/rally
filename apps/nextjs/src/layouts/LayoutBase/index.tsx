@@ -1,5 +1,3 @@
-import { HMSRoomProvider, useHMSActions } from '@100mslive/react-sdk'
-import { useEffect } from 'react'
 import { useAccount } from 'wagmi'
 import { ConnectButton } from '@rainbow-me/rainbowkit'
 import MobileTopMenu from './MobileTopMenu'
@@ -12,13 +10,6 @@ interface LayoutProps {
 export const LayoutBase = (props: LayoutProps) => {
   const { children } = props
   const { address, isConnecting } = useAccount()
-
-  const hmsActions = useHMSActions()
-  useEffect(() => {
-    window.onunload = () => {
-      hmsActions.leave()
-    }
-  }, [hmsActions])
 
   return (
     <div className="relative flex-grow flex flex-col">
@@ -51,10 +42,6 @@ export const LayoutBase = (props: LayoutProps) => {
 }
 
 export const getLayout = (page: any) => {
-  return (
-    <HMSRoomProvider>
-      <LayoutBase>{page}</LayoutBase>
-    </HMSRoomProvider>
-  )
+  return <LayoutBase>{page}</LayoutBase>
 }
 export default LayoutBase

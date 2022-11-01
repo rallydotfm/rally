@@ -9,7 +9,6 @@ interface FormSelectProps extends SelectProps, SystemUiInputProps {
 
 export const FormSelect = (props: FormSelectProps) => {
   const { className, hasError, scale, appearance, children, ...rest } = props
-  //@ts-ignore
   return (
     <div className={`${className ?? ''} relative`}>
       <select

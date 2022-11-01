@@ -32,7 +32,9 @@ export function useSmartContract() {
     onSuccess(data) {
       const iface = new utils.Interface(audioChatABI)
       const log = data.logs
+      //@ts-ignore
       console.log('Created !', iface.parseLog(log[0]))
+      //@ts-ignore
       console.log('Created !', iface.parseLog(log[1]))
     },
   })
@@ -43,7 +45,9 @@ export function useSmartContract() {
   const mutationUploadImageFile = useMutation(async (file) => {
     try {
       const client = makeStorageClient()
+      //@ts-ignore
       const cid = await client.put([file])
+      //@ts-ignore
       setImageRallyCID(cid)
       return cid
     } catch (e) {
@@ -57,7 +61,9 @@ export function useSmartContract() {
   const mutationUploadJsonFile = useMutation(async (file) => {
     try {
       const client = makeStorageClient()
+      //@ts-ignore
       const cid = await client.put([file])
+      //@ts-ignore
       setFileRallyCID(cid)
       return cid
     } catch (e) {}
@@ -67,7 +73,7 @@ export function useSmartContract() {
    *  Upload Rally image to IPFS (if necessary) and format and upload Rally data as a JSON file to IPFS (if necessary)
    * @param values - values returned by our form
    */
-  async function prepareRallyData(values) {
+  async function prepareRallyData(values: any) {
     try {
       if (!imageRallyCID) {
         await mutationUploadImageFile.mutateAsync(values?.rally_image_file)
@@ -95,6 +101,7 @@ export function useSmartContract() {
           type: 'application/json',
         })
         // upload JSON file to IPFS
+        //@ts-ignore
         const cidMetadata = await mutationUploadJsonFile.mutateAsync(rallyDataJSON)
 
         return [
@@ -115,10 +122,11 @@ export function useSmartContract() {
     }
   }
 
-  async function onSubmitNewAudioChat(values) {
+  async function onSubmitNewAudioChat(values: any) {
     try {
       const args = await prepareRallyData(values)
       await contractWriteNewAudioChat?.writeAsync?.({
+        //@ts-ignore
         recklesslySetUnpreparedArgs: args,
       })
     } catch (e) {
