@@ -17,6 +17,7 @@
     "noUncheckedIndexedAccess": true,
     "baseUrl": "./src",
     "paths": {
+      "@abi/*": ["abi/*"],
       "@components/*": ["components/*", "components/_pages/*"],
       "@contracts/*": ["contracts/*"],
       "@config/*": ["config/*"],

@@ -1,17 +1,12 @@
 import { useContractRead, useNetwork } from 'wagmi'
-import { audioChatABI } from '@rally/abi'
-import { CONTRACT_AUDIO_CHATS } from '@config/contracts'
+import { contractConfigAudioChat } from '@config/contracts'
 import { useQueries } from '@tanstack/react-query'
 import { STATES_AUDIO_CHATS } from '@helpers/mappingAudioChatState'
 
-const contractConfig = {
-  address: CONTRACT_AUDIO_CHATS,
-  abi: audioChatABI,
-}
 export function useGetAudioChatsByWalletAddress(address?: string) {
   const { chain } = useNetwork()
   const queryAudioChatsByAddressRawData = useContractRead({
-    ...contractConfig,
+    ...contractConfigAudioChat,
     chainId: chain?.id,
     functionName: 'getAudioChatsByAdress', //@todo: update this
     enabled: address && chain?.unsupported === false ? true : false,

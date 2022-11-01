@@ -4,7 +4,7 @@ import { useMutation } from '@tanstack/react-query'
 import { makeStorageClient } from '@config/web3storage'
 import { CONTRACT_AUDIO_CHATS } from '@config/contracts'
 import { useContractWrite, useAccount, useWaitForTransaction, useNetwork } from 'wagmi'
-import { audioChatABI } from '@rally/abi'
+import { audioChatABI } from '@abi/audioChat'
 import { utils } from 'ethers'
 
 export function useSmartContract() {
