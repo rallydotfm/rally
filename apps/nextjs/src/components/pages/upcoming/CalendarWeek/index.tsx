@@ -17,7 +17,7 @@ export default function CalendarWeek(props) {
   const { events } = props
 
   return (
-    <div className="w-full">
+    <div className="w-full animate-appear">
       <Tab.Group defaultIndex={getDay(new Date())}>
         <Tab.List className="w-screen xs:w-full grid gap-3 grid-cols-7 -mx-6 px-2 xs:mx-0 xs:px-0">
           {weekDay.map((tab) => (
@@ -43,7 +43,7 @@ export default function CalendarWeek(props) {
                     return getDay(event.data.datetime_start_at) === getDay(tab.date)
                   })
                   .map((audioChat, i) => (
-                    <li key={`panel-${audioChat.cid}`}>
+                    <li className="animate-appear" key={`panel-${audioChat.cid}`}>
                       <span className="font-bold block mb-2">{format(audioChat.data.datetime_start_at, 'HH:mm')}</span>
                       <article className="flex flex-col space-y-4 xs:flex-row xs:space-y-0 xs:space-i-6">
                         <div className="relative w-full overflow-hidden xs:w-20 sm:w-32 aspect-twitter-card rounded-t-md xs:rounded-b-md">
