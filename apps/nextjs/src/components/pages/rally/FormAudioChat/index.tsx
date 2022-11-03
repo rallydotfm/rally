@@ -10,7 +10,6 @@ import FormRadioOption from '@components/FormRadioOption'
 import { CameraIcon, PlusIcon } from '@heroicons/react/20/solid'
 import EthereumAddress from '@components/EthereumAddress'
 import OptionGuild from '@components/pages/rally/FormAudioChat/OptionGuild'
-import { useEffect } from 'react'
 
 interface FormAudioChatProps {
   state: any
@@ -146,6 +145,7 @@ export const FormAudioChat = (props: FormAudioChatProps) => {
                   name="rally_start_at"
                   id="rally_start_at"
                   type="datetime-local"
+                  min={new Date().toISOString().substring(0, 16)}
                   pattern="[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}"
                   required
                   aria-describedby="input-rally_start_at-description input-start-at-timezone-helpblock input-rally_start_at-helpblock"

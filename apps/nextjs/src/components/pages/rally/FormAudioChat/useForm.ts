@@ -44,6 +44,7 @@ export function useForm(config: { initialValues: any; onSubmit: any }) {
     tagsInput.machine({
       id: 'rally-tags-input',
       addOnPaste: true,
+      value: initialValues?.rally_tags ?? [],
       onChange: (tags: { values: Array<string> }) => {
         //@ts-ignore
         formAudioChat.setData('rally_tags', tags.values)

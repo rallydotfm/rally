@@ -63,7 +63,9 @@ const OptionGuild = (props: OptionGuildProps) => {
                     <input
                       className="peer cursor-pointer peer absolute w-full h-full opacity-0"
                       type="checkbox"
-                      defaultChecked={false}
+                      defaultChecked={
+                        data()?.rally_access_control_guilds?.[index].roles.includes(`${role.id}`) ? true : false
+                      }
                       onChange={(e) => {
                         if (e.currentTarget.checked === true) {
                           setData(`rally_access_control_guilds.${index}.roles`, [

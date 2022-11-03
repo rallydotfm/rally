@@ -39,12 +39,14 @@ const Page: NextPage = () => {
               </>
             ) : (
               <>
-                <FormUpdateAudioChat
-                  //@ts-ignore
-                  values={{
-                    ...queryAudioChatMetadata,
-                  }}
-                />
+                {queryAudioChatMetadata.isSuccess && (
+                  <FormUpdateAudioChat
+                    //@ts-ignore
+                    values={{
+                      ...queryAudioChatMetadata.data,
+                    }}
+                  />
+                )}
               </>
             )}
           </>
