@@ -1,6 +1,6 @@
 // @ts-check
-import { env } from "./src/env/server.mjs";
-import withTM from "next-transpile-modules";
+import { env } from './src/env/server.mjs'
+import withTM from 'next-transpile-modules'
 
 /**
  * Don't be scared of the generics here.
@@ -11,12 +11,12 @@ import withTM from "next-transpile-modules";
  * @constraint {{import('next').NextConfig}}
  */
 function defineNextConfig(config) {
-  return config;
+  return config
 }
 
-export default withTM(["@acme/api", "@acme/db"])(
+export default withTM(['@rally/abi', '@rally/api', '@rally/db'])(
   defineNextConfig({
     reactStrictMode: true,
     swcMinify: true,
-  })
-);
+  }),
+)

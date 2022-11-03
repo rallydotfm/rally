@@ -1,0 +1,13 @@
+{
+  "name": "@rally/abi",
+  "version": "0.1.0",
+  "main": "./src/index.ts",
+  "license": "MIT",
+  "scripts": {
+    "clean": "rm -rf .turbo node_modules"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "typescript": "^4.8.3"
+  }
+}
