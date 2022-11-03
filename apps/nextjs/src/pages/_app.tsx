@@ -11,6 +11,8 @@ import { getLayout as getBaseLayout } from '@layouts/LayoutBase'
 import '@styles/globals.css'
 import '@rainbow-me/rainbowkit/styles.css'
 import { theme } from '@config/rainbowkit'
+import { Toaster } from 'react-hot-toast'
+import { toastOptions } from '@config/react-hot-toast'
 
 function MyApp({ Component, pageProps }: AppProps) {
   //@ts-ignore
@@ -28,6 +30,8 @@ function MyApp({ Component, pageProps }: AppProps) {
           </RainbowKitProvider>
         </WagmiConfig>
       </QueryClientProvider>
+      {/* @ts-ignore */}
+      <Toaster position="top-right" toastOptions={toastOptions} />
     </>
   )
 }

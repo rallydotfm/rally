@@ -29,8 +29,6 @@ export const EthereumAddress = (props: EthereumAddressProps) => {
     },
   )
 
-  console.log(queryUserProfileLens)
-
   const queryEns = useEnsName({
     chainId: chain.mainnet.id,
     address: address as `0x${string}`,

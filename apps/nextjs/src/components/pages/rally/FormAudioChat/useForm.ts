@@ -1,4 +1,4 @@
-import { object, string, boolean, array, any } from 'zod'
+import { object, string, boolean, array, any, number } from 'zod'
 import { isPast } from 'date-fns'
 import { useForm as useStoreForm } from '@felte/react'
 import { validator } from '@felte/validator-zod'
@@ -8,7 +8,7 @@ import { useMachine, normalizeProps } from '@zag-js/react'
 export const schema = object({
   rally_name: string().trim().min(1),
   rally_description: string().trim().min(1),
-  rally_description_private: string().optional(),
+  rally_max_attendees: number().positive().optional(),
   rally_image_file: any(),
   rally_image_src: string().optional(),
   rally_start_at: string().refine((value) => value !== '' && !isPast(new Date(value))),

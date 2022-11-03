@@ -13,13 +13,13 @@ export const DialogModal = (props: DialogModalProps) => {
   const { isOpen, setIsOpen, title, children } = props
   return (
     <Dialog open={isOpen} onClose={() => setIsOpen(false)} className="relative z-50">
-      <div className="fixed inset-0 bg-black bg-opacity-50" aria-hidden="true" />
+      <div className="fixed inset-0 bg-black bg-opacity-75" aria-hidden="true" />
 
       <div className="fixed inset-0 flex items-center justify-center 2xs:p-4">
         {/* Container to center the panel */}
         <div className="flex min-h-full w-full items-center justify-center">
           {/* The actual dialog panel  */}
-          <Dialog.Panel className="text-sm mx-auto min-h-screen  max-h-screen overflow-y-auto 2xs:min-h-auto 2xs:max-h-[calc(100vh-60px)] w-full max-w-screen-2xs border px-4 pt-4 pb-6 border-neutral-4 bg-neutral-0 2xs:rounded-lg">
+          <Dialog.Panel className="text-sm mx-auto min-h-screen max-h-screen overflow-y-auto 2xs:min-h-[auto] 2xs:max-h-[calc(100vh-60px)] w-full max-w-screen-2xs border px-4 pt-4 pb-6 border-neutral-4 bg-black 2xs:rounded-lg">
             <Dialog.Title className="sr-only">{title}</Dialog.Title>
             <div className="p-2 relative">
               <button

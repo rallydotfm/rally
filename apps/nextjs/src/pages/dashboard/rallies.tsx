@@ -8,15 +8,23 @@ import Link from 'next/link'
 import button from '@components/Button/styles'
 import { ROUTE_RALLY_UPDATE, ROUTE_RALLY_VIEW } from '@config/routes'
 import { IconSpinner } from '@components/Icons'
-import { STATES_AUDIO_CHATS } from '@helpers/mappingAudioChatState'
+import { DICTIONARY_STATES_AUDIO_CHATS } from '@helpers/mappingAudioChatState'
 import { CalendarIcon } from '@heroicons/react/20/solid'
 import { format, formatRelative } from 'date-fns'
+import { useState } from 'react'
+import toast from 'react-hot-toast'
 
+const SORT_ORDER = {
+  START_CLOSEST: 'start_at.closest',
+  START_FURTHEST: 'start_at.furthest',
+  CREATED_OLDEST: 'start_at.oldest',
+  CREATED_NEWEST: 'start_at.newest',
+}
 const Page: NextPage = () => {
   const { address } = useAccount()
   const { queryAudioChatsByAddressRawData, queriesAudioChatsByAddressMetadata } =
     useGetAudioChatsByWalletAddress(address)
-
+  const [sortOrder, setSortOrder] = useState(SORT_ORDER.START_CLOSEST)
   return (
     <>
       <Head>
@@ -45,6 +53,17 @@ const Page: NextPage = () => {
             <ul className="space-y-8 animate-appear">
               {queriesAudioChatsByAddressMetadata
                 .filter((query) => query?.data?.name)
+                /* @ts-ignore */
+                .sort((a, b) => {
+                  if (sortOrder === SORT_ORDER.START_CLOSEST)
+                    return a.data.epoch_time_start_at > b.data.epoch_time_start_at
+                  if (sortOrder === SORT_ORDER.START_FURTHEST)
+                    return a.data.epoch_time_start_at < b.data.epoch_time_start_at
+                  if (sortOrder === SORT_ORDER.CREATED_NEWEST)
+                    return a.data.epoch_time_created_at > b.data.epoch_time_created_at
+                  if (sortOrder === SORT_ORDER.CREATED_OLDEST)
+                    return a.data.epoch_time_created_at < b.data.epoch_time_created_at
+                })
                 .map((audioChat) => {
                   return (
                     <li
@@ -71,12 +90,13 @@ const Page: NextPage = () => {
                           <div className="px-4 flex-grow flex flex-col xs:px-0">
                             {' '}
                             <h1 className="font-bold">{audioChat.data.name}</h1>
-                            {audioChat.data.state !== STATES_AUDIO_CHATS.CANCELLED ? (
+                            {audioChat.data.state !== DICTIONARY_STATES_AUDIO_CHATS.CANCELLED.value ? (
                               <>
                                 <p className="mt-2 font-medium flex items-start text-neutral-12 text-xs">
                                   <CalendarIcon className="translate-y-1 opacity-90 shrink-0 w-5 mie-2" />
                                   {formatRelative(audioChat.data.datetime_start_at, new Date())}
-                                  <span>&nbsp;({format(audioChat.data.datetime_start_at, 'OOOO')})</span>
+                                  <br />
+                                  <span>&nbsp;({format(audioChat.data.datetime_start_at, 'ppp')})</span>
                                 </p>
                               </>
                             ) : (

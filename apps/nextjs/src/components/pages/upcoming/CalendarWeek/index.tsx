@@ -1,10 +1,10 @@
 import { useState } from 'react'
 import { Tab } from '@headlessui/react'
-import { eachDayOfInterval, endOfWeek, format, formatRelative, getDay, startOfWeek } from 'date-fns'
-import { STATES_AUDIO_CHATS } from '@helpers/mappingAudioChatState'
-import { CalendarIcon } from '@heroicons/react/20/solid'
+import { eachDayOfInterval, endOfWeek, format, getDay, isPast, startOfWeek } from 'date-fns'
+import { ROUTE_RALLY_VIEW } from '@config/routes'
+import Link from 'next/link'
 
-export default function CalendarWeek(props) {
+export default function CalendarWeek(props: any) {
   const [weekDay] = useState(
     eachDayOfInterval({
       start: startOfWeek(new Date()),
@@ -39,35 +39,49 @@ export default function CalendarWeek(props) {
             <Tab.Panel key={`panel-${tab.day}`}>
               <ul className="space-y-4 divide-y divide-neutral-4">
                 {events
-                  .filter((event) => {
+                  .filter((event: any) => {
                     return getDay(event.data.datetime_start_at) === getDay(tab.date)
                   })
-                  .map((audioChat, i) => (
-                    <li className="animate-appear" key={`panel-${audioChat.cid}`}>
-                      <span className="font-bold block mb-2">{format(audioChat.data.datetime_start_at, 'HH:mm')}</span>
-                      <article className="flex flex-col space-y-4 xs:flex-row xs:space-y-0 xs:space-i-6">
-                        <div className="relative w-full overflow-hidden xs:w-20 sm:w-32 aspect-twitter-card rounded-t-md xs:rounded-b-md">
-                          <div className="bg-neutral-5 absolute w-full h-full inset-0 animate-pulse" />
-                          <img
-                            alt=""
-                            loading="lazy"
-                            width="128px"
-                            height="86px"
-                            src={`https://ipfs.io/ipfs/${audioChat.data.image}`}
-                            className="relative z-10 block w-full h-full object-cover "
-                          />
-                        </div>
+                  .map((audioChat: any, i: number) => {
+                    return (
+                      <li
+                        className={`${
+                          isPast(audioChat.data.datetime_start_at) ? 'opacity-50' : ''
+                        } animate-appear relative`}
+                        key={`panel-${audioChat.cid}`}
+                      >
+                        <span className="font-bold block mb-2">
+                          {format(audioChat.data.datetime_start_at, 'HH:mm')}
+                        </span>
+                        <article className="flex flex-col space-y-4 xs:flex-row xs:space-y-0 xs:space-i-6">
+                          <div className="relative w-full overflow-hidden xs:w-20 sm:w-32 aspect-twitter-card rounded-t-md xs:rounded-b-md">
+                            <div className="bg-neutral-5 absolute w-full h-full inset-0 animate-pulse" />
+                            <img
+                              alt=""
+                              loading="lazy"
+                              width="128px"
+                              height="86px"
+                              src={`https://ipfs.io/ipfs/${audioChat.data.image}`}
+                              className="relative z-10 block w-full h-full object-cover "
+                            />
+                          </div>
 
-                        <div className="px-4 flex-grow flex flex-col xs:px-0">
-                          <h1 className="font-bold">{audioChat.data.name}</h1>
-                          <p className="text-neutral-12 uppercase font-bold tracking-wide text-2xs mt-2">
-                            {audioChat.data.is_private ? 'Gated access' : 'Free access'}
-                          </p>
-                          <p className="text-neutral-11 text-2xs mt-2">{audioChat.data.cohosts_list.length} cohosts</p>
-                        </div>
-                      </article>
-                    </li>
-                  ))}
+                          <div className="px-4 flex-grow flex flex-col xs:px-0">
+                            <h1 className="font-bold">{audioChat.data.name}</h1>
+                            <p className="text-neutral-12 uppercase font-bold tracking-wide text-2xs mt-2">
+                              {audioChat.data.is_private ? 'Gated access' : 'Free access'}
+                            </p>
+                            <p className="text-neutral-11 text-2xs mt-2">
+                              {audioChat.data.cohosts_list.length} cohosts
+                            </p>
+                          </div>
+                        </article>
+                        <Link href={ROUTE_RALLY_VIEW.replace('[idRally]', audioChat.data.id)}>
+                          <a className="absolute z-10 opacity-0 inset-0 w-full h-full">View rally page</a>
+                        </Link>
+                      </li>
+                    )
+                  })}
               </ul>
             </Tab.Panel>
           ))}

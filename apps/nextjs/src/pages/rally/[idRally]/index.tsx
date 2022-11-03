@@ -9,7 +9,7 @@ import button from '@components/Button/styles'
 import { ArrowLeftIcon } from '@heroicons/react/20/solid'
 import Button from '@components/Button'
 import { useAccount } from 'wagmi'
-import { STATES_AUDIO_CHATS } from '@helpers/mappingAudioChatState'
+import { DICTIONARY_STATES_AUDIO_CHATS } from '@helpers/mappingAudioChatState'
 import CountdownOpening from '@components/pages/rally/CountdownOpening'
 import { isFuture } from 'date-fns'
 
@@ -58,12 +58,14 @@ const Page: NextPage = () => {
             </div>
           )}
           {address === queryAudioChatMetadata?.data?.creator &&
-            [STATES_AUDIO_CHATS.PENDING, STATES_AUDIO_CHATS.PLANNED].includes(queryAudioChatMetadata.data?.state) && (
+            [DICTIONARY_STATES_AUDIO_CHATS.READY.value, DICTIONARY_STATES_AUDIO_CHATS.PLANNED.value].includes(
+              queryAudioChatMetadata.data?.state,
+            ) && (
               <div className="animate-appear mt-5 flex justify-center">
                 <Button>Start live</Button>
               </div>
             )}
-          {queryAudioChatMetadata?.data?.state === STATES_AUDIO_CHATS.LIVE && (
+          {queryAudioChatMetadata?.data?.state === DICTIONARY_STATES_AUDIO_CHATS.LIVE.value && (
             <div className="flex flex-col items-center animate-appear mt-8 justify-center">
               <Button>Join live</Button>
               <p className="text-neutral-11 pt-5 text-2xs">Your mic will be muted when you join.</p>

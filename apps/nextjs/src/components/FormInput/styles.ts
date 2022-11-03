@@ -19,7 +19,7 @@ export const input = cva(
       },
       scale: {
         default: ['px-3 py-1.5 text-sm', 'border'],
-        sm: ['px-3 py-0.5 text-sm', 'border'],
+        sm: ['px-3 py-0.5 text-xs', 'border'],
         md: ['px-4 py-1.5 text-md', 'border'],
       },
       appearance: {

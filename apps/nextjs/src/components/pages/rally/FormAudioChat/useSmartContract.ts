@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import { getUnixTime } from 'date-fns'
 import { useMutation } from '@tanstack/react-query'
 import { makeStorageClient } from '@config/web3storage'
@@ -6,10 +5,39 @@ import { CONTRACT_AUDIO_CHATS } from '@config/contracts'
 import { useContractWrite, useAccount, useWaitForTransaction, useNetwork } from 'wagmi'
 import { audioChatABI } from '@rally/abi'
 import { utils } from 'ethers'
+import create from 'zustand'
+import toast from 'react-hot-toast'
 
-export function useSmartContract() {
-  const [fileRallyCID, setFileRallyCID] = useState()
-  const [imageRallyCID, setImageRallyCID] = useState()
+export interface TxUi {
+  isDialogVisible: boolean
+  rallyId: string | undefined
+  fileRallyCID: string | undefined
+  imageRallyCID: string | undefined
+  setDialogVisibility: (visibility: boolean) => void
+  setRallyId: (newId?: string) => void
+  setFileRallyCID: (newFileCid?: string) => void
+  setImageRallyCID: (newImageCid?: string) => void
+  resetState: () => void
+}
+export const useStoreTxUi = create<TxUi>((set) => ({
+  setDialogVisibility: (visibility: boolean) => set(() => ({ isDialogVisible: visibility })),
+  setRallyId: (newId?: string) => set(() => ({ rallyId: newId })),
+  setFileRallyCID: (cid?: string) => set(() => ({ fileRallyCID: cid })),
+  setImageRallyCID: (cid?: string) => set(() => ({ imageRallyCID: cid })),
+  resetState: () =>
+    set(() => ({
+      isDialogVisible: false,
+      rallyId: undefined,
+      fileRallyCID: undefined,
+      imageRallyCID: undefined,
+    })),
+  isDialogVisible: false,
+  rallyId: undefined,
+  fileRallyCID: undefined,
+  imageRallyCID: undefined,
+}))
+
+export function useSmartContract(stateTxUi: TxUi) {
   const account = useAccount()
   const { chain } = useNetwork()
 
@@ -27,15 +55,17 @@ export function useSmartContract() {
     hash: contractWriteNewAudioChat?.data?.hash,
     chainId: chain?.id,
     onError(e) {
-      console.error('Something went wrong :( ', e)
+      console.error(e)
+      toast.error(e?.message)
     },
     onSuccess(data) {
       const iface = new utils.Interface(audioChatABI)
       const log = data.logs
+      toast.success('Your rally was created successfully !')
       //@ts-ignore
-      console.log('Created !', iface.parseLog(log[0]))
-      //@ts-ignore
-      console.log('Created !', iface.parseLog(log[1]))
+      stateTxUi.setRallyId(iface.parseLog(log[0]).args.audio_event_id)
+      stateTxUi.setFileRallyCID()
+      stateTxUi.setImageRallyCID()
     },
   })
 
@@ -48,10 +78,12 @@ export function useSmartContract() {
       //@ts-ignore
       const cid = await client.put([file])
       //@ts-ignore
-      setImageRallyCID(cid)
+      stateTxUi.setImageRallyCID(cid)
       return cid
     } catch (e) {
       console.error(e)
+      //@ts-ignore
+      toast.error(e?.message ?? e)
     }
   })
 
@@ -64,9 +96,13 @@ export function useSmartContract() {
       //@ts-ignore
       const cid = await client.put([file])
       //@ts-ignore
-      setFileRallyCID(cid)
+      stateTxUi.setFileRallyCID(cid)
       return cid
-    } catch (e) {}
+    } catch (e) {
+      console.error(e)
+      //@ts-ignore
+      toast.error(e?.message ?? e)
+    }
   })
 
   /**
@@ -75,26 +111,32 @@ export function useSmartContract() {
    */
   async function prepareRallyData(values: any) {
     try {
-      if (!imageRallyCID) {
-        await mutationUploadImageFile.mutateAsync(values?.rally_image_file)
-      }
+      let image = stateTxUi.imageRallyCID
+      let metadata = stateTxUi.fileRallyCID
 
-      if (!fileRallyCID) {
+      if (!stateTxUi.imageRallyCID?.length) {
+        image = await mutationUploadImageFile.mutateAsync(values?.rally_image_file)
+        stateTxUi.setImageRallyCID(image)
+      }
+      if (!stateTxUi.fileRallyCID?.length) {
         // upload image file (if it exists) to IPFS
         // create JSON file with form values + uploaded image URL
         const rallyData = {
           name: values.rally_name,
           description: values.rally_description,
           tags: values.rally_tags,
-          image: `${imageRallyCID}/${values.rally_image_file.name}`,
+          image: `${image}/${values.rally_image_file.name}`,
           has_cohosts: values.rally_has_cohosts,
-          cohosts_list: values.rally_cohosts ?? [],
+          cohosts_list: values.rally_cohosts.map((cohost: any) => cohost.eth_address) ?? [],
           will_be_recorded: values.rally_is_recorded,
           is_private: values.rally_is_private,
+          max_attendees: values.rally_max_attendees,
           access_control: {
             guilds: values.rally_access_control_guilds,
-            blacklist: values.rally_access_control_blacklist,
-            whitelist: [...values.rally_access_control_whitelist, ...values.rally_cohosts],
+            whitelist: [
+              ...values.rally_access_control_whitelist,
+              ...values.rally_cohosts.map((cohost: any) => cohost.eth_address),
+            ],
           },
         }
         const rallyDataJSON = new File([JSON.stringify(rallyData)], 'data.json', {
@@ -102,27 +144,31 @@ export function useSmartContract() {
         })
         // upload JSON file to IPFS
         //@ts-ignore
-        const cidMetadata = await mutationUploadJsonFile.mutateAsync(rallyDataJSON)
-
-        return [
-          /*
-            eventTimestamp : Datetime at which the rally will start,
-            createdAt: Current datetime,
-            cid_metadata: CID
-            creator: Current user wallet address
-          */
-          getUnixTime(new Date(values.rally_start_at)),
-          getUnixTime(new Date()),
-          cidMetadata,
-          account?.address,
-        ]
+        metadata = await mutationUploadJsonFile.mutateAsync(rallyDataJSON)
+        stateTxUi.setFileRallyCID(metadata)
       }
+
+      return [
+        /*
+          eventTimestamp : Datetime at which the rally will start,
+          createdAt: Current datetime,
+          cid_metadata: CID
+          creator: Current user wallet address
+        */
+        getUnixTime(new Date(values.rally_start_at)),
+        getUnixTime(new Date()),
+        metadata,
+        account?.address,
+      ]
     } catch (e) {
       console.error(e)
+      //@ts-ignore
+      toast.error(e?.message ?? e)
     }
   }
 
   async function onSubmitNewAudioChat(values: any) {
+    stateTxUi.setDialogVisibility(true)
     try {
       const args = await prepareRallyData(values)
       await contractWriteNewAudioChat?.writeAsync?.({
@@ -137,6 +183,7 @@ export function useSmartContract() {
   return {
     onSubmitNewAudioChat,
     stateNewAudioChat: {
+      contract: contractWriteNewAudioChat,
       transaction: txCreateAudioChat,
       uploadImage: mutationUploadImageFile,
       uploadData: mutationUploadJsonFile,

@@ -35,7 +35,7 @@ const Label = (props: FormLabelProps) => {
 const Description = (props: PProps) => {
   const { children, ...rest } = props
   return (
-    <p className="text-2xs pb-1.5 text-neutral-12" {...rest}>
+    <p className="text-[0.85em] pb-1.5 text-neutral-12" {...rest}>
       {children}
     </p>
   )
