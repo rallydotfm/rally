@@ -1,4 +1,4 @@
-import FormAudioChat from '../FormAudioChat'
+import FormAudioChat from '../../FormAudioChat'
 import { useSmartContract, useStoreTxUi } from '@components/pages/rally/FormAudioChat/useSmartContract'
 import useForm from '@components/pages/rally/FormAudioChat/useForm'
 import { useUnmountEffect } from '@react-hookz/web'
@@ -23,7 +23,7 @@ export const FormUpdateAudioChat = (props: any) => {
       rally_has_cohosts: values.has_cohosts,
       rally_is_recorded: values.will_be_recorded,
       rally_tags: values.tags,
-      rally_cohosts: [],
+      rally_cohosts: values.cohosts_list,
       rally_name: values.name,
       rally_description: values.description,
       rally_start_at: values.datetime_start_at.toISOString().substring(0, 16),
@@ -33,8 +33,7 @@ export const FormUpdateAudioChat = (props: any) => {
           guild_id: guild.guild_id,
           roles: guild.roles.map((role: any) => role),
         })) ?? [],
-      rally_access_control_blacklist: [],
-      rally_access_control_whitelist: [],
+      rally_access_control_whitelist: values.access_control.whitelist,
     },
   })
   useEffect(() => {

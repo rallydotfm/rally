@@ -71,6 +71,20 @@ const Page: NextPage = () => {
               Uploading image to IPFS
             </span>
           </li>
+          {formAudioChat.data()?.rally_has_cohosts === true && (
+            <li
+              className={`
+              flex items-center
+             ${stateNewAudioChat.uploadData.isIdle ? 'text-neutral-11' : 'text-white'}`}
+            >
+              {stateNewAudioChat.signEncryption.isSuccess && <CheckCircleIcon className="w-5 text-positive-11" />}
+              {stateNewAudioChat.signEncryption.isError && <ExclamationTriangleIcon className="w-5 text-negative-10" />}
+              {stateNewAudioChat.signEncryption.isLoading && <IconSpinner className="animate-spin" />}
+              <span className={`pis-1ex ${stateNewAudioChat.signEncryption.isLoading ? 'animate-pulse' : ''}`}>
+                Confirming co-hosts Etheurem address encryption
+              </span>
+            </li>
+          )}
           <li
             className={`
             flex items-center
@@ -109,6 +123,7 @@ const Page: NextPage = () => {
           </li>
         </ol>
         {[
+          stateNewAudioChat.signEncryption,
           stateNewAudioChat.transaction,
           stateNewAudioChat.contract,
           stateNewAudioChat.uploadImage,
@@ -116,6 +131,7 @@ const Page: NextPage = () => {
         ].filter((slice) => slice.isError)?.length > 0 && (
           <div className="mt-6 animate-appear">
             {[
+              stateNewAudioChat.signEncryption,
               stateNewAudioChat.transaction,
               stateNewAudioChat.contract,
               stateNewAudioChat.uploadImage,

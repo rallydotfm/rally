@@ -27,6 +27,7 @@ importers:
       '@headlessui/tailwindcss': ^0.1.1
       '@heroicons/react': ^2.0.12
       '@lit-protocol/sdk-browser': ^1.1.228
+      '@livekit/react-core': ^1.0.3
       '@radix-ui/colors': ^0.1.8
       '@rainbow-me/rainbowkit': ^0.7.3
       '@rally/abi': '*'
@@ -57,6 +58,9 @@ importers:
       ethers: ^5.7.2
       graphql: ^16.6.0
       js-cookie: ^3.0.1
+      lit-js-sdk: ^1.1.234
+      livekit-client: ^1.5.0
+      livekit-server-sdk: ^1.0.3
       next: 12.3.1
       next-transpile-modules: ^9.1.0
       postcss: ^8.4.18
@@ -64,6 +68,7 @@ importers:
       react-dom: 18.2.0
       react-hot-toast: ^2.4.0
       react-html-props: ^1.0.33
+      siwe: ^1.1.6
       tailwindcss: ^3.2.1
       tailwindcss-logical: ^3.0.0
       typescript: ^4.8.4
@@ -80,6 +85,7 @@ importers:
       '@headlessui/react': 1.7.3_biqbaboplfbrettd7655fr4n2y
       '@heroicons/react': 2.0.12_react@18.2.0
       '@lit-protocol/sdk-browser': 1.1.228
+      '@livekit/react-core': 1.0.3_bqfvdwtidjrzf3bijhs4prqa6i
       '@rainbow-me/rainbowkit': 0.7.3_cb4fkzaxwbg4l5jffcmcvy6tvq
       '@rally/abi': link:../../packages/abi
       '@rally/api': link:../../packages/api
@@ -99,11 +105,15 @@ importers:
       ethers: 5.7.2
       graphql: 16.6.0
       js-cookie: 3.0.1
+      lit-js-sdk: 1.1.234
+      livekit-client: 1.5.0
+      livekit-server-sdk: 1.0.3
       next: 12.3.1_biqbaboplfbrettd7655fr4n2y
       react: 18.2.0
       react-dom: 18.2.0_react@18.2.0
       react-hot-toast: 2.4.0_biqbaboplfbrettd7655fr4n2y
       react-html-props: 1.0.33_react@18.2.0
+      siwe: 1.1.6_ethers@5.7.2
       urql: 3.0.3_onqnqwb3ubg5opvemcqf7c2qhy
       wagmi: 0.7.5_ir5rj4sfbt34e63yhlgyn6mx7a
       web3.storage: 4.4.0_a2bzktwtwlvfrskzzpbzbwea4y
@@ -1996,6 +2006,19 @@ packages:
       - encoding
     dev: false
 
+  /@livekit/react-core/1.0.3_bqfvdwtidjrzf3bijhs4prqa6i:
+    resolution: {integrity: sha512-hpQmU02EsanCIBRq7fsIfoZHtjOMUEhGcP0QclB4ke3XDfhZPXL2uqfdVLz8CWUpEN04Aygt3kM1olbXsyr8fg==}
+    engines: {node: '>=10'}
+    peerDependencies:
+      livekit-client: ^1.3.2
+      react: '>=15'
+      react-dom: '>=15'
+    dependencies:
+      livekit-client: 1.5.0
+      react: 18.2.0
+      react-dom: 18.2.0_react@18.2.0
+    dev: false
+
   /@manypkg/cli/0.19.2:
     resolution: {integrity: sha512-DXx/P1lyunNoFWwOj1MWBucUhaIJljoiAGOpO2fE0GKMBCI6EZBZD0Up1+fQZoXBecKXRgV9mGgLvIB2fOQ0KQ==}
     hasBin: true
@@ -3095,6 +3118,24 @@ packages:
     resolution: {integrity: sha512-4BwqyWy6KpSvkocSaV7WR3BlZfrxLbJSLkg+j7Gl6pTDE+U55lLhJvQaMuDVazXYxcjBsG09k7UlH7cGiUI5vQ==}
     dev: false
 
+  /@walletconnect/ethereum-provider/1.7.8_3cxu5zja4e2r5wmvge7mdcljwq:
+    resolution: {integrity: sha512-dnl560zFMdK/LD4MD2XwHbWj7RXOaeXWPc9jzDaosLQLAXfA5mKe4XbCFFUPbVMYuyBdRI9NZv3Ci/qDb5wncQ==}
+    dependencies:
+      '@walletconnect/client': 1.8.0_3cxu5zja4e2r5wmvge7mdcljwq
+      '@walletconnect/jsonrpc-http-connection': 1.0.3
+      '@walletconnect/jsonrpc-provider': 1.0.5
+      '@walletconnect/signer-connection': 1.8.0_3cxu5zja4e2r5wmvge7mdcljwq
+      '@walletconnect/types': 1.8.0
+      '@walletconnect/utils': 1.8.0
+      eip1193-provider: 1.0.1_3cxu5zja4e2r5wmvge7mdcljwq
+      eventemitter3: 4.0.7
+    transitivePeerDependencies:
+      - bufferutil
+      - debug
+      - encoding
+      - utf-8-validate
+    dev: false
+
   /@walletconnect/ethereum-provider/1.8.0:
     resolution: {integrity: sha512-Nq9m+oo5P0F+njsROHw9KMWdoc/8iGHYzQdkjJN/1C7DtsqFRg5k5a3hd9rzCLpbPsOC1q8Z5lRs6JQgDvPm6Q==}
     dependencies:
@@ -3675,6 +3716,10 @@ packages:
     resolution: {integrity: sha512-Z7tMw1ytTXt5jqMcOP+OQteU1VuNK9Y02uuJtKQ1Sv69jXQKKg5cibLwGJow8yzZP+eAc18EmLGPal0bp36rvQ==}
     engines: {node: '>=8'}
 
+  /async-await-queue/1.2.1:
+    resolution: {integrity: sha512-v2j+/EMzAnuJZ8I4570KJMFhi6G9g3WZyFh6cPnmQSJh3nLao77XpRt01kyFegQazPSKvue1yaIYDp/NfV/b0g==}
+    dev: false
+
   /async-mutex/0.2.6:
     resolution: {integrity: sha512-Hs4R+4SPgamu6rSGW8C7cV9gaWUKEHykfzCCvIRuaVv636Ju10ZdeUbvb4TBEW0INuq2DHZqXbK4Nd3yG4RaRw==}
     dependencies:
@@ -4093,9 +4138,24 @@ packages:
       quick-lru: 4.0.1
     dev: false
 
+  /camelcase-keys/7.0.2:
+    resolution: {integrity: sha512-Rjs1H+A9R+Ig+4E/9oyB66UC5Mj9Xq3N//vcLf2WzgdTi/3gUu3Z9KoqmlrEG4VuuLK8wJHofxzdQXz/knhiYg==}
+    engines: {node: '>=12'}
+    dependencies:
+      camelcase: 6.3.0
+      map-obj: 4.3.0
+      quick-lru: 5.1.1
+      type-fest: 1.4.0
+    dev: false
+
   /camelcase/5.3.1:
     resolution: {integrity: sha512-L28STB170nwWS63UjtlEOE3dldQApaJXZkOI1uMFfzf3rRuPegHaHesyee+YxQ+W6SvRDQV6UrdOdRiR153wJg==}
     engines: {node: '>=6'}
+
+  /camelcase/6.3.0:
+    resolution: {integrity: sha512-Gmy6FhYlCY7uOElZUSbxo2UCDH8owEk996gkbrpsgGtrJLM3J7jGxl9Ic7Qwwj4ivOE5AWZWRMecDdF7hqGjFA==}
+    engines: {node: '>=10'}
+    dev: false
 
   /caniuse-lite/1.0.30001414:
     resolution: {integrity: sha512-t55jfSaWjCdocnFdKQoO+d2ct9C59UZg4dY3OnUlSZ447r8pUtIKdp0hpAzrGFultmTC+Us+KpKi4GZl/LXlFg==}
@@ -7054,6 +7114,34 @@ packages:
       micromodal: 0.4.10
     dev: false
 
+  /lit-js-sdk/1.1.234:
+    resolution: {integrity: sha512-jriua+Igavu5kbGYxMuUxmNrd4TfMXGNoG3hNoBA0+FyTYvYo9assYegWkP8w8vTW2FGC5qJDhNvFf0pOAfgWQ==}
+    dependencies:
+      '@ethersproject/bytes': 5.7.0
+      '@ethersproject/contracts': 5.7.0
+      '@ethersproject/hash': 5.7.0
+      '@ethersproject/providers': 5.7.2_3cxu5zja4e2r5wmvge7mdcljwq
+      '@ethersproject/strings': 5.7.0
+      '@ethersproject/units': 5.7.0
+      '@ethersproject/wallet': 5.7.0
+      '@walletconnect/ethereum-provider': 1.7.8_3cxu5zja4e2r5wmvge7mdcljwq
+      buffer: 6.0.3
+      bufferutil: 4.0.7
+      cross-blob: 3.0.2
+      jszip: 3.10.1
+      lit-connect-modal: 0.1.10
+      lit-siwe: 1.1.8_vs2eitok36dr26fji5ujfsmafm
+      node-fetch: 3.2.10
+      pako: 2.0.4
+      tslib: 2.4.0
+      tweetnacl: 1.0.3
+      tweetnacl-util: 0.15.1
+      utf-8-validate: 5.0.10
+    transitivePeerDependencies:
+      - debug
+      - encoding
+    dev: false
+
   /lit-siwe/1.1.8_vs2eitok36dr26fji5ujfsmafm:
     resolution: {integrity: sha512-gXI8GG0GAClw6G7T9p4p6Kn9ywDo8j2d90ShaYArJdsqqO9gwXfzxF84SMeY+bpsNqqQ3FahrhEwTCHd6w7wNw==}
     peerDependencies:
@@ -7069,6 +7157,31 @@ packages:
       '@spruceid/siwe-parser': 1.1.3
       '@stablelib/random': 1.0.2
       apg-js: 4.1.2
+    dev: false
+
+  /livekit-client/1.5.0:
+    resolution: {integrity: sha512-D87jSRLpP2NDqRz1GcgMBPE/vWYPtrIrox+9g+/A1sAe7vtK8CWp/HTMvm2oJ5MHnajaSrxMwUIRED7yZ049pg==}
+    dependencies:
+      async-await-queue: 1.2.1
+      events: 3.3.0
+      loglevel: 1.8.0
+      protobufjs: 7.1.2
+      sdp-transform: 2.14.1
+      ts-debounce: 4.0.0
+      typed-emitter: 2.1.0
+      ua-parser-js: 1.0.32
+      webrtc-adapter: 8.2.0
+    dev: false
+
+  /livekit-server-sdk/1.0.3:
+    resolution: {integrity: sha512-zZsAUnwv9ahArwaeCAH3Kzybk/UTk4WqrKYzarEMbVYGPUX0GFp/yC0HLcdF0MJ5hvJtcFgslrNTU7tWdGpBFw==}
+    dependencies:
+      axios: 0.21.4
+      camelcase-keys: 7.0.2
+      jsonwebtoken: 8.5.1
+      protobufjs: 6.11.3
+    transitivePeerDependencies:
+      - debug
     dev: false
 
   /load-json-file/5.3.0:
@@ -7159,8 +7272,17 @@ packages:
       wrap-ansi: 6.2.0
     dev: true
 
+  /loglevel/1.8.0:
+    resolution: {integrity: sha512-G6A/nJLRgWOuuwdNuA6koovfEV1YpqqAG4pRUlFaz3jj2QNZ8M4vBqnVA+HBTmU/AMNUtlOsMmSpF6NyOjztbA==}
+    engines: {node: '>= 0.6.0'}
+    dev: false
+
   /long/4.0.0:
     resolution: {integrity: sha512-XsP+KhQif4bjX1kbuSiySJFNAehNxgLb6hPRGJ9QsUr8ajHkuXGdrHmFUTUUXhDwVX2R5bY4JNZEwbUiMhV+MA==}
+    dev: false
+
+  /long/5.2.1:
+    resolution: {integrity: sha512-GKSNGeNAtw8IryjjkhZxuKB3JzlcLTwjtiQCHKvqQet81I93kXslhDQruGI/QsddO83mcDToBVy7GqGS/zYf/A==}
     dev: false
 
   /loose-envify/1.4.0:
@@ -8112,6 +8234,25 @@ packages:
       long: 4.0.0
     dev: false
 
+  /protobufjs/7.1.2:
+    resolution: {integrity: sha512-4ZPTPkXCdel3+L81yw3dG6+Kq3umdWKh7Dc7GW/CpNk4SX3hK58iPCWeCyhVTDrbkNeKrYNZ7EojM5WDaEWTLQ==}
+    engines: {node: '>=12.0.0'}
+    requiresBuild: true
+    dependencies:
+      '@protobufjs/aspromise': 1.1.2
+      '@protobufjs/base64': 1.1.2
+      '@protobufjs/codegen': 2.0.4
+      '@protobufjs/eventemitter': 1.1.0
+      '@protobufjs/fetch': 1.1.0
+      '@protobufjs/float': 1.0.2
+      '@protobufjs/inquire': 1.1.0
+      '@protobufjs/path': 1.1.2
+      '@protobufjs/pool': 1.1.0
+      '@protobufjs/utf8': 1.1.0
+      '@types/node': 18.11.4
+      long: 5.2.1
+    dev: false
+
   /proxy-compare/2.3.0:
     resolution: {integrity: sha512-c3L2CcAi7f7pvlD0D7xsF+2CQIW8C3HaYx2Pfgq8eA4HAl3GAH6/dVYsyBbYF/0XJs2ziGLrzmz5fmzPm6A0pQ==}
     dev: false
@@ -8194,7 +8335,6 @@ packages:
   /quick-lru/5.1.1:
     resolution: {integrity: sha512-WuyALRjWPDGtt/wzJiadO5AXY+8hZ80hVpe6MyivgraREW751X3SbhRvG3eLKOYN+8VEvqLcf3wdnt44Z4S4SA==}
     engines: {node: '>=10'}
-    dev: true
 
   /rabin-wasm/0.1.5:
     resolution: {integrity: sha512-uWgQTo7pim1Rnj5TuWcCewRDTf0PEFTSlaUjWP4eY9EbLV9em08v89oCz/WO+wRxpYuO36XEHp4wgYQnAgOHzA==}
@@ -8614,7 +8754,6 @@ packages:
     resolution: {integrity: sha512-z9MzKh/UcOqB3i20H6rtrlaE/CgjLOvheWK/9ILrbhROGTweAi1BaFsTT9FbwZi5Trr1qNRs+MXkhmR06awzQA==}
     dependencies:
       tslib: 2.4.0
-    dev: true
 
   /safari-14-idb-fix/3.0.0:
     resolution: {integrity: sha512-eBNFLob4PMq8JA1dGyFn6G97q3/WzNtFK4RnzT1fnLq+9RyrGknzYiM/9B12MnKAxuj1IXr7UKYtTNtjyKMBog==}
@@ -8762,6 +8901,17 @@ packages:
   /signedsource/1.0.0:
     resolution: {integrity: sha512-6+eerH9fEnNmi/hyM1DXcRK3pWdoMQtlkQ+ns0ntzunjKqp5i3sKCc80ym8Fib3iaYhdJUOPdhlJWj1tvge2Ww==}
     dev: true
+
+  /siwe/1.1.6_ethers@5.7.2:
+    resolution: {integrity: sha512-3WRdEil32Tc2vuNzqJ2/Z/MIvsvy0Nkzc2ov+QujmpHO7tM83dgcb47z0Pu236T4JQkOQCqQkq3AJ/rVIezniA==}
+    peerDependencies:
+      ethers: 5.5.1
+    dependencies:
+      '@spruceid/siwe-parser': 1.1.3
+      '@stablelib/random': 1.0.2
+      apg-js: 4.1.2
+      ethers: 5.7.2
+    dev: false
 
   /slash/3.0.0:
     resolution: {integrity: sha512-g9Q1haeby36OSStwb4ntCGGGaKsaVSjQ68fBxoQcutl5fS1vuY18H3wSt3jFyFtrkx+Kz0V1G85A4MyAdDMi2Q==}
@@ -9192,6 +9342,10 @@ packages:
     engines: {node: '>=8'}
     dev: false
 
+  /ts-debounce/4.0.0:
+    resolution: {integrity: sha512-+1iDGY6NmOGidq7i7xZGA4cm8DAa6fqdYcvO5Z6yBevH++Bdo9Qt/mN0TzHUgcCcKv1gmh9+W5dHqz8pMWbCbg==}
+    dev: false
+
   /ts-log/2.2.5:
     resolution: {integrity: sha512-PGcnJoTBnVGy6yYNFxWVNkdcAuAMstvutN9MgDJIV6L0oG8fB+ZNNy1T+wJzah8RPGor1mZuPQkVfXNDpy9eHA==}
     dev: true
@@ -9380,6 +9534,17 @@ packages:
   /type-fest/0.8.1:
     resolution: {integrity: sha512-4dbzIzqvjtgiM5rw1k5rEHtBANKmdudhGyBEajN01fEyhaAIhsoKNy6y7+IN93IfpFtwY9iqi7kD+xwKhQsNJA==}
     engines: {node: '>=8'}
+    dev: false
+
+  /type-fest/1.4.0:
+    resolution: {integrity: sha512-yGSza74xk0UG8k+pLh5oeoYirvIiWo5t0/o3zHHAO2tRDiZcxWP7fywNlXhqb6/r6sWvwi+RsyQMWhVLe4BVuA==}
+    engines: {node: '>=10'}
+    dev: false
+
+  /typed-emitter/2.1.0:
+    resolution: {integrity: sha512-g/KzbYKbH5C2vPkaXGu8DJlHrGKHLsM25Zg9WuC9pMGfuvT+X25tZQWo5fK1BjBm8+UrVE9LDCvaY0CQk+fXDA==}
+    optionalDependencies:
+      rxjs: 7.5.7
     dev: false
 
   /typedarray-to-buffer/3.1.5:

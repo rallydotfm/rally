@@ -1,11 +1,11 @@
 import type { NextPage } from 'next'
 import Head from 'next/head'
-import useGetAudioChatById from '@hooks/useGetAudioChatById'
 import { IconSpinner } from '@components/Icons'
 import Notice from '@components/Notice'
-import FormUpdateAudioChat from '@components/pages/rally/FormUpdateAudioChat'
+import FormUpdateAudioChat from '@components/pages/rally/update/FormUpdateAudioChat'
 import { useRouter } from 'next/router'
 import { useAccount } from 'wagmi'
+import useGetAudioChatToUpdate from '@components/pages/rally/update/useGetAudioChatToUpdate'
 
 const Page: NextPage = () => {
   const { address } = useAccount()
@@ -14,7 +14,9 @@ const Page: NextPage = () => {
     isReady,
   } = useRouter()
   //@ts-ignore
-  const { queryAudioChatByIdRawData, queryAudioChatMetadata } = useGetAudioChatById(idRally)
+  const { queryAudioChatByIdRawData, queryAudioChatMetadata, queryDecryptCohostsAddress } =
+    //@ts-ignore
+    useGetAudioChatToUpdate(idRally)
 
   return (
     <>
@@ -39,11 +41,12 @@ const Page: NextPage = () => {
               </>
             ) : (
               <>
-                {queryAudioChatMetadata.isSuccess && (
+                {queryAudioChatMetadata.isSuccess && queryDecryptCohostsAddress?.isSuccess && (
                   <FormUpdateAudioChat
                     //@ts-ignore
                     values={{
                       ...queryAudioChatMetadata.data,
+                      cohosts_list: queryDecryptCohostsAddress.data,
                     }}
                   />
                 )}

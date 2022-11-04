@@ -28,8 +28,6 @@ export const schema = object({
       roles: array(string()),
     }),
   ).optional(),
-  rally_access_control_blacklist: array(string().regex(/^0x[a-fA-F0-9]{40}$/)).optional(),
-  rally_access_control_whitelist: array(string().regex(/^0x[a-fA-F0-9]{40}$/)).optional(),
 })
 
 export function useForm(config: { initialValues: any; onSubmit: any }) {

@@ -67,6 +67,7 @@ export const FormAudioChat = (props: FormAudioChatProps) => {
                 </FormField.Description>
                 <FormTextarea
                   required
+                  rows={10}
                   hasError={errors()?.rally_description ? true : false}
                   placeholder="Eg: Community discussion about the future of Rally. Members only !"
                   name="rally_description"
@@ -186,7 +187,7 @@ export const FormAudioChat = (props: FormAudioChatProps) => {
 
               <FormField.HelpBlock
                 hasError={errors()?.rally_max_attendees ? true : false}
-                id="input-rally_start_at-helpblock"
+                id="input-rally_max_attendees-helpblock"
               >
                 The maximum amount of participants must be a positive number.
               </FormField.HelpBlock>
@@ -283,7 +284,7 @@ export const FormAudioChat = (props: FormAudioChatProps) => {
                               Ethereum address
                             </FormField.Label>
                             <FormField.Description id={`input-rally_cohosts.${index}.eth_address-description`}>
-                              We will use this Ethereum address to grant moderator powers to your co-host.
+                              We will use this Ethereum address to grant moderator powers to your co-host. <br />
                             </FormField.Description>
                             <FormInput
                               scale="sm"
