@@ -5,7 +5,7 @@ export const audioChatABI = [
       { indexed: false, internalType: 'bytes32', name: 'audio_event_id', type: 'bytes32' },
       { indexed: false, internalType: 'enum AudioChat.stateOptions', name: 'new_state', type: 'uint8' },
     ],
-    name: 'handleAudioChatStateChanged',
+    name: 'handleAudioChatChangedState',
     type: 'event',
   },
   {
@@ -41,6 +41,16 @@ export const audioChatABI = [
   },
   {
     inputs: [
+      { internalType: 'enum AudioChat.stateOptions', name: 'new_changed_state', type: 'uint8' },
+      { internalType: 'bytes32', name: 'audio_chat_id', type: 'bytes32' },
+    ],
+    name: 'changeState',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [
       { internalType: 'uint256', name: 'start_at', type: 'uint256' },
       { internalType: 'uint256', name: 'created_at', type: 'uint256' },
       { internalType: 'string', name: 'cid_metadata', type: 'string' },
@@ -57,13 +67,6 @@ export const audioChatABI = [
     name: 'deleteTheAudioChat',
     outputs: [],
     stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
-    inputs: [],
-    name: 'getAllOwnedIds',
-    outputs: [{ internalType: 'bytes32[]', name: '', type: 'bytes32[]' }],
-    stateMutability: 'view',
     type: 'function',
   },
   {
@@ -129,14 +132,7 @@ export const audioChatABI = [
         type: 'tuple[]',
       },
     ],
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
-    inputs: [{ internalType: 'enum AudioChat.stateOptions', name: 'state', type: 'uint8' }],
-    name: 'getStateArray',
-    outputs: [{ internalType: 'bytes32[]', name: '', type: 'bytes32[]' }],
-    stateMutability: 'nonpayable',
+    stateMutability: 'view',
     type: 'function',
   },
   {
@@ -156,16 +152,6 @@ export const audioChatABI = [
       { internalType: 'uint256', name: 'address_index', type: 'uint256' },
     ],
     stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [
-      { internalType: 'enum AudioChat.stateOptions', name: 'new_changed_state', type: 'uint8' },
-      { internalType: 'bytes32', name: 'audio_chat_id', type: 'bytes32' },
-    ],
-    name: 'stateChanged',
-    outputs: [],
-    stateMutability: 'nonpayable',
     type: 'function',
   },
   {

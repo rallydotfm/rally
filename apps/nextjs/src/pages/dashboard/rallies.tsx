@@ -79,12 +79,15 @@ const Page: NextPage = () => {
                     return a.data.epoch_time_created_at < b.data.epoch_time_created_at
                 })
                 .map((audioChat) => {
+                  //@ts-ignore
+                  const rawDataState = queryAudioChatsByAddressRawData?.data?.filter(
+                    (chat) => chat.audio_event_id === audioChat.data.id,
+                  )?.[0].state
                   return (
                     <li
                       className="animate-appear relative overflow-hidden focus-within:bg-neutral-3 xs:pt-2 pb-3 md:pb-4 xs:pis-2 xs:pie-4 rounded-md bg-neutral-1"
                       key={audioChat.data.id}
                     >
-                      {audioChat.data.state}
                       <Link href={ROUTE_RALLY_VIEW.replace('[idRally]', audioChat.data.id)}>
                         <a className="absolute inset-0 w-full h-full opacity-0">View page</a>
                       </Link>
@@ -129,17 +132,19 @@ const Page: NextPage = () => {
                         </article>
                         <div className="flex flex-col space-y-3 xs:space-y-0 xs:flex-row border-t border-t-neutral-5 pt-3 px-4 xs:pt-1.5 md:pt-4 mt-6 xs:-mis-4 xs:-mie-8 xs:px-6">
                           {[
-                            DICTIONARY_STATES_AUDIO_CHATS.PLANNED.label,
-                            DICTIONARY_STATES_AUDIO_CHATS.READY.label,
-                          ].includes(audioChat.data.state) &&
+                            DICTIONARY_STATES_AUDIO_CHATS.PLANNED.value,
+                            DICTIONARY_STATES_AUDIO_CHATS.READY.value,
+                            //@ts-ignore
+                          ].includes(rawDataState) &&
                             isFuture(audioChat.data.datetime_start_at) && (
                               <Button className="relative z-10">Go live</Button>
                             )}
                           <div className="xs:mis-auto">
                             {[
-                              DICTIONARY_STATES_AUDIO_CHATS.PLANNED.label,
-                              DICTIONARY_STATES_AUDIO_CHATS.READY.label,
-                            ].includes(audioChat.data.state) &&
+                              DICTIONARY_STATES_AUDIO_CHATS.PLANNED.value,
+                              DICTIONARY_STATES_AUDIO_CHATS.READY.value,
+                              //@ts-ignore
+                            ].includes(rawDataState) &&
                               isFuture(audioChat.data.datetime_start_at) && (
                                 <Link href={ROUTE_RALLY_UPDATE.replace('[idRally]', audioChat.data.id)}>
                                   <a
@@ -154,7 +159,8 @@ const Page: NextPage = () => {
                                 </Link>
                               )}
 
-                            {[DICTIONARY_STATES_AUDIO_CHATS.PLANNED.label].includes(audioChat.data.state) &&
+                            {/* @ts-ignore */}
+                            {[DICTIONARY_STATES_AUDIO_CHATS.PLANNED.value].includes(rawDataState) &&
                               isFuture(audioChat.data.datetime_start_at) && (
                                 <Button
                                   onClick={() => {

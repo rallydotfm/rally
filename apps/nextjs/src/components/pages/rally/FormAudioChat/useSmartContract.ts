@@ -251,9 +251,11 @@ export function useSmartContract(stateTxUi: TxUi) {
           },
         }
 
-        if (image && values?.rally_image_file.name) {
+        if (image) {
           //@ts-ignore
           rallyData.image = `${image}/${values?.rally_image_file.name}`
+        } else {
+          if (values.rally_image_src) rallyData.image = values.rally_image_src
         }
 
         const rallyDataJSON = new File([JSON.stringify(rallyData)], 'data.json', {
@@ -266,19 +268,12 @@ export function useSmartContract(stateTxUi: TxUi) {
         stateTxUi.setFileRallyCID(metadata)
       }
 
-      return [
-        /*
-          Datetime at which the rally will start,
-          Current datetime,
-          CID,
-          Current user wallet address
-        */
-        getUnixTime(new Date(values.rally_start_at)),
-        getUnixTime(new Date()),
+      return {
+        startAt: getUnixTime(new Date(values.rally_start_at)),
         metadata,
-        account?.address,
-        values.is_indexed,
-      ]
+        creatorWalletAddress: account?.address,
+        isIndexed: values.is_indexed,
+      }
     } catch (e) {
       console.error(e)
       //@ts-ignore
@@ -293,9 +288,23 @@ export function useSmartContract(stateTxUi: TxUi) {
     stateTxUi.setDialogVisibility(true)
     try {
       const args = await prepareRallyData(values)
+      const { startAt, metadata, creatorWalletAddress, isIndexed } = args
       await contractWriteNewAudioChat?.writeAsync?.({
         //@ts-ignore
-        recklesslySetUnpreparedArgs: args,
+        recklesslySetUnpreparedArgs: [
+          /*
+              Datetime at which the rally will start,
+              Current datetime,
+              CID,
+              Current user wallet address,
+              should the audiochat be indexed or not
+            */
+          startAt,
+          getUnixTime(new Date()),
+          metadata,
+          creatorWalletAddress,
+          isIndexed,
+        ],
       })
     } catch (e) {
       console.error(e)

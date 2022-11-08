@@ -41,7 +41,7 @@ export function useCancelAudioChat(stateTxUiCancelRally: TxUiCancelRally, refetc
     mode: 'recklesslyUnprepared',
     address: CONTRACT_AUDIO_CHATS,
     abi: audioChatABI,
-    functionName: 'stateChanged',
+    functionName: 'changeState',
     chainId: chain?.id,
   })
 
@@ -55,12 +55,12 @@ export function useCancelAudioChat(stateTxUiCancelRally: TxUiCancelRally, refetc
     },
     async onSuccess() {
       try {
-        await refetch()
         await queryClient.invalidateQueries({
           queryKey: ['audio-chat-metadata', stateTxUiCancelRally.rallyId],
           type: 'active',
           exact: true,
         })
+        await refetch()
         stateTxUiCancelRally.resetState()
         toast.success('Your rally was cancelled successfully !')
       } catch (e) {
@@ -74,12 +74,14 @@ export function useCancelAudioChat(stateTxUiCancelRally: TxUiCancelRally, refetc
       await contractWriteCancelAudioChat?.writeAsync?.({
         //@ts-ignore
         recklesslySetUnpreparedArgs: [DICTIONARY_STATES_AUDIO_CHATS.CANCELLED.value, stateTxUiCancelRally.rallyId],
-        recklesslySetUnpreparedOverrides: {
-          gasLimit: `${25000}`,
-        },
       })
     } catch (e) {
-      console.error(e)
+      console.error(
+        /* recklesslySetUnpreparedOverrides: {
+        gasLimit: 2100000,
+        gasPrice: 8000000000,
+      },*/ e,
+      )
     }
   }
   return {
