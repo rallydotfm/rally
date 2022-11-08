@@ -41,15 +41,19 @@ const Page: NextPage = () => {
               </>
             ) : (
               <>
-                {queryAudioChatMetadata.isSuccess && queryDecryptCohostsAddress?.isSuccess && (
-                  <FormUpdateAudioChat
-                    //@ts-ignore
-                    values={{
-                      ...queryAudioChatMetadata.data,
-                      cohosts_list: queryDecryptCohostsAddress.data,
-                    }}
-                  />
-                )}
+                {queryAudioChatMetadata.isSuccess &&
+                  (queryAudioChatMetadata?.data?.cohosts_list?.length === 0 ||
+                    (queryAudioChatMetadata?.data?.cohosts_list?.length > 0 &&
+                      queryDecryptCohostsAddress?.isSuccess)) && (
+                    <FormUpdateAudioChat
+                      //@ts-ignore
+                      values={{
+                        ...queryAudioChatMetadata.data,
+                        cohosts_list:
+                          queryAudioChatMetadata?.data?.cohosts_list === 0 ? [] : queryDecryptCohostsAddress.data,
+                      }}
+                    />
+                  )}
               </>
             )}
           </>

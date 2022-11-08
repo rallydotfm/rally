@@ -12,6 +12,7 @@ export function useGetAudioChatsByWalletAddress(address?: string) {
     functionName: 'getAudioChatsByAdress', //@todo: update this
     enabled: address && chain?.unsupported === false ? true : false,
     args: [address as `0x${string}`],
+    cacheOnBlock: true,
     onError(e) {
       console.error(e)
       toast.error(e?.message)
@@ -25,6 +26,7 @@ export function useGetAudioChatsByWalletAddress(address?: string) {
           return {
             queryKey: ['audio-chat-metadata', audioChat?.cid_metadata],
             queryFn: async () => await getAudioChatMetadata(audioChat),
+            staleTime: 0,
           }
         })
       : [],

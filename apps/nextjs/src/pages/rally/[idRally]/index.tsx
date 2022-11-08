@@ -73,6 +73,7 @@ const Page: NextPage = () => {
           )}
         </header>
         <main>
+          {queryAudioChatMetadata.data?.state}
           {!isReady ||
             queryAudioChatByIdRawData?.status === 'loading' ||
             (queryAudioChatMetadata?.status === 'loading' && (

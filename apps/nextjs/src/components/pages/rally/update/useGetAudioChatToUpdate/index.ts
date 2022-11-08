@@ -76,12 +76,13 @@ export function useGetAudioChatToUpdate(id: `0x${string}`) {
             }
           }),
         )
-        return decryptedList
+        return decryptedList ?? []
       } catch (e) {
         console.error(e)
       }
     },
     {
+      refetchOnWindowFocus: false,
       enabled:
         queryAudioChatMetadata?.data?.cohosts_list?.length > 0 &&
         queryAudioChatMetadata?.data?.creator === account?.address &&

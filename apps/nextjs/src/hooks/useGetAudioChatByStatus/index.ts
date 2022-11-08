@@ -25,6 +25,7 @@ export function useGetAudioChatByState(states: Array<number>) {
           return {
             queryKey: ['audio-chat-metadata', audioChat?.cid_metadata],
             queryFn: async () => await getAudioChatMetadata(audioChat),
+            staleTime: 0,
           }
         })
       : [],
