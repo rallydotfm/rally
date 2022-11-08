@@ -27,7 +27,7 @@ NEXT_PUBLIC_LENS_HUB_PROXY=0x60Ae865ee4C725cd04353b5AAb364553f56ceF82
 NEXT_PUBLIC_LENS_PERIPHERY=0xD5037d72877808cdE7F669563e9389930AF404E8
 
 # Start the project by running this command in the root folder.
-pnpm start
+pnpm dev
 ```
 
 ### Side-note regarding database

@@ -54,22 +54,24 @@ export default function CalendarWeek(props: any) {
                           {format(audioChat.data.datetime_start_at, 'HH:mm')}
                         </span>
                         <article className="flex flex-col space-y-4 xs:flex-row xs:space-y-0 xs:space-i-6">
-                          <div className="relative w-full overflow-hidden xs:w-20 sm:w-32 aspect-twitter-card rounded-t-md xs:rounded-b-md">
-                            <div className="bg-neutral-5 absolute w-full h-full inset-0 animate-pulse" />
-                            <img
-                              alt=""
-                              loading="lazy"
-                              width="128px"
-                              height="86px"
-                              src={`https://ipfs.io/ipfs/${audioChat.data.image}`}
-                              className="relative z-10 block w-full h-full object-cover "
-                            />
-                          </div>
+                          {audioChat?.data?.image && (
+                            <div className="relative w-full overflow-hidden xs:w-20 sm:w-32 aspect-twitter-card rounded-t-md xs:rounded-b-md">
+                              <div className="bg-neutral-5 absolute w-full h-full inset-0 animate-pulse" />
+                              <img
+                                alt=""
+                                loading="lazy"
+                                width="128px"
+                                height="86px"
+                                src={`https://ipfs.io/ipfs/${audioChat.data.image}`}
+                                className="relative z-10 block w-full h-full object-cover "
+                              />
+                            </div>
+                          )}
 
                           <div className="px-4 flex-grow flex flex-col xs:px-0">
                             <h1 className="font-bold">{audioChat.data.name}</h1>
                             <p className="text-neutral-12 uppercase font-bold tracking-wide text-2xs mt-2">
-                              {audioChat.data.is_private ? 'Gated access' : 'Free access'}
+                              {audioChat.data.is_gated ? 'Gated access' : 'Free access'}
                             </p>
                             <p className="text-neutral-11 text-2xs mt-2">
                               {audioChat.data.cohosts_list.length} cohosts

@@ -221,7 +221,7 @@ export function useSmartContract(stateTxUi: TxUi) {
       let metadata = stateTxUi.fileRallyCID
 
       // upload image file (if it exists) to IPFS
-      if (!stateTxUi.imageRallyCID?.length) {
+      if (values?.rally_image_file) {
         image = await mutationUploadImageFile.mutateAsync(values?.rally_image_file)
         stateTxUi.setImageRallyCID(image)
       }
@@ -240,16 +240,20 @@ export function useSmartContract(stateTxUi: TxUi) {
           name: values.rally_name,
           description: values.rally_description,
           tags: values.rally_tags,
-          image: `${image}/${values.rally_image_file.name}`,
           has_cohosts: values.rally_has_cohosts,
           cohosts_list: rally_cohosts,
           will_be_recorded: values.rally_is_recorded,
-          is_private: values.rally_is_private,
+          is_gated: values.rally_is_gated,
           max_attendees: values.rally_max_attendees,
           access_control: {
             guilds: values.rally_access_control_guilds,
             whitelist: [account.address, ...values.rally_cohosts.map((cohost: any) => cohost.eth_address)],
           },
+        }
+
+        if (image && values?.rally_image_file.name) {
+          //@ts-ignore
+          rallyData.image = `${image}/${values?.rally_image_file.name}`
         }
 
         const rallyDataJSON = new File([JSON.stringify(rallyData)], 'data.json', {
@@ -273,6 +277,7 @@ export function useSmartContract(stateTxUi: TxUi) {
         getUnixTime(new Date()),
         metadata,
         account?.address,
+        values.is_indexed,
       ]
     } catch (e) {
       console.error(e)

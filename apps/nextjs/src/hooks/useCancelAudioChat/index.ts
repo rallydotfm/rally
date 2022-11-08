@@ -74,6 +74,9 @@ export function useCancelAudioChat(stateTxUiCancelRally: TxUiCancelRally, refetc
       await contractWriteCancelAudioChat?.writeAsync?.({
         //@ts-ignore
         recklesslySetUnpreparedArgs: [DICTIONARY_STATES_AUDIO_CHATS.CANCELLED.value, stateTxUiCancelRally.rallyId],
+        recklesslySetUnpreparedOverrides: {
+          gasLimit: `${25000}`,
+        },
       })
     } catch (e) {
       console.error(e)

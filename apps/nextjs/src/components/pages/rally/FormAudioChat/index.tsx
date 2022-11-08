@@ -7,7 +7,7 @@ import InputCheckboxToggle from '@components/InputCheckboxToggle'
 import FormRadioGroup from '@components/FormRadioGroup'
 import { RadioGroup } from '@headlessui/react'
 import FormRadioOption from '@components/FormRadioOption'
-import { CameraIcon, PlusIcon } from '@heroicons/react/20/solid'
+import { CameraIcon, InformationCircleIcon, PlusIcon } from '@heroicons/react/20/solid'
 import EthereumAddress from '@components/EthereumAddress'
 import OptionGuild from '@components/pages/rally/FormAudioChat/OptionGuild'
 
@@ -24,7 +24,7 @@ export const FormAudioChat = (props: FormAudioChatProps) => {
     apiInputRallyTags,
     labelButtonSubmit,
     labelButtonSubmitting,
-    storeForm: { form, setData, resetField, addField, data, errors, isValid },
+    storeForm: { form, setData, resetField, addField, data, setFields, errors, isValid },
   } = props
 
   return (
@@ -56,7 +56,39 @@ export const FormAudioChat = (props: FormAudioChatProps) => {
                 Please type a name.
               </FormField.HelpBlock>
             </FormField>
-
+            <FormField>
+              <FormField.InputField>
+                <FormField.Label hasError={errors()?.rally_start_at ? true : false} htmlFor="rally_start_at">
+                  Date and time
+                </FormField.Label>
+                <FormField.Description id="input-rally_start_at-description">
+                  The date and time at which of your rally will take place.
+                </FormField.Description>
+                <FormInput
+                  hasError={errors()?.rally_start_at ? true : false}
+                  name="rally_start_at"
+                  id="rally_start_at"
+                  type="datetime-local"
+                  min={new Date().toISOString().substring(0, 16)}
+                  pattern="[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}"
+                  required
+                  aria-describedby="input-rally_start_at-description input-start-at-timezone-helpblock input-rally_start_at-helpblock"
+                />
+              </FormField.InputField>
+              <FormField.HelpBlock
+                hasError={errors()?.rally_start_at ? true : false}
+                id="input-start-at-timezone-helpblock"
+                className="not-sr-only pt-2 text-neutral-11 text-2xs"
+              >
+                Timezone: ({Intl.DateTimeFormat().resolvedOptions().timeZone})
+              </FormField.HelpBlock>
+              <FormField.HelpBlock
+                hasError={errors()?.rally_start_at ? true : false}
+                id="input-rally_start_at-helpblock"
+              >
+                Please pick a valid date.
+              </FormField.HelpBlock>
+            </FormField>
             <FormField>
               <FormField.InputField>
                 <FormField.Label hasError={errors()?.rally_description ? true : false} htmlFor="rally_description">
@@ -66,8 +98,7 @@ export const FormAudioChat = (props: FormAudioChatProps) => {
                   A few words on what will be the topic discussed in your rally.
                 </FormField.Description>
                 <FormTextarea
-                  required
-                  rows={10}
+                  rows={7}
                   hasError={errors()?.rally_description ? true : false}
                   placeholder="Eg: Community discussion about the future of Rally. Members only !"
                   name="rally_description"
@@ -135,51 +166,18 @@ export const FormAudioChat = (props: FormAudioChatProps) => {
 
             <FormField>
               <FormField.InputField>
-                <FormField.Label hasError={errors()?.rally_start_at ? true : false} htmlFor="rally_start_at">
-                  Date and time
-                </FormField.Label>
-                <FormField.Description id="input-rally_start_at-description">
-                  The date and time at which of your rally will take place.
-                </FormField.Description>
-                <FormInput
-                  hasError={errors()?.rally_start_at ? true : false}
-                  name="rally_start_at"
-                  id="rally_start_at"
-                  type="datetime-local"
-                  min={new Date().toISOString().substring(0, 16)}
-                  pattern="[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}"
-                  required
-                  aria-describedby="input-rally_start_at-description input-start-at-timezone-helpblock input-rally_start_at-helpblock"
-                />
-              </FormField.InputField>
-              <FormField.HelpBlock
-                hasError={errors()?.rally_start_at ? true : false}
-                id="input-start-at-timezone-helpblock"
-                className="not-sr-only pt-2 text-neutral-11 text-2xs"
-              >
-                Timezone: ({Intl.DateTimeFormat().resolvedOptions().timeZone})
-              </FormField.HelpBlock>
-              <FormField.HelpBlock
-                hasError={errors()?.rally_start_at ? true : false}
-                id="input-rally_start_at-helpblock"
-              >
-                Please pick a valid date.
-              </FormField.HelpBlock>
-            </FormField>
-            <FormField>
-              <FormField.InputField>
                 <FormField.Label hasError={errors()?.rally_max_attendees ? true : false} htmlFor="rally_max_attendees">
-                  Maximum number of participants (optional)
+                  Maximum number of participants
                 </FormField.Label>
                 <FormField.Description id="input-rally_max_attendees-description">
-                  The maximum amount of people that can attend your rally.
+                  The maximum amount of people that can attend your rally (you, co-hosts, guests and listeners).
                 </FormField.Description>
                 <FormInput
                   hasError={errors()?.rally_max_attendees ? true : false}
                   name="rally_max_attendees"
                   id="rally_max_attendees"
                   type="number"
-                  min={1}
+                  min={2}
                   step="1"
                   aria-describedby="input-rally_max_attendees-description input-rally_max_attendees-helpblock"
                 />
@@ -208,8 +206,9 @@ export const FormAudioChat = (props: FormAudioChatProps) => {
               <InputCheckboxToggle
                 label="This rally will be recorded"
                 checked={data().rally_is_recorded}
-                onChange={(value: boolean) => setData('rally_is_recorded', value)}
-                name="rally_is_recorded"
+                onChange={(value: any) => {
+                  setFields('rally_is_recorded', value)
+                }}
               />
             </FormField>
           </fieldset>
@@ -234,7 +233,6 @@ export const FormAudioChat = (props: FormAudioChatProps) => {
                     setData('rally_cohosts', [])
                   }
                 }}
-                name="rally_has_cohosts"
               />
             </FormField>
             {data().rally_has_cohosts === true && (
@@ -348,115 +346,128 @@ export const FormAudioChat = (props: FormAudioChatProps) => {
               </div>
             )}
           </fieldset>
-          <fieldset className="space-y-5">
+          <fieldset>
             <legend className="mb-4 uppercase text-sm font-bold">Privacy</legend>
-            <FormRadioGroup
-              className="!mt-0"
-              defaultValue={data()?.rally_is_private === true ? true : false}
-              onChange={(value: boolean) => {
-                setData('rally_is_private', value)
-                if (value === true) {
-                  addField('rally_access_control_guilds', {
-                    guild_id: '',
-                    roles: [],
-                  })
-                  addField('rally_access_control_blacklist', '')
-                  addField('rally_access_control_whitelist', '')
-                } else {
-                  resetField('rally_access_control_guilds')
-                  resetField('rally_access_control_blacklist')
-                  resetField('rally_access_control_whitelist')
-                }
-              }}
-            >
-              <RadioGroup.Label className="sr-only">Can anyone join this rally ?</RadioGroup.Label>
-              <FormRadioOption value={false}>Free access (anybody can join)</FormRadioOption>
-              <FormRadioOption value={true}>
-                Gated access (only wallets meeting specific requirements will be allowed to join)
-              </FormRadioOption>
-            </FormRadioGroup>
-            {data().rally_is_private === true && (
-              <>
-                <div className="grid grid-cols-1 gap-3 animate-appear">
-                  {data().rally_access_control_guilds.map((guild: { key: string }, index: number) => {
-                    return (
-                      <div
-                        className="animate-appear space-y-3 p-3 border rounded-md  bg-neutral-1 border-neutral-4"
-                        key={`guild-${guild.key}`}
-                      >
-                        <FormField>
-                          <FormField.InputField>
-                            <FormField.Label
-                              className="text-xs"
-                              hasError={errors()?.[`rally_access_control_guilds.${index}.guild_id`] ? true : false}
-                              htmlFor={`rally_access_control_guilds.${index}.guild_id`}
-                            >
-                              Guild ID
-                            </FormField.Label>
-                            <FormField.Description
-                              className="sr-only"
-                              id={`input-rally_access_control_guilds.${index}.guild_id-description`}
-                            >
-                              The ID of the Guild
-                            </FormField.Description>
-                            <FormInput
-                              scale="sm"
-                              hasError={errors()?.[`rally_access_control_guilds.${index}.guild_id`] ? true : false}
-                              placeholder="Eg: our-guild, layer3, lens-protocol..."
-                              name={`rally_access_control_guilds.${index}.guild_id`}
-                              id={`rally_access_control_guilds.${index}.guild_id`}
-                              aria-describedby={`input-rally_access_control_guilds.${index}.guild_id-description input-rally_access_control_guilds.${index}.guild_id-helpblock`}
-                            />
-                          </FormField.InputField>
-                          <FormField.HelpBlock
-                            hasError={errors()?.[`rally_access_control_guilds.${index}.guild_id`] ? true : false}
-                            id={`input-rally_access_control_guilds.${index}.guild_id-helpblock`}
-                          >
-                            The name that will be displayed for this co-host.
-                          </FormField.HelpBlock>
-                        </FormField>
-                        {data()?.rally_access_control_guilds[index]?.guild_id !== '' && (
-                          <div className="mt-4 pt-3 animate-appear border-t border-neutral-6">
-                            <OptionGuild
-                              index={index}
-                              data={data}
-                              setData={setData}
-                              id={data()?.rally_access_control_guilds[index]?.guild_id?.trim()}
-                            />
-                          </div>
-                        )}
-                        <Button
-                          intent="negative-ghost"
-                          className="!mt-6 w-full"
-                          scale="sm"
-                          onClick={() => {
-                            const updated = data()?.rally_access_control_guilds.filter(
-                              (rallyGuild: any) => rallyGuild.key !== guild.key,
-                            )
-                            setData('rally_access_control_guilds', updated)
-                          }}
+            <div className="space-y-5">
+              <FormRadioGroup
+                className="!mt-0"
+                defaultValue={data()?.rally_is_gated === true ? true : false}
+                onChange={(value: boolean) => {
+                  setData('rally_is_gated', value)
+                  if (value === true) {
+                    addField('rally_access_control_guilds', {
+                      guild_id: '',
+                      roles: [],
+                    })
+                    addField('rally_access_control_blacklist', '')
+                    addField('rally_access_control_whitelist', '')
+                  } else {
+                    resetField('rally_access_control_guilds')
+                    resetField('rally_access_control_blacklist')
+                    resetField('rally_access_control_whitelist')
+                  }
+                }}
+              >
+                <RadioGroup.Label className="sr-only">Can anyone join this rally ?</RadioGroup.Label>
+                <FormRadioOption value={false}>Free access (anybody can join)</FormRadioOption>
+                <FormRadioOption value={true}>
+                  Gated access (only wallets meeting specific requirements will be allowed to join)
+                </FormRadioOption>
+              </FormRadioGroup>
+              {data().rally_is_gated === true && (
+                <>
+                  <div className="grid grid-cols-1 gap-3 animate-appear">
+                    {data().rally_access_control_guilds.map((guild: { key: string }, index: number) => {
+                      return (
+                        <div
+                          className="animate-appear space-y-3 p-3 border rounded-md  bg-neutral-1 border-neutral-4"
+                          key={`guild-${guild.key}`}
                         >
-                          Remove guild
-                        </Button>
-                      </div>
-                    )
-                  })}
-                  <button
-                    className="min-h-[12rem] text-white text-opacity-75 w-full h-full flex flex-col items-center justify-center p-3 border-dashed border rounded-md bg-neutral-1 bg-opacity-50 hover:bg-opacity-75 focus:bg-opacity-90 hover:focus:bg-opacity-95 border-neutral-4"
-                    onClick={() => {
-                      addField('rally_access_control_guilds', {
-                        id: '',
-                        roles: [],
-                      })
-                    }}
-                    type="button"
-                  >
-                    <PlusIcon className="w-8 mb-3" />
-                    <span className="text-xs">Add another Guild</span>
-                  </button>
+                          <FormField>
+                            <FormField.InputField>
+                              <FormField.Label
+                                className="text-xs"
+                                hasError={errors()?.[`rally_access_control_guilds.${index}.guild_id`] ? true : false}
+                                htmlFor={`rally_access_control_guilds.${index}.guild_id`}
+                              >
+                                Guild ID
+                              </FormField.Label>
+                              <FormField.Description
+                                className="sr-only"
+                                id={`input-rally_access_control_guilds.${index}.guild_id-description`}
+                              >
+                                The ID of the Guild
+                              </FormField.Description>
+                              <FormInput
+                                scale="sm"
+                                hasError={errors()?.[`rally_access_control_guilds.${index}.guild_id`] ? true : false}
+                                placeholder="Eg: our-guild, layer3, lens-protocol..."
+                                name={`rally_access_control_guilds.${index}.guild_id`}
+                                id={`rally_access_control_guilds.${index}.guild_id`}
+                                aria-describedby={`input-rally_access_control_guilds.${index}.guild_id-description input-rally_access_control_guilds.${index}.guild_id-helpblock`}
+                              />
+                            </FormField.InputField>
+                            <FormField.HelpBlock
+                              hasError={errors()?.[`rally_access_control_guilds.${index}.guild_id`] ? true : false}
+                              id={`input-rally_access_control_guilds.${index}.guild_id-helpblock`}
+                            >
+                              The name that will be displayed for this co-host.
+                            </FormField.HelpBlock>
+                          </FormField>
+                          {data()?.rally_access_control_guilds[index]?.guild_id !== '' && (
+                            <div className="mt-4 pt-3 animate-appear border-t border-neutral-6">
+                              <OptionGuild
+                                index={index}
+                                data={data}
+                                setData={setData}
+                                id={data()?.rally_access_control_guilds[index]?.guild_id?.trim()}
+                              />
+                            </div>
+                          )}
+                          <Button
+                            intent="negative-ghost"
+                            className="!mt-6 w-full"
+                            scale="sm"
+                            onClick={() => {
+                              const updated = data()?.rally_access_control_guilds.filter(
+                                (rallyGuild: any) => rallyGuild.key !== guild.key,
+                              )
+                              setData('rally_access_control_guilds', updated)
+                            }}
+                          >
+                            Remove guild
+                          </Button>
+                        </div>
+                      )
+                    })}
+                    <button
+                      className="min-h-[12rem] text-white text-opacity-75 w-full h-full flex flex-col items-center justify-center p-3 border-dashed border rounded-md bg-neutral-1 bg-opacity-50 hover:bg-opacity-75 focus:bg-opacity-90 hover:focus:bg-opacity-95 border-neutral-4"
+                      onClick={() => {
+                        addField('rally_access_control_guilds', {
+                          id: '',
+                          roles: [],
+                        })
+                      }}
+                      type="button"
+                    >
+                      <PlusIcon className="w-8 mb-3" />
+                      <span className="text-xs">Add another Guild</span>
+                    </button>
+                  </div>
+                </>
+              )}
+              <FormField>
+                <InputCheckboxToggle
+                  label="Index this rally"
+                  checked={data().rally_is_indexed}
+                  onChange={(value: boolean) => setData('rally_is_indexed', value)}
+                />
+                <div className="inline-flex text-2xs text-neutral-12 space-i-1ex mt-1.5">
+                  <InformationCircleIcon className="w-4" />
+                  <p>Indexed rallies will be visible by everyone in the upcoming and home pages.</p>
                 </div>
-              </>
-            )}
+              </FormField>
+            </div>
           </fieldset>
         </div>
         <Button

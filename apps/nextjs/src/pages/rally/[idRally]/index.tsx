@@ -37,17 +37,19 @@ const Page: NextPage = () => {
               </a>
             </Link>
           </nav>
-          <div className="relative self-center rounded-md mt-10 w-48 overflow-hidden aspect-square">
-            <div className="bg-neutral-5 absolute w-full h-full inset-0 animate-pulse" />
-            <img
-              src={`https://ipfs.io/ipfs/${queryAudioChatMetadata?.data?.image}`}
-              className="relative z-10 w-full h-full object-cover"
-              alt=""
-              width="192px"
-              height="192px"
-              loading="lazy"
-            />
-          </div>
+          {queryAudioChatMetadata?.data?.image && (
+            <div className="relative self-center rounded-md mt-10 w-48 overflow-hidden aspect-square">
+              <div className="bg-neutral-5 absolute w-full h-full inset-0 animate-pulse" />
+              <img
+                src={`https://ipfs.io/ipfs/${queryAudioChatMetadata?.data?.image}`}
+                className="relative z-10 w-full h-full object-cover"
+                alt=""
+                width="192px"
+                height="192px"
+                loading="lazy"
+              />
+            </div>
+          )}
 
           <div className="mt-5 mx-auto">
             <h1 className="font-bold text-4xl">{queryAudioChatMetadata?.data?.name}</h1>

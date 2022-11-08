@@ -19,9 +19,10 @@ const Page: NextPage = () => {
   const { formAudioChat, apiInputRallyTags } = useForm({
     onSubmit: (values: any) => onSubmitNewAudioChat(values),
     initialValues: {
-      rally_is_private: false,
+      rally_is_gated: false,
       rally_has_cohosts: false,
       rally_is_recorded: false,
+      rally_is_indexed: false,
       rally_tags: [],
       rally_cohosts: [],
       rally_name: '',
@@ -63,14 +64,16 @@ const Page: NextPage = () => {
       >
         <span className="font-bold">Deploying new rally</span>
         <ol className="space-y-3 mt-6 font-medium text-xs">
-          <li className={`flex items-center text-white`}>
-            {stateNewAudioChat.uploadImage.isSuccess && <CheckCircleIcon className="w-5 text-positive-11" />}
-            {stateNewAudioChat.uploadImage.isError && <ExclamationTriangleIcon className="w-5 text-negative-10" />}
-            {stateNewAudioChat.uploadImage.isLoading && <IconSpinner className="animate-spin" />}
-            <span className={`pis-1ex ${stateNewAudioChat.uploadImage.isLoading ? 'animate-pulse' : ''}`}>
-              Uploading image to IPFS
-            </span>
-          </li>
+          {formAudioChat?.data()?.rally_image_file && (
+            <li className={`flex items-center text-white`}>
+              {stateNewAudioChat.uploadImage.isSuccess && <CheckCircleIcon className="w-5 text-positive-11" />}
+              {stateNewAudioChat.uploadImage.isError && <ExclamationTriangleIcon className="w-5 text-negative-10" />}
+              {stateNewAudioChat.uploadImage.isLoading && <IconSpinner className="animate-spin" />}
+              <span className={`pis-1ex ${stateNewAudioChat.uploadImage.isLoading ? 'animate-pulse' : ''}`}>
+                Uploading image to IPFS
+              </span>
+            </li>
+          )}
           {formAudioChat.data()?.rally_has_cohosts === true && (
             <li
               className={`

@@ -19,7 +19,7 @@ export const FormUpdateAudioChat = (props: any) => {
   const { formAudioChat, apiInputRallyTags } = useForm({
     onSubmit: (values: any) => onSubmitNewAudioChat(values),
     initialValues: {
-      rally_is_private: values.is_private,
+      rally_is_gated: values.is_gated,
       rally_has_cohosts: values.has_cohosts,
       rally_is_recorded: values.will_be_recorded,
       rally_tags: values.tags,

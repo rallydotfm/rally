@@ -7,7 +7,7 @@ import { useMachine, normalizeProps } from '@zag-js/react'
 
 export const schema = object({
   rally_name: string().trim().min(1),
-  rally_description: string().trim().min(1),
+  rally_description: string().trim(),
   rally_max_attendees: number().positive().optional(),
   rally_image_file: any(),
   rally_image_src: string().optional(),
@@ -21,7 +21,8 @@ export const schema = object({
     }),
   ).optional(),
   rally_is_recorded: boolean(),
-  rally_is_private: boolean(),
+  rally_is_gated: boolean(),
+  rally_is_indexed: boolean(),
   rally_access_control_guilds: array(
     object({
       guild_id: string(),
