@@ -1,5 +1,5 @@
 import { getUnixTime } from 'date-fns'
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { makeStorageClient } from '@config/web3storage'
 import { CONTRACT_AUDIO_CHATS } from '@config/contracts'
 import { useContractWrite, useAccount, useWaitForTransaction, useNetwork, chainId, useSignMessage } from 'wagmi'
@@ -47,6 +47,7 @@ export const useStoreTxUi = create<TxUi>((set) => ({
 export function useSmartContract(stateTxUi: TxUi) {
   const account = useAccount()
   const { chain } = useNetwork()
+  const queryClient = useQueryClient()
 
   const { signMessageAsync, ...mutationSignMessage } = useSignMessage({
     onError(e) {
@@ -80,6 +81,34 @@ export function useSmartContract(stateTxUi: TxUi) {
       stateTxUi.setRallyId(iface.parseLog(log[0]).args.audio_event_id)
       stateTxUi.setFileRallyCID()
       stateTxUi.setImageRallyCID()
+    },
+  })
+
+  // Query to edit an existing audio chat
+  const contractWriteEditAudioChat = useContractWrite({
+    mode: 'recklesslyUnprepared',
+    address: CONTRACT_AUDIO_CHATS,
+    abi: audioChatABI,
+    functionName: 'updateAudioChat',
+    chainId: chain?.id,
+  })
+
+  // Transaction receipt for `recklesslyUnprepared` (edit audio chat data query)
+  const txEditAudioChat = useWaitForTransaction({
+    hash: contractWriteEditAudioChat?.data?.hash,
+    chainId: chain?.id,
+    onError(e) {
+      console.error(e)
+      toast.error(e?.message)
+    },
+    async onSuccess(data) {
+      await queryClient.invalidateQueries({
+        queryKey: ['audio-chat-metadata', stateTxUi.rallyId],
+        type: 'active',
+        exact: true,
+      })
+
+      toast.success('Your rally was updated successfully !')
     },
   })
 
@@ -215,7 +244,7 @@ export function useSmartContract(stateTxUi: TxUi) {
    *  Upload Rally image to IPFS (if necessary) and format and upload Rally data as a JSON file to IPFS (if necessary)
    * @param values - values returned by our form
    */
-  async function prepareRallyData(values: any) {
+  async function prepareRallyData(values: any, isUpdate: boolean) {
     try {
       let image = stateTxUi.imageRallyCID
       let metadata = stateTxUi.fileRallyCID
@@ -226,10 +255,10 @@ export function useSmartContract(stateTxUi: TxUi) {
         stateTxUi.setImageRallyCID(image)
       }
 
-      if (!stateTxUi.fileRallyCID?.length) {
+      if (!stateTxUi.fileRallyCID?.length || isUpdate === true) {
         // create JSON file with form values + uploaded image URL
         let rally_cohosts = []
-
+        let whitelist
         // encrypt cohosts addresses
         if (values?.rally_cohosts?.length > 0) {
           //@ts-ignore
@@ -247,17 +276,20 @@ export function useSmartContract(stateTxUi: TxUi) {
           max_attendees: values.rally_max_attendees,
           access_control: {
             guilds: values.rally_access_control_guilds,
-            whitelist: [account.address, ...values.rally_cohosts.map((cohost: any) => cohost.eth_address)],
+            whitelist: [account.address, ...values?.rally_cohosts?.map((cohost: any) => cohost.eth_address)],
           },
         }
 
-        if (image) {
+        if (image && values.rally_image_file) {
+          console.log('has file')
           //@ts-ignore
           rallyData.image = `${image}/${values?.rally_image_file.name}`
         } else {
+          console.log('no file ')
           if (values.rally_image_src) rallyData.image = values.rally_image_src
         }
 
+        console.log(rallyData)
         const rallyDataJSON = new File([JSON.stringify(rallyData)], 'data.json', {
           type: 'application/json',
         })
@@ -272,7 +304,7 @@ export function useSmartContract(stateTxUi: TxUi) {
         startAt: getUnixTime(new Date(values.rally_start_at)),
         metadata,
         creatorWalletAddress: account?.address,
-        isIndexed: values.is_indexed,
+        isIndexed: values.rally_is_indexed,
       }
     } catch (e) {
       console.error(e)
@@ -287,7 +319,7 @@ export function useSmartContract(stateTxUi: TxUi) {
   async function onSubmitNewAudioChat(values: any) {
     stateTxUi.setDialogVisibility(true)
     try {
-      const args = await prepareRallyData(values)
+      const args = await prepareRallyData(values, false)
       const { startAt, metadata, creatorWalletAddress, isIndexed } = args
       await contractWriteNewAudioChat?.writeAsync?.({
         //@ts-ignore
@@ -311,8 +343,46 @@ export function useSmartContract(stateTxUi: TxUi) {
     }
   }
 
+  /**
+   * Upload form data as a JSON after preparing them (upload image, encrypt cohosts wallet address) and update an audio chat data on chain
+   */
+  async function onSubmitEditAudioChat(args) {
+    const { id, values } = args
+    stateTxUi.setDialogVisibility(true)
+    try {
+      const args = await prepareRallyData(values, true)
+      const { startAt, metadata } = args
+
+      await contractWriteEditAudioChat?.writeAsync?.({
+        //@ts-ignore
+        recklesslySetUnpreparedArgs: [
+          /*
+            audio chat id, 
+            new CID
+            new start_at
+            is indexed
+          */
+          id,
+          metadata,
+          startAt,
+          values.rally_is_indexed,
+        ],
+      })
+    } catch (e) {
+      console.error(e)
+    }
+  }
+
   return {
     onSubmitNewAudioChat,
+    onSubmitEditAudioChat,
+    stateEditAudioChat: {
+      contract: contractWriteEditAudioChat,
+      signEncryption: mutationSignMessage,
+      transaction: txEditAudioChat,
+      uploadImage: mutationUploadImageFile,
+      uploadData: mutationUploadJsonFile,
+    },
     stateNewAudioChat: {
       contract: contractWriteNewAudioChat,
       signEncryption: mutationSignMessage,

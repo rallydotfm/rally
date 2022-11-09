@@ -9,7 +9,7 @@ import LitJsSdk from '@lit-protocol/sdk-browser'
 const litNodeClient = new LitJsSdk.LitNodeClient()
 litNodeClient.connect()
 
-export function useGetAudioChatToUpdate(id: `0x${string}`) {
+export function useGetAudioChatToEdit(id: `0x${string}`) {
   const account = useAccount()
   const { chain } = useNetwork()
   const { signMessageAsync, ...mutationSignMessage } = useSignMessage({
@@ -98,4 +98,4 @@ export function useGetAudioChatToUpdate(id: `0x${string}`) {
   }
 }
 
-export default useGetAudioChatToUpdate
+export default useGetAudioChatToEdit

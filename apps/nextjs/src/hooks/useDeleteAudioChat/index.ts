@@ -3,19 +3,18 @@ import toast from 'react-hot-toast'
 import create from 'zustand'
 import { audioChatABI } from '@rally/abi'
 import { CONTRACT_AUDIO_CHATS } from '@config/contracts'
-import { DICTIONARY_STATES_AUDIO_CHATS } from '@helpers/mappingAudioChatState'
 import { useQueryClient } from '@tanstack/react-query'
 
-export interface TxUiCancelRally {
+export interface TxUiDeleteRally {
   isDialogVisible: boolean
   rallyId: string | undefined
   setDialogVisibility: (visibility: boolean) => void
-  selectRallyToCancel: (id: string) => void
+  selectRallyToDelete: (id: string) => void
   resetState: () => void
 }
 
-export const useStoreTxUiCancelRally = create<TxUiCancelRally>((set) => ({
-  selectRallyToCancel: (id: string) =>
+export const useStoreTxUiDeleteRally = create<TxUiDeleteRally>((set) => ({
+  selectRallyToDelete: (id: string) =>
     set(() => ({
       rallyId: id,
       isDialogVisible: true,
@@ -33,21 +32,21 @@ export const useStoreTxUiCancelRally = create<TxUiCancelRally>((set) => ({
   rallyId: undefined,
 }))
 
-export function useCancelAudioChat(stateTxUiCancelRally: TxUiCancelRally, refetch: any) {
+export function useDeleteAudioChat(stateTxUiDeleteRally: TxUiDeleteRally, refetch: any) {
   const { chain } = useNetwork()
   const queryClient = useQueryClient()
   // Query to create a new audio chat
-  const contractWriteCancelAudioChat = useContractWrite({
+  const contractWriteDeleteAudioChat = useContractWrite({
     mode: 'recklesslyUnprepared',
     address: CONTRACT_AUDIO_CHATS,
     abi: audioChatABI,
-    functionName: 'changeState',
+    functionName: 'deleteAudioChat',
     chainId: chain?.id,
   })
 
-  // Transaction receipt for `contractWriteCancelAudioChat` (change audiochat state query)
-  const txCancelAudioChat = useWaitForTransaction({
-    hash: contractWriteCancelAudioChat?.data?.hash,
+  // Transaction receipt for `contractWriteDeleteAudioChat` (change audiochat state query)
+  const txDeleteAudioChat = useWaitForTransaction({
+    hash: contractWriteDeleteAudioChat?.data?.hash,
     chainId: chain?.id,
     onError(e) {
       console.error(e)
@@ -56,36 +55,40 @@ export function useCancelAudioChat(stateTxUiCancelRally: TxUiCancelRally, refetc
     async onSuccess() {
       try {
         await queryClient.invalidateQueries({
-          queryKey: ['audio-chat-metadata', stateTxUiCancelRally.rallyId],
+          queryKey: ['audio-chat-metadata', stateTxUiDeleteRally.rallyId],
           type: 'active',
           exact: true,
         })
         await refetch()
-        stateTxUiCancelRally.resetState()
-        toast.success('Your rally was cancelled successfully !')
+        stateTxUiDeleteRally.resetState()
+        toast.success('Your rally was deleted successfully !')
       } catch (e) {
         console.error(e)
       }
     },
   })
 
-  async function onClickCancelAudioChat() {
+  async function onClickDeleteAudioChat() {
     try {
-      await contractWriteCancelAudioChat?.writeAsync?.({
+      await contractWriteDeleteAudioChat?.writeAsync?.({
         //@ts-ignore
-        recklesslySetUnpreparedArgs: [DICTIONARY_STATES_AUDIO_CHATS.CANCELLED.value, stateTxUiCancelRally.rallyId],
+        recklesslySetUnpreparedArgs: [stateTxUiDeleteRally.rallyId],
+        recklesslySetUnpreparedOverrides: {
+          gasLimit: 2100000,
+          gasPrice: 8000000000,
+        },
       })
     } catch (e) {
       console.error(e)
     }
   }
   return {
-    onClickCancelAudioChat,
-    stateCancelAudioChat: {
-      contract: contractWriteCancelAudioChat,
-      transaction: txCancelAudioChat,
+    onClickDeleteAudioChat,
+    stateDeleteAudioChat: {
+      contract: contractWriteDeleteAudioChat,
+      transaction: txDeleteAudioChat,
     },
   }
 }
 
-export default useCancelAudioChat
+export default useDeleteAudioChat

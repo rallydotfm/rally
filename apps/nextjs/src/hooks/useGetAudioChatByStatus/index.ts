@@ -23,7 +23,7 @@ export function useGetAudioChatByState(states: Array<number>) {
     queries: queryAudioChatsByStateRawData?.data?.length
       ? queryAudioChatsByStateRawData?.data?.map((audioChat: any) => {
           return {
-            queryKey: ['audio-chat-metadata', audioChat?.cid_metadata],
+            queryKey: ['audio-chat-metadata', audioChat?.audio_event_id],
             queryFn: async () => await getAudioChatMetadata(audioChat),
             staleTime: 0,
           }

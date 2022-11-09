@@ -18,7 +18,7 @@ export function useGetAudioChatById(idAudioChat?: `0x${string}`) {
     },
   })
   const queryAudioChatMetadata = useQuery(
-    ['audio-chat-metadata', queryAudioChatByIdRawData?.data?.cid_metadata],
+    ['audio-chat-metadata', queryAudioChatByIdRawData?.data?.audio_event_id],
     async () => {
       const audioChat = queryAudioChatByIdRawData?.data
       //@ts-ignore

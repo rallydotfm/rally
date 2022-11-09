@@ -49,7 +49,7 @@ export function useUpcomingAudioChats() {
       weeklyAudioChats?.length > 0
         ? weeklyAudioChats.map((audioChat: any) => {
             return {
-              queryKey: ['upcoming-audio-chat-metadata', audioChat?.cid_metadata],
+              queryKey: ['upcoming-audio-chat-metadata', audioChat?.audio_event_id],
               queryFn: async () => {
                 const cid = audioChat?.cid_metadata
                 try {

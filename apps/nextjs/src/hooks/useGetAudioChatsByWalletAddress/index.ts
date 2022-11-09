@@ -18,13 +18,14 @@ export function useGetAudioChatsByWalletAddress(address?: string) {
       toast.error(e?.message)
     },
   })
+
   const queriesAudioChatsByAddressMetadata = useQueries({
     //@ts-ignore
     enabled: queryAudioChatsByAddressRawData?.data?.length > 0 ?? false,
     queries: queryAudioChatsByAddressRawData?.data?.length
       ? queryAudioChatsByAddressRawData?.data?.map((audioChat) => {
           return {
-            queryKey: ['audio-chat-metadata', audioChat?.cid_metadata],
+            queryKey: ['audio-chat-metadata', audioChat?.audio_event_id],
             queryFn: async () => await getAudioChatMetadata(audioChat),
           }
         })

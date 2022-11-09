@@ -6,14 +6,20 @@ import { getLayout } from '@layouts/LayoutDashboard'
 import Button from '@components/Button'
 import Link from 'next/link'
 import button from '@components/Button/styles'
-import { ROUTE_RALLY_UPDATE, ROUTE_RALLY_VIEW } from '@config/routes'
+import { ROUTE_RALLY_EDIT, ROUTE_RALLY_VIEW } from '@config/routes'
 import { IconSpinner } from '@components/Icons'
 import { DICTIONARY_STATES_AUDIO_CHATS } from '@helpers/mappingAudioChatState'
-import { CalendarIcon } from '@heroicons/react/20/solid'
+import { CalendarIcon, ExclamationCircleIcon, PencilIcon, TrashIcon } from '@heroicons/react/20/solid'
 import { format, isFuture, formatRelative } from 'date-fns'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useCancelAudioChat, useStoreTxUiCancelRally } from '@hooks/useCancelAudioChat'
-import DialogModal from '@components/DialogModal'
+import { useDeleteAudioChat, useStoreTxUiDeleteRally } from '@hooks/useDeleteAudioChat'
+import { useGoLiveAudioChat, useStoreTxUiGoLiveRally } from '@hooks/useGoLiveAudioChat'
+import DialogCancelRallyConfirmation from '@components/DialogCancelRallyConfirmation'
+import DialogDeleteRallyConfirmation from '@components/DialogDeleteRallyConfirmation'
+import DialogGoLive from '@components/DialogGoLive'
+import { Menu } from '@headlessui/react'
+import { useRouter } from 'next/router'
 
 const SORT_ORDER = {
   START_CLOSEST: 'start_at.closest',
@@ -25,11 +31,21 @@ const Page: NextPage = () => {
   const { address } = useAccount()
   const { queryAudioChatsByAddressRawData, queriesAudioChatsByAddressMetadata } =
     useGetAudioChatsByWalletAddress(address)
+
+  const stateTxUiRallyGoLive = useStoreTxUiGoLiveRally()
+  const { onClickGoLive, stateGoLive } = useGoLiveAudioChat(stateTxUiRallyGoLive)
+
   const stateTxUiCancelRally = useStoreTxUiCancelRally()
   const { onClickCancelAudioChat, stateCancelAudioChat } = useCancelAudioChat(
     stateTxUiCancelRally,
     queryAudioChatsByAddressRawData.refetch,
   )
+  const stateTxUiDeleteRally = useStoreTxUiDeleteRally()
+  const { onClickDeleteAudioChat, stateDeleteAudioChat } = useDeleteAudioChat(
+    stateTxUiDeleteRally,
+    queryAudioChatsByAddressRawData.refetch,
+  )
+  const { push } = useRouter()
   const [sortOrder, setSortOrder] = useState(SORT_ORDER.START_CLOSEST)
   return (
     <>
@@ -37,7 +53,7 @@ const Page: NextPage = () => {
         <title>Dashboard - Rally</title>
         <meta name="description" content="Rally is the place to be." />
       </Head>
-      <main>
+      <main className="pb-32">
         {(queryAudioChatsByAddressRawData.isLoading ||
           queriesAudioChatsByAddressMetadata.filter((query) => query?.isLoading)?.length > 0) && (
           <div className="mb-6 flex items-center justify-center space-i-1ex">
@@ -48,7 +64,7 @@ const Page: NextPage = () => {
         {queryAudioChatsByAddressRawData.status === 'error' && <>Error</>}
         {queryAudioChatsByAddressRawData.status === 'success' && (
           <>
-            <div className="mb-3 animate-appear  flex justify-between">
+            <div className="mb-6 animate-appear  flex justify-between">
               <h2 className="font-medium text-xs text-neutral-11">
                 {queriesAudioChatsByAddressMetadata.filter((query) => query?.status === 'success')?.length} rallies
               </h2>
@@ -85,7 +101,7 @@ const Page: NextPage = () => {
                   )?.[0].state
                   return (
                     <li
-                      className="animate-appear relative overflow-hidden focus-within:bg-neutral-3 xs:pt-2 pb-3 md:pb-4 xs:pis-2 xs:pie-4 rounded-md bg-neutral-1"
+                      className="animate-appear relative focus-within:ring-4 focus-within:ring-interactive-11 xs:pt-2 pb-3 md:pb-4 xs:pis-2 xs:pie-4 rounded-md bg-neutral-1"
                       key={audioChat.data.id}
                     >
                       <Link href={ROUTE_RALLY_VIEW.replace('[idRally]', audioChat.data.id)}>
@@ -94,7 +110,7 @@ const Page: NextPage = () => {
                       <div className="xs:pt-2 xs:pis-2 xs:pie-4">
                         <article className="flex flex-col space-y-4 xs:flex-row xs:space-y-0 xs:space-i-6">
                           {audioChat?.data?.image && (
-                            <div className="relative w-full overflow-hidden xs:w-20 sm:w-32 aspect-twitter-card rounded-t-md xs:rounded-b-md">
+                            <div className="relative w-full overflow-hidden xs:w-20 sm:w-42 aspect-twitter-card rounded-t-md xs:rounded-b-md">
                               <div className="bg-neutral-5 absolute w-full h-full inset-0 animate-pulse" />
                               <img
                                 alt=""
@@ -112,10 +128,10 @@ const Page: NextPage = () => {
                             <h1 className="font-bold">{audioChat.data.name}</h1>
                             {audioChat.data.state !== DICTIONARY_STATES_AUDIO_CHATS.CANCELLED.label ? (
                               <>
-                                <p className="mt-2 font-medium flex items-start text-neutral-12 text-xs">
+                                <p className="mt-2 font-medium flex flex-wrap items-baseline text-neutral-12 text-xs">
                                   <CalendarIcon className="translate-y-1 opacity-90 shrink-0 w-5 mie-2" />
                                   {formatRelative(audioChat.data.datetime_start_at, new Date())}
-                                  <br />
+
                                   <span>&nbsp;({format(audioChat.data.datetime_start_at, 'ppp')})</span>
                                 </p>
                               </>
@@ -130,49 +146,83 @@ const Page: NextPage = () => {
                             </p>
                           </div>
                         </article>
-                        <div className="flex flex-col space-y-3 xs:space-y-0 xs:flex-row border-t border-t-neutral-5 pt-3 px-4 xs:pt-1.5 md:pt-4 mt-6 xs:-mis-4 xs:-mie-8 xs:px-6">
+                        <div className="flex items-center border-t border-t-neutral-5 pt-3 px-4 xs:pt-1.5 md:pt-4 mt-6 xs:-mis-4 xs:-mie-8 xs:px-6">
                           {[
                             DICTIONARY_STATES_AUDIO_CHATS.PLANNED.value,
                             DICTIONARY_STATES_AUDIO_CHATS.READY.value,
                             //@ts-ignore
                           ].includes(rawDataState) &&
                             isFuture(audioChat.data.datetime_start_at) && (
-                              <Button className="relative z-10">Go live</Button>
+                              <Button
+                                onClick={async () => {
+                                  stateTxUiRallyGoLive.setDialogVisibility(true)
+                                  await onClickGoLive(audioChat.data.id)
+                                }}
+                                scale="sm"
+                                className="w-auto relative z-10"
+                              >
+                                Go live
+                              </Button>
                             )}
-                          <div className="xs:mis-auto">
-                            {[
-                              DICTIONARY_STATES_AUDIO_CHATS.PLANNED.value,
-                              DICTIONARY_STATES_AUDIO_CHATS.READY.value,
-                              //@ts-ignore
-                            ].includes(rawDataState) &&
-                              isFuture(audioChat.data.datetime_start_at) && (
-                                <Link href={ROUTE_RALLY_UPDATE.replace('[idRally]', audioChat.data.id)}>
-                                  <a
-                                    className={button({
-                                      scale: 'sm',
-                                      intent: 'primary-ghost',
-                                      class: 'relative z-20 xs:mie-4',
-                                    })}
-                                  >
-                                    Edit
-                                  </a>
-                                </Link>
-                              )}
-
-                            {/* @ts-ignore */}
-                            {[DICTIONARY_STATES_AUDIO_CHATS.PLANNED.value].includes(rawDataState) &&
-                              isFuture(audioChat.data.datetime_start_at) && (
-                                <Button
-                                  onClick={() => {
-                                    stateTxUiCancelRally.selectRallyToCancel(audioChat.data.id)
-                                  }}
-                                  scale="sm"
-                                  intent="negative-ghost"
-                                  className="relative xs:mie-4 z-20"
+                          <div className="mis-auto">
+                            {(![DICTIONARY_STATES_AUDIO_CHATS.LIVE.label].includes(rawDataState) ||
+                              ([
+                                DICTIONARY_STATES_AUDIO_CHATS.PLANNED.value,
+                                DICTIONARY_STATES_AUDIO_CHATS.READY.value,
+                                //@ts-ignore
+                              ].includes(rawDataState) &&
+                                isFuture(audioChat.data.datetime_start_at))) && (
+                              <Menu as="div" className="text-2xs relative z-10">
+                                <Menu.Button
+                                  className={button({
+                                    intent: 'neutral-ghost',
+                                    scale: 'xs',
+                                    class: 'ui-open:bg-opacity-10 rounded-md',
+                                  })}
                                 >
-                                  Cancel
-                                </Button>
-                              )}
+                                  More
+                                </Menu.Button>
+                                <Menu.Items className="absolute flex flex-col w-full  xs:w-max-content inline-end-0 mt-2 origin-top-right divide-y border-neutral-6 border divide-neutral-4 rounded-md overflow-hidden bg-neutral-3 focus:outline-none">
+                                  {[
+                                    DICTIONARY_STATES_AUDIO_CHATS.PLANNED.value,
+                                    DICTIONARY_STATES_AUDIO_CHATS.READY.value,
+                                    //@ts-ignore
+                                  ].includes(rawDataState) &&
+                                    isFuture(audioChat.data.datetime_start_at) && (
+                                      <>
+                                        <Menu.Item
+                                          as="button"
+                                          className="flex items-center space-i-2 px-4 text-start py-2.5 ui-active:bg-neutral-12 ui-active:text-neutral-1 font-bold"
+                                          onClick={() => push(ROUTE_RALLY_EDIT.replace('[idRally]', audioChat.data.id))}
+                                        >
+                                          <PencilIcon className="ui-active:text-interactive-9 w-4 mie-1ex" />
+                                          Edit
+                                        </Menu.Item>
+                                        <Menu.Item
+                                          className="flex items-center space-i-2 px-4 text-start py-2.5 ui-active:bg-neutral-12 ui-active:text-neutral-1 font-bold"
+                                          as="button"
+                                          onClick={() => stateTxUiCancelRally.selectRallyToCancel(audioChat.data.id)}
+                                        >
+                                          <ExclamationCircleIcon className="ui-active:text-interactive-9 w-4 mie-1ex" />
+                                          Cancel
+                                        </Menu.Item>
+                                      </>
+                                    )}
+
+                                  {![DICTIONARY_STATES_AUDIO_CHATS.LIVE.label].includes(rawDataState) &&
+                                    isFuture(audioChat.data.datetime_start_at) && (
+                                      <Menu.Item
+                                        className="flex items-center space-i-2 px-4 text-start py-2.5 ui-active:text-neutral-1 ui-active:bg-neutral-12 font-bold"
+                                        as="button"
+                                        onClick={() => stateTxUiDeleteRally.selectRallyToDelete(audioChat.data.id)}
+                                      >
+                                        <TrashIcon className="w-4 mie-1ex ui-active:text-negative-9" />
+                                        Delete forever
+                                      </Menu.Item>
+                                    )}
+                                </Menu.Items>
+                              </Menu>
+                            )}
                           </div>
                         </div>
                       </div>
@@ -183,30 +233,17 @@ const Page: NextPage = () => {
           </>
         )}
       </main>
-      <DialogModal
-        title="Cancel rally"
-        isOpen={stateTxUiCancelRally.isDialogVisible}
-        setIsOpen={stateTxUiCancelRally.setDialogVisibility}
-      >
-        <p className="font-bold text-center py-6">Are you sure you want to cancel this rally ?</p>
-        <div className="flex flex-col justify-center items-center xs:flex-row space-y-3 xs:space-y-0 xs:space-i-3">
-          <Button
-            isLoading={stateCancelAudioChat.contract.isLoading || stateCancelAudioChat.transaction.isLoading}
-            disabled={
-              stateCancelAudioChat.contract.isLoading ||
-              stateCancelAudioChat.transaction.isLoading ||
-              stateCancelAudioChat.contract.isSuccess ||
-              stateCancelAudioChat.transaction.isSuccess
-            }
-            onClick={onClickCancelAudioChat}
-          >
-            Yes, cancel this rally
-          </Button>
-          <Button onClick={stateTxUiCancelRally.resetState} intent="neutral-outline">
-            Go back
-          </Button>
-        </div>
-      </DialogModal>
+      <DialogCancelRallyConfirmation
+        stateTxUi={stateTxUiCancelRally}
+        stateCancelAudioChat={stateCancelAudioChat}
+        onClickCancel={onClickCancelAudioChat}
+      />
+      <DialogDeleteRallyConfirmation
+        stateTxUi={stateTxUiDeleteRally}
+        stateDeleteAudioChat={stateDeleteAudioChat}
+        onClickDelete={onClickDeleteAudioChat}
+      />
+      <DialogGoLive stateTxUi={stateTxUiRallyGoLive} stateDeleteAudioChat={stateGoLive} />
     </>
   )
 }

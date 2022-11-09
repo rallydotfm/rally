@@ -12,6 +12,7 @@ import Button from '@components/Button'
 import Notice from '@components/Notice'
 import button from '@components/Button/styles'
 import { useUnmountEffect } from '@react-hookz/web'
+import { DeploymentStep } from '@components/DeploymentStep'
 
 const Page: NextPage = () => {
   const stateTxUi = useStoreTxUi()
@@ -66,12 +67,13 @@ const Page: NextPage = () => {
         <ol className="space-y-3 mt-6 font-medium text-xs">
           {formAudioChat?.data()?.rally_image_file && (
             <li className={`flex items-center text-white`}>
-              {stateNewAudioChat.uploadImage.isSuccess && <CheckCircleIcon className="w-5 text-positive-11" />}
-              {stateNewAudioChat.uploadImage.isError && <ExclamationTriangleIcon className="w-5 text-negative-10" />}
-              {stateNewAudioChat.uploadImage.isLoading && <IconSpinner className="animate-spin" />}
-              <span className={`pis-1ex ${stateNewAudioChat.uploadImage.isLoading ? 'animate-pulse' : ''}`}>
+              <DeploymentStep
+                isLoading={stateNewAudioChat.uploadImage.isLoading}
+                isError={stateNewAudioChat.uploadImage.isError}
+                isSuccess={stateNewAudioChat.uploadImage.isSuccess}
+              >
                 Uploading image to IPFS
-              </span>
+              </DeploymentStep>
             </li>
           )}
           {formAudioChat.data()?.rally_has_cohosts === true && (
@@ -80,12 +82,13 @@ const Page: NextPage = () => {
               flex items-center
              ${stateNewAudioChat.uploadData.isIdle ? 'text-neutral-11' : 'text-white'}`}
             >
-              {stateNewAudioChat.signEncryption.isSuccess && <CheckCircleIcon className="w-5 text-positive-11" />}
-              {stateNewAudioChat.signEncryption.isError && <ExclamationTriangleIcon className="w-5 text-negative-10" />}
-              {stateNewAudioChat.signEncryption.isLoading && <IconSpinner className="animate-spin" />}
-              <span className={`pis-1ex ${stateNewAudioChat.signEncryption.isLoading ? 'animate-pulse' : ''}`}>
+              <DeploymentStep
+                isLoading={stateNewAudioChat.signEncryption.isLoading}
+                isError={stateNewAudioChat.signEncryption.isError}
+                isSuccess={stateNewAudioChat.signEncryption.isSuccess}
+              >
                 Confirming co-hosts Etheurem address encryption
-              </span>
+              </DeploymentStep>
             </li>
           )}
           <li
@@ -93,36 +96,39 @@ const Page: NextPage = () => {
             flex items-center
             ${stateNewAudioChat.uploadData.isIdle ? 'text-neutral-11' : 'text-white'}`}
           >
-            {stateNewAudioChat.uploadData.isSuccess && <CheckCircleIcon className="w-5 text-positive-11" />}
-            {stateNewAudioChat.uploadData.isError && <ExclamationTriangleIcon className="w-5 text-negative-10" />}
-            {stateNewAudioChat.uploadData.isLoading && <IconSpinner className="animate-spin" />}
-            <span className={`pis-1ex ${stateNewAudioChat.uploadData.isLoading ? 'animate-pulse' : ''}`}>
+            <DeploymentStep
+              isLoading={stateNewAudioChat.uploadData.isLoading}
+              isError={stateNewAudioChat.uploadData.isError}
+              isSuccess={stateNewAudioChat.uploadData.isSuccess}
+            >
               Uploading Rally metadata
-            </span>
+            </DeploymentStep>
           </li>
           <li
             className={`
             flex items-center 
             ${stateNewAudioChat.contract.isIdle ? 'text-neutral-11' : 'text-white'}`}
           >
-            {stateNewAudioChat.contract.isSuccess && <CheckCircleIcon className="w-5 text-positive-11" />}
-            {stateNewAudioChat.contract.isError && <ExclamationTriangleIcon className="w-5 text-negative-10" />}
-            {stateNewAudioChat.contract.isLoading && <IconSpinner className="animate-spin" />}
-            <span className={`pis-1ex ${stateNewAudioChat.contract.isLoading ? 'animate-pulse' : ''}`}>
-              Sign create rally transaction
-            </span>
+            <DeploymentStep
+              isLoading={stateNewAudioChat.contract.isLoading}
+              isError={stateNewAudioChat.contract.isError}
+              isSuccess={stateNewAudioChat.contract.isSuccess}
+            >
+              Sign create rally transaction{' '}
+            </DeploymentStep>
           </li>
           <li
             className={`
             flex items-center 
             ${stateNewAudioChat.transaction.isIdle ? 'text-neutral-11' : 'text-white'}`}
           >
-            {stateNewAudioChat.transaction.isSuccess && <CheckCircleIcon className="w-5 text-positive-11" />}
-            {stateNewAudioChat.transaction.isError && <ExclamationTriangleIcon className="w-5 text-negative-10" />}
-            {stateNewAudioChat.transaction.isLoading && <IconSpinner className="animate-spin" />}
-            <span className={`pis-1ex ${stateNewAudioChat.transaction.isLoading ? 'animate-pulse' : ''}`}>
+            <DeploymentStep
+              isLoading={stateNewAudioChat.transaction.isLoading}
+              isError={stateNewAudioChat.transaction.isError}
+              isSuccess={stateNewAudioChat.transaction.isSuccess}
+            >
               Creating rally
-            </span>
+            </DeploymentStep>
           </li>
         </ol>
         {[

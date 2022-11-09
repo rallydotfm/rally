@@ -2,10 +2,10 @@ import type { NextPage } from 'next'
 import Head from 'next/head'
 import { IconSpinner } from '@components/Icons'
 import Notice from '@components/Notice'
-import FormUpdateAudioChat from '@components/pages/rally/update/FormUpdateAudioChat'
+import FormEditAudioChat from '@components/pages/rally/edit/FormEditAudioChat'
 import { useRouter } from 'next/router'
 import { useAccount } from 'wagmi'
-import useGetAudioChatToUpdate from '@components/pages/rally/update/useGetAudioChatToUpdate'
+import useGetAudioChatToEdit from '@components/pages/rally/edit/useGetAudioChatToEdit'
 
 const Page: NextPage = () => {
   const { address } = useAccount()
@@ -16,16 +16,16 @@ const Page: NextPage = () => {
   //@ts-ignore
   const { queryAudioChatByIdRawData, queryAudioChatMetadata, queryDecryptCohostsAddress } =
     //@ts-ignore
-    useGetAudioChatToUpdate(idRally)
+    useGetAudioChatToEdit(idRally)
 
   return (
     <>
       <Head>
-        <title>Update rally - Rally</title>
+        <title>Edit rally - Rally</title>
         <meta name="description" content="Rally is the place to be." />
       </Head>
       <main>
-        <h1 className="font-bold text-2xl mb-3">Update rally</h1>
+        <h1 className="font-bold text-2xl mb-3">Edit rally</h1>
         {!isReady ||
           (queryAudioChatByIdRawData?.status === 'loading' && (
             <div className="animate-appear flex items-center space-i-1ex">
@@ -45,7 +45,7 @@ const Page: NextPage = () => {
                   (queryAudioChatMetadata?.data?.cohosts_list?.length === 0 ||
                     (queryAudioChatMetadata?.data?.cohosts_list?.length > 0 &&
                       queryDecryptCohostsAddress?.isSuccess)) && (
-                    <FormUpdateAudioChat
+                    <FormEditAudioChat
                       //@ts-ignore
                       values={{
                         ...queryAudioChatMetadata.data,
