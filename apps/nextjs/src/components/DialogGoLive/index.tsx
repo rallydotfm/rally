@@ -13,7 +13,7 @@ export const DialogGoLive = (props: any) => {
         After this, you'll be redirected to your rally page, and your rally will be open for other people to join.
       </p>
 
-      <ol className="mt-6">
+      <ol className="mt-6 space-y-3 font-medium text-xs">
         <li
           className={`
           flex items-center 

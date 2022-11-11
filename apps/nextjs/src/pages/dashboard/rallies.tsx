@@ -147,10 +147,10 @@ const Page: NextPage = () => {
                         </article>
                         <div className="flex items-center border-t border-t-neutral-5 pt-3 px-4 xs:pt-1.5 md:pt-4 mt-6 xs:-mis-4 xs:-mie-8 xs:px-6">
                           {[
-                            DICTIONARY_STATES_AUDIO_CHATS.PLANNED.value,
-                            DICTIONARY_STATES_AUDIO_CHATS.READY.value,
+                            DICTIONARY_STATES_AUDIO_CHATS.PLANNED.label,
+                            DICTIONARY_STATES_AUDIO_CHATS.READY.label,
                             //@ts-ignore
-                          ].includes(rawDataState) &&
+                          ].includes(audioChat.data.state) &&
                             isFuture(audioChat.data.datetime_start_at) && (
                               <Button
                                 onClick={async () => {
@@ -166,12 +166,12 @@ const Page: NextPage = () => {
                           <div className="mis-auto">
                             <>
                               {/** @ts-ignore */}
-                              {(![DICTIONARY_STATES_AUDIO_CHATS.LIVE.label].includes(rawDataState) ||
+                              {(![DICTIONARY_STATES_AUDIO_CHATS.LIVE.label].includes(audioChat.data.state) ||
                                 ([
-                                  DICTIONARY_STATES_AUDIO_CHATS.PLANNED.value,
-                                  DICTIONARY_STATES_AUDIO_CHATS.READY.value,
+                                  DICTIONARY_STATES_AUDIO_CHATS.PLANNED.label,
+                                  DICTIONARY_STATES_AUDIO_CHATS.READY.label,
                                   //@ts-ignore
-                                ].includes(rawDataState) &&
+                                ].includes(audioChat.data.state) &&
                                   isFuture(audioChat.data.datetime_start_at))) && (
                                 <Menu as="div" className="text-2xs relative z-10">
                                   <Menu.Button
@@ -185,10 +185,10 @@ const Page: NextPage = () => {
                                   </Menu.Button>
                                   <Menu.Items className="absolute flex flex-col w-full  xs:w-max-content inline-end-0 mt-2 origin-top-right divide-y border-neutral-6 border divide-neutral-4 rounded-md overflow-hidden bg-neutral-3 focus:outline-none">
                                     {[
-                                      DICTIONARY_STATES_AUDIO_CHATS.PLANNED.value,
-                                      DICTIONARY_STATES_AUDIO_CHATS.READY.value,
+                                      DICTIONARY_STATES_AUDIO_CHATS.PLANNED.label,
+                                      DICTIONARY_STATES_AUDIO_CHATS.READY.label,
                                       //@ts-ignore
-                                    ].includes(rawDataState) &&
+                                    ].includes(audioChat.data.state) &&
                                       isFuture(audioChat.data.datetime_start_at) && (
                                         <>
                                           <Menu.Item
@@ -212,7 +212,7 @@ const Page: NextPage = () => {
                                         </>
                                       )}
                                     {/* @ts-ignore */}
-                                    {![DICTIONARY_STATES_AUDIO_CHATS.LIVE.label].includes(rawDataState) && (
+                                    {![DICTIONARY_STATES_AUDIO_CHATS.LIVE.label].includes(audioChat.data.state) && (
                                       <Menu.Item
                                         className="flex items-center space-i-2 px-4 text-start py-2.5 ui-active:text-neutral-1 ui-active:bg-neutral-12 font-bold"
                                         as="button"
