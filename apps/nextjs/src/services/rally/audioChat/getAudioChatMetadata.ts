@@ -16,6 +16,7 @@ export async function getAudioChatMetadata(audioChat: {
     return {
       id: audioChat?.audio_event_id,
       cid: audioChat?.cid_metadata,
+      //@ts-ignore @todo check this
       is_indexed: audioChat?.is_indexed ?? false,
       //@ts-ignore
       state: DICTIONARY_STATES_AUDIO_CHATS[audioChat?.state],

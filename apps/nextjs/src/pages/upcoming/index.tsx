@@ -100,9 +100,6 @@ const Page: NextPage = () => {
                 {queriesUpcomingAudioChatsMetadata.filter((query) => query?.status === 'success')?.length} rallies
                 happening this week
               </h2>
-              <Button intent="neutral-ghost" scale="xs" onClick={() => queryAudioChatsByStateRawData.refetch()}>
-                Refresh
-              </Button>
             </div>
             <CalendarWeek
               events={queriesUpcomingAudioChatsMetadata?.filter((query) => isThisWeek(query?.data?.datetime_start_at))}

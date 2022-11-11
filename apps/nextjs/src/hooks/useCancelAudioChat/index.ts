@@ -60,7 +60,11 @@ export function useCancelAudioChat(stateTxUiCancelRally: TxUiCancelRally, refetc
           type: 'active',
           exact: true,
         })
-        await refetch()
+        queryClient.setQueryData(['audio-chat-metadata', stateTxUiCancelRally.rallyId], (rallyData) => ({
+          //@ts-ignore
+          ...rallyData,
+          state: DICTIONARY_STATES_AUDIO_CHATS.CANCELLED.label,
+        }))
         stateTxUiCancelRally.resetState()
         toast.success('Your rally was cancelled successfully !')
       } catch (e) {

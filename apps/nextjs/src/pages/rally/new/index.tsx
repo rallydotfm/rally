@@ -64,6 +64,7 @@ const Page: NextPage = () => {
         setIsOpen={stateTxUi.setDialogVisibility}
       >
         <span className="font-bold">Deploying new rally</span>
+        {/* @ts-ignore */}
         <ol className="space-y-3 mt-6 font-medium text-xs">
           {formAudioChat?.data()?.rally_image_file && (
             <li className={`flex items-center text-white`}>
@@ -114,7 +115,7 @@ const Page: NextPage = () => {
               isError={stateNewAudioChat.contract.isError}
               isSuccess={stateNewAudioChat.contract.isSuccess}
             >
-              Sign create rally transaction{' '}
+              Sign the 'Create rally' transaction{' '}
             </DeploymentStep>
           </li>
           <li

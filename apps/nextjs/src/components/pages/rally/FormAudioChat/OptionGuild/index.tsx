@@ -10,6 +10,7 @@ interface OptionGuildProps {
   index: number
   data: any
   setData: any
+  disabled: boolean
 }
 
 const OptionGuild = (props: OptionGuildProps) => {

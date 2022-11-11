@@ -18,6 +18,7 @@ import { useGoLiveAudioChat, useStoreTxUiGoLiveRally } from '@hooks/useGoLiveAud
 import DialogCancelRallyConfirmation from '@components/DialogCancelRallyConfirmation'
 import DialogDeleteRallyConfirmation from '@components/DialogDeleteRallyConfirmation'
 import DialogGoLive from '@components/DialogGoLive'
+import BadgeRallyState from '@components/BadgeRallyState'
 import { Menu } from '@headlessui/react'
 import { useRouter } from 'next/router'
 
@@ -64,17 +65,10 @@ const Page: NextPage = () => {
         {queryAudioChatsByAddressRawData.status === 'error' && <>Error</>}
         {queryAudioChatsByAddressRawData.status === 'success' && (
           <>
-            <div className="mb-6 animate-appear  flex justify-between">
+            <div className="mb-6 animate-appear flex justify-between">
               <h2 className="font-medium text-xs text-neutral-11">
                 {queriesAudioChatsByAddressMetadata.filter((query) => query?.status === 'success')?.length} rallies
               </h2>
-              <Button
-                intent="neutral-ghost"
-                scale="xs"
-                onClick={async () => await queryAudioChatsByAddressRawData.refetch()}
-              >
-                Refresh
-              </Button>
             </div>
             <ul
               className={`${
@@ -101,16 +95,20 @@ const Page: NextPage = () => {
                   )?.[0].state
                   return (
                     <li
-                      className="animate-appear relative focus-within:ring-4 focus-within:ring-interactive-11 xs:pt-2 pb-3 md:pb-4 xs:pis-2 xs:pie-4 rounded-md bg-neutral-1"
+                      className={`animate-appear relative focus-within:z-10 focus-within:ring-4 focus-within:ring-interactive-11 xs:pt-2 pb-3 md:pb-4 xs:pis-2 xs:pie-4 rounded-md bg-neutral-1`}
                       key={audioChat.data.id}
                     >
                       <Link href={ROUTE_RALLY_VIEW.replace('[idRally]', audioChat.data.id)}>
                         <a className="absolute inset-0 w-full h-full opacity-0">View page</a>
                       </Link>
                       <div className="xs:pt-2 xs:pis-2 xs:pie-4">
-                        <article className="flex flex-col space-y-4 xs:flex-row xs:space-y-0 xs:space-i-6">
+                        <article
+                          className={`${
+                            audioChat.data.state === DICTIONARY_STATES_AUDIO_CHATS.CANCELLED.label ? 'opacity-50' : ''
+                          } flex flex-col space-y-4 xs:flex-row xs:space-y-0 xs:space-i-6`}
+                        >
                           {audioChat?.data?.image && (
-                            <div className="relative w-full overflow-hidden xs:w-20 sm:w-42 aspect-twitter-card rounded-t-md xs:rounded-b-md">
+                            <div className="relative w-full overflow-hidden xs:w-32 md:aspect-square lg:w-32 aspect-twitter-card rounded-t-md xs:rounded-b-md">
                               <div className="bg-neutral-5 absolute w-full h-full inset-0 animate-pulse" />
                               <img
                                 alt=""
@@ -125,8 +123,11 @@ const Page: NextPage = () => {
 
                           <div className="px-4 flex-grow flex flex-col xs:px-0">
                             {' '}
-                            <h1 className="font-bold">{audioChat.data.name}</h1>
-                            {audioChat.data.state !== DICTIONARY_STATES_AUDIO_CHATS.CANCELLED.label ? (
+                            <h1 className="font-bold flex flex-col-reverse">
+                              <span className="py-2">{audioChat.data.name}</span>
+                              <BadgeRallyState state={audioChat.data.state} />
+                            </h1>
+                            {audioChat.data.state !== DICTIONARY_STATES_AUDIO_CHATS.CANCELLED.label && (
                               <>
                                 <p className="mt-2 font-medium flex flex-wrap items-baseline text-neutral-12 text-xs">
                                   <CalendarIcon className="translate-y-1 opacity-90 shrink-0 w-5 mie-2" />
@@ -135,8 +136,6 @@ const Page: NextPage = () => {
                                   <span>&nbsp;({format(audioChat.data.datetime_start_at, 'ppp')})</span>
                                 </p>
                               </>
-                            ) : (
-                              'Cancelled'
                             )}
                             <p className="text-neutral-12 uppercase font-bold tracking-wide text-2xs mt-2">
                               {audioChat.data.is_gated ? 'Gated access' : 'Free access'}
@@ -165,52 +164,55 @@ const Page: NextPage = () => {
                               </Button>
                             )}
                           <div className="mis-auto">
-                            {(![DICTIONARY_STATES_AUDIO_CHATS.LIVE.label].includes(rawDataState) ||
-                              ([
-                                DICTIONARY_STATES_AUDIO_CHATS.PLANNED.value,
-                                DICTIONARY_STATES_AUDIO_CHATS.READY.value,
-                                //@ts-ignore
-                              ].includes(rawDataState) &&
-                                isFuture(audioChat.data.datetime_start_at))) && (
-                              <Menu as="div" className="text-2xs relative z-10">
-                                <Menu.Button
-                                  className={button({
-                                    intent: 'neutral-ghost',
-                                    scale: 'xs',
-                                    class: 'ui-open:bg-opacity-10 rounded-md',
-                                  })}
-                                >
-                                  More
-                                </Menu.Button>
-                                <Menu.Items className="absolute flex flex-col w-full  xs:w-max-content inline-end-0 mt-2 origin-top-right divide-y border-neutral-6 border divide-neutral-4 rounded-md overflow-hidden bg-neutral-3 focus:outline-none">
-                                  {[
-                                    DICTIONARY_STATES_AUDIO_CHATS.PLANNED.value,
-                                    DICTIONARY_STATES_AUDIO_CHATS.READY.value,
-                                    //@ts-ignore
-                                  ].includes(rawDataState) &&
-                                    isFuture(audioChat.data.datetime_start_at) && (
-                                      <>
-                                        <Menu.Item
-                                          as="button"
-                                          className="flex items-center space-i-2 px-4 text-start py-2.5 ui-active:bg-neutral-12 ui-active:text-neutral-1 font-bold"
-                                          onClick={() => push(ROUTE_RALLY_EDIT.replace('[idRally]', audioChat.data.id))}
-                                        >
-                                          <PencilIcon className="ui-active:text-interactive-9 w-4 mie-1ex" />
-                                          Edit
-                                        </Menu.Item>
-                                        <Menu.Item
-                                          className="flex items-center space-i-2 px-4 text-start py-2.5 ui-active:bg-neutral-12 ui-active:text-neutral-1 font-bold"
-                                          as="button"
-                                          onClick={() => stateTxUiCancelRally.selectRallyToCancel(audioChat.data.id)}
-                                        >
-                                          <ExclamationCircleIcon className="ui-active:text-interactive-9 w-4 mie-1ex" />
-                                          Cancel
-                                        </Menu.Item>
-                                      </>
-                                    )}
-
-                                  {![DICTIONARY_STATES_AUDIO_CHATS.LIVE.label].includes(rawDataState) &&
-                                    isFuture(audioChat.data.datetime_start_at) && (
+                            <>
+                              {/** @ts-ignore */}
+                              {(![DICTIONARY_STATES_AUDIO_CHATS.LIVE.label].includes(rawDataState) ||
+                                ([
+                                  DICTIONARY_STATES_AUDIO_CHATS.PLANNED.value,
+                                  DICTIONARY_STATES_AUDIO_CHATS.READY.value,
+                                  //@ts-ignore
+                                ].includes(rawDataState) &&
+                                  isFuture(audioChat.data.datetime_start_at))) && (
+                                <Menu as="div" className="text-2xs relative z-10">
+                                  <Menu.Button
+                                    className={button({
+                                      intent: 'neutral-ghost',
+                                      scale: 'xs',
+                                      class: 'ui-open:bg-opacity-10 rounded-md',
+                                    })}
+                                  >
+                                    More
+                                  </Menu.Button>
+                                  <Menu.Items className="absolute flex flex-col w-full  xs:w-max-content inline-end-0 mt-2 origin-top-right divide-y border-neutral-6 border divide-neutral-4 rounded-md overflow-hidden bg-neutral-3 focus:outline-none">
+                                    {[
+                                      DICTIONARY_STATES_AUDIO_CHATS.PLANNED.value,
+                                      DICTIONARY_STATES_AUDIO_CHATS.READY.value,
+                                      //@ts-ignore
+                                    ].includes(rawDataState) &&
+                                      isFuture(audioChat.data.datetime_start_at) && (
+                                        <>
+                                          <Menu.Item
+                                            as="button"
+                                            className="flex items-center space-i-2 px-4 text-start py-2.5 ui-active:bg-neutral-12 ui-active:text-neutral-1 font-bold"
+                                            onClick={() =>
+                                              push(ROUTE_RALLY_EDIT.replace('[idRally]', audioChat.data.id))
+                                            }
+                                          >
+                                            <PencilIcon className="ui-active:text-interactive-9 w-4 mie-1ex" />
+                                            Edit
+                                          </Menu.Item>
+                                          <Menu.Item
+                                            className="flex items-center space-i-2 px-4 text-start py-2.5 ui-active:bg-neutral-12 ui-active:text-neutral-1 font-bold"
+                                            as="button"
+                                            onClick={() => stateTxUiCancelRally.selectRallyToCancel(audioChat.data.id)}
+                                          >
+                                            <ExclamationCircleIcon className="ui-active:text-interactive-9 w-4 mie-1ex" />
+                                            Cancel
+                                          </Menu.Item>
+                                        </>
+                                      )}
+                                    {/* @ts-ignore */}
+                                    {![DICTIONARY_STATES_AUDIO_CHATS.LIVE.label].includes(rawDataState) && (
                                       <Menu.Item
                                         className="flex items-center space-i-2 px-4 text-start py-2.5 ui-active:text-neutral-1 ui-active:bg-neutral-12 font-bold"
                                         as="button"
@@ -220,9 +222,10 @@ const Page: NextPage = () => {
                                         Delete forever
                                       </Menu.Item>
                                     )}
-                                </Menu.Items>
-                              </Menu>
-                            )}
+                                  </Menu.Items>
+                                </Menu>
+                              )}
+                            </>
                           </div>
                         </div>
                       </div>
@@ -243,7 +246,7 @@ const Page: NextPage = () => {
         stateDeleteAudioChat={stateDeleteAudioChat}
         onClickDelete={onClickDeleteAudioChat}
       />
-      <DialogGoLive stateTxUi={stateTxUiRallyGoLive} stateDeleteAudioChat={stateGoLive} />
+      <DialogGoLive stateTxUi={stateTxUiRallyGoLive} stateGoLiveAudioChat={stateGoLive} />
     </>
   )
 }

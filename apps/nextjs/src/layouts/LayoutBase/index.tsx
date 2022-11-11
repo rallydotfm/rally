@@ -27,7 +27,7 @@ export const LayoutBase = (props: LayoutProps) => {
       <div className="flex-grow pb-12 md:pb-0 flex flex-col md:grid md:grid-cols-12">
         <MainNavBar address={address} />
         <MobileTopMenu address={address} />
-        <div className="pt-8 pb-12 md:pb-32 md:border-x md:border-neutral-4 md:border-solid md:col-span-8 px-6 flex-grow">
+        <div className="pt-8 pb-12 md:pb-32 md:border-x flex flex-col md:border-neutral-4 md:border-solid md:col-span-8 px-6 flex-grow">
           {children}
         </div>
         <div className="hidden md:block md:col-span-1 lg:col-span-2 md:pis-6 pb-6">

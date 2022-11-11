@@ -21,7 +21,7 @@ export const LayoutWalletRequired = (props: LayoutProps) => {
         </Notice>
       )}
       {chain?.unsupported === true && (
-        <Notice intent="primary-outline" className="mt-9 text-center">
+        <Notice intent="primary-outline" className="mt-9 mx-auto w-fit-content text-center">
           Please switch to Mumbai testnet to interact with this page.
         </Notice>
       )}

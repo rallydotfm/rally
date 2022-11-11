@@ -32,7 +32,7 @@ export const FormEditAudioChat = (props: any) => {
       rally_name: values.name,
       rally_description: values.description,
       rally_start_at: values.datetime_start_at.toISOString().substring(0, 16),
-      rally_image_src: `https://ipfs.io/ipfs/${values?.image}`,
+      rally_image_src: values?.image,
       rally_access_control_guilds:
         values.access_control?.guilds.map((guild: any) => ({
           guild_id: guild.guild_id,
@@ -64,6 +64,7 @@ export const FormEditAudioChat = (props: any) => {
         setIsOpen={stateTxUi.setDialogVisibility}
       >
         <span className="font-bold">Deploying rally changes</span>
+        {/* @ts-ignore */}
         <ol className="space-y-3 mt-6 font-medium text-xs">
           {formAudioChat?.data()?.rally_image_file && (
             <li className={`flex items-center text-white`}>
@@ -114,7 +115,7 @@ export const FormEditAudioChat = (props: any) => {
               isError={stateEditAudioChat.contract.isError}
               isSuccess={stateEditAudioChat.contract.isSuccess}
             >
-              Sign create rally transaction{' '}
+              Sign the 'Update rally' transaction{' '}
             </DeploymentStep>
           </li>
           <li
@@ -127,7 +128,7 @@ export const FormEditAudioChat = (props: any) => {
               isError={stateEditAudioChat.transaction.isError}
               isSuccess={stateEditAudioChat.transaction.isSuccess}
             >
-              Update rally
+              Updating rally
             </DeploymentStep>
           </li>
         </ol>

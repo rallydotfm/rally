@@ -1,7 +1,8 @@
 import DialogModal from '@components/DialogModal'
 import Button from '@components/Button'
+import { useEffect } from 'react'
 
-export const DialogDeleteRallyConfirmation = (props) => {
+export const DialogDeleteRallyConfirmation = (props: any) => {
   const { stateTxUi, stateDeleteAudioChat, onClickDelete } = props
   return (
     <DialogModal title="Delete rally" isOpen={stateTxUi.isDialogVisible} setIsOpen={stateTxUi.setDialogVisibility}>
@@ -13,12 +14,7 @@ export const DialogDeleteRallyConfirmation = (props) => {
         <Button
           intent="negative"
           isLoading={stateDeleteAudioChat.contract.isLoading || stateDeleteAudioChat.transaction.isLoading}
-          disabled={
-            stateDeleteAudioChat.contract.isLoading ||
-            stateDeleteAudioChat.transaction.isLoading ||
-            stateDeleteAudioChat.contract.isSuccess ||
-            stateDeleteAudioChat.transaction.isSuccess
-          }
+          disabled={stateDeleteAudioChat.contract.isLoading || stateDeleteAudioChat.transaction.isLoading}
           onClick={onClickDelete}
         >
           Yes, delete this rally

@@ -51,31 +51,35 @@ const Page: NextPage = () => {
             </div>
           )}
 
-          <div className="mt-5 mx-auto">
-            <h1 className="font-bold text-4xl">{queryAudioChatMetadata?.data?.name}</h1>
-          </div>
-          {(isFuture(queryAudioChatMetadata?.data?.datetime_start_at) ?? false) && (
-            <div className="animate-appear mx-auto mt-8">
-              <CountdownOpening startsAt={queryAudioChatMetadata?.data?.datetime_start_at} />
-            </div>
-          )}
+          <h1 className="sr-only">{queryAudioChatMetadata?.data?.name}</h1>
+        </header>
+        <main className="flex flex-col grow justify-center items-center">
+          <h1 className="font-bold text-4xl flex items-center flex-col-reverse">
+            <span>{queryAudioChatMetadata?.data?.name}</span>
+            <span className="text-2xs uppercase tracking-wider">{queryAudioChatMetadata?.data?.state}</span>
+          </h1>
+          {queryAudioChatMetadata?.data?.state === DICTIONARY_STATES_AUDIO_CHATS.PLANNED.label &&
+            (isFuture(queryAudioChatMetadata?.data?.datetime_start_at) ?? false) && (
+              <div className="animate-appear mx-auto mt-8">
+                <CountdownOpening startsAt={queryAudioChatMetadata?.data?.datetime_start_at} />
+              </div>
+            )}
           {address === queryAudioChatMetadata?.data?.creator &&
-            [DICTIONARY_STATES_AUDIO_CHATS.READY.value, DICTIONARY_STATES_AUDIO_CHATS.PLANNED.value].includes(
+            [DICTIONARY_STATES_AUDIO_CHATS.READY.label, DICTIONARY_STATES_AUDIO_CHATS.PLANNED.label].includes(
               queryAudioChatMetadata.data?.state,
             ) && (
               <div className="animate-appear mt-5 flex justify-center">
                 <Button>Start live</Button>
               </div>
             )}
-          {queryAudioChatMetadata?.data?.state === DICTIONARY_STATES_AUDIO_CHATS.LIVE.value && (
+
+          {queryAudioChatMetadata?.data?.state === DICTIONARY_STATES_AUDIO_CHATS.LIVE.label && (
             <div className="flex flex-col items-center animate-appear mt-8 justify-center">
-              <Button>Join live</Button>
+              <Button>Join audio room</Button>
               <p className="text-neutral-11 pt-5 text-2xs">Your mic will be muted when you join.</p>
             </div>
           )}
-        </header>
-        <main>
-          {queryAudioChatMetadata.data?.state}
+
           {!isReady ||
             queryAudioChatByIdRawData?.status === 'loading' ||
             (queryAudioChatMetadata?.status === 'loading' && (
@@ -85,10 +89,12 @@ const Page: NextPage = () => {
               </div>
             ))}
 
-          <section className="-mx-6 pt-8 px-6 animate-appear">
-            <h2 className="uppercase text-neutral-12 tracking-widest font-bold mb-4">About</h2>
-            <p className="text-md text-neutral-11">{queryAudioChatMetadata?.data?.description}</p>
-          </section>
+          {queryAudioChatMetadata?.data?.description?.trim()?.length > 0 && (
+            <section className="-mx-6 pt-8 px-6 animate-appear">
+              <h2 className="uppercase text-neutral-12 tracking-widest font-bold mb-4">About</h2>
+              <p className="text-md text-neutral-11">{queryAudioChatMetadata?.data?.description}</p>
+            </section>
+          )}
         </main>
       </div>
     </>

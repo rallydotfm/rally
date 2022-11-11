@@ -10,6 +10,7 @@ import FormRadioOption from '@components/FormRadioOption'
 import { CameraIcon, InformationCircleIcon, PlusIcon } from '@heroicons/react/20/solid'
 import EthereumAddress from '@components/EthereumAddress'
 import OptionGuild from '@components/pages/rally/FormAudioChat/OptionGuild'
+import { useAccount, useNetwork } from 'wagmi'
 
 interface FormAudioChatProps {
   state: any
@@ -26,7 +27,8 @@ export const FormAudioChat = (props: FormAudioChatProps) => {
     labelButtonSubmitting,
     storeForm: { form, setData, resetField, addField, data, setFields, errors, isValid },
   } = props
-
+  const { chain } = useNetwork()
+  const account = useAccount()
   return (
     <>
       <form ref={form}>
@@ -41,6 +43,7 @@ export const FormAudioChat = (props: FormAudioChatProps) => {
                 </FormField.Label>
                 <FormField.Description id="input-rally_name-description">The name of your rally.</FormField.Description>
                 <FormInput
+                  disabled={!account?.address || chain?.unsupported === true}
                   hasError={errors()?.rally_name ? true : false}
                   placeholder="Eg: RallyDAO meeting #5"
                   name="rally_name"
@@ -65,6 +68,7 @@ export const FormAudioChat = (props: FormAudioChatProps) => {
                   The date and time at which of your rally will take place.
                 </FormField.Description>
                 <FormInput
+                  disabled={!account?.address || chain?.unsupported === true}
                   hasError={errors()?.rally_start_at ? true : false}
                   name="rally_start_at"
                   id="rally_start_at"
@@ -98,6 +102,7 @@ export const FormAudioChat = (props: FormAudioChatProps) => {
                   A few words on what will be the topic discussed in your rally.
                 </FormField.Description>
                 <FormTextarea
+                  disabled={!account?.address || chain?.unsupported === true}
                   rows={7}
                   hasError={errors()?.rally_description ? true : false}
                   placeholder="Eg: Community discussion about the future of Rally. Members only !"
@@ -131,33 +136,57 @@ export const FormAudioChat = (props: FormAudioChatProps) => {
                       Your image should have a 2:1 ratio and not be larger than 1MB.
                     </FormField.HelpBlock>
                   </div>
-                  <div className="mt-3 lg:mt-0 sw-full lg:w-96 aspect-twitter-card rounded-md overflow-hidden relative bg-neutral-1">
-                    <input
-                      onChange={(e) => {
-                        //@ts-ignore
-                        const src = URL.createObjectURL(e.target.files[0])
-                        setData('rally_image_src', src)
-                      }}
-                      className="absolute w-full h-full block inset-0 z-30 cursor-pointer opacity-0"
-                      type="file"
-                      accept="image/*"
-                      name="rally_image_file"
-                      id="rally_image_file"
-                      required
-                      aria-describedby="input-rally_image_file-description input-rally_image_file-helpblock"
-                    />
-                    <div className="absolute w-full h-full rounded-md inset-0 z-20 bg-neutral-3 bg-opacity-20 flex items-center justify-center">
-                      <CameraIcon className="w-10 text-white" />
-                    </div>
-                    {data()?.rally_image_src && (
-                      <img
-                        alt=""
-                        loading="lazy"
-                        width="112"
-                        height="112"
-                        className="absolute w-full h-full object-cover block z-10 inset-0"
-                        src={data()?.rally_image_src}
+                  <div className="mt-3 relative lg:mt-0">
+                    <div className="w-full lg:w-96 aspect-twitter-card rounded-md overflow-hidden relative bg-neutral-1">
+                      <input
+                        disabled={!account?.address || chain?.unsupported === true}
+                        onChange={(e) => {
+                          //@ts-ignore
+                          const src = URL.createObjectURL(e.target.files[0])
+                          setData('rally_image_src', src)
+                        }}
+                        className="absolute w-full h-full block inset-0 z-30 cursor-pointer opacity-0"
+                        type="file"
+                        accept="image/*"
+                        name="rally_image_file"
+                        id="rally_image_file"
+                        required
+                        aria-describedby="input-rally_image_file-description input-rally_image_file-helpblock"
                       />
+                      <div className="absolute w-full h-full rounded-md inset-0 z-20 bg-neutral-3 bg-opacity-20 flex items-center justify-center">
+                        <CameraIcon className="w-10 text-white" />
+                      </div>
+
+                      {data()?.rally_image_src && (
+                        <img
+                          alt=""
+                          loading="lazy"
+                          width="112"
+                          height="112"
+                          className="absolute w-full h-full object-cover block z-10 inset-0"
+                          src={
+                            !data()?.rally_image_file
+                              ? `https://ipfs.io/ipfs/${data()?.rally_image_src}`
+                              : data()?.rally_image_src
+                          }
+                        />
+                      )}
+                    </div>
+
+                    {data()?.rally_image_src && (
+                      <Button
+                        disabled={!account?.address || chain?.unsupported === true}
+                        type="button"
+                        className="mt-2 w-full"
+                        intent="negative-ghost"
+                        scale="xs"
+                        onClick={() => {
+                          setData('rally_image_src')
+                          setData('rally_image_file')
+                        }}
+                      >
+                        Delete image
+                      </Button>
                     )}
                   </div>
                 </div>
@@ -176,6 +205,7 @@ export const FormAudioChat = (props: FormAudioChatProps) => {
                   hasError={errors()?.rally_max_attendees ? true : false}
                   name="rally_max_attendees"
                   id="rally_max_attendees"
+                  disabled={!account?.address || chain?.unsupported === true}
                   type="number"
                   min={2}
                   step="1"
@@ -196,7 +226,11 @@ export const FormAudioChat = (props: FormAudioChatProps) => {
                   Tags
                 </FormField.Label>
                 <FormField.Description id="input-rally_tags-description">Add some tags</FormField.Description>
-                <InputTags className="w-full" api={apiInputRallyTags} />
+                <InputTags
+                  disabled={!account?.address || chain?.unsupported === true}
+                  className="w-full"
+                  api={apiInputRallyTags}
+                />
               </FormField.InputField>
               <FormField.HelpBlock hasError={errors()?.rally_tags ? true : false} id="input-rally_tags-helpblock">
                 Please add at least 1 tag.
@@ -206,6 +240,7 @@ export const FormAudioChat = (props: FormAudioChatProps) => {
               <InputCheckboxToggle
                 label="This rally will be recorded"
                 checked={data().rally_is_recorded}
+                disabled={!account?.address || chain?.unsupported === true}
                 onChange={(value: any) => {
                   setFields('rally_is_recorded', value)
                 }}
@@ -220,6 +255,7 @@ export const FormAudioChat = (props: FormAudioChatProps) => {
             </p>
             <FormField className="!mt-3">
               <InputCheckboxToggle
+                disabled={!account?.address || chain?.unsupported === true}
                 label="This rally will have co-hosts"
                 checked={data().rally_has_cohosts}
                 onChange={(value: boolean) => {
@@ -258,6 +294,7 @@ export const FormAudioChat = (props: FormAudioChatProps) => {
                             </FormField.Description>
                             <FormInput
                               scale="sm"
+                              disabled={!account?.address || chain?.unsupported === true}
                               hasError={errors()?.[`rally_cohosts.${index}.name`] ? true : false}
                               placeholder="Eg: Lili, Koopah, DollarFifty..."
                               name={`rally_cohosts.${index}.name`}
@@ -287,6 +324,7 @@ export const FormAudioChat = (props: FormAudioChatProps) => {
                             <FormInput
                               scale="sm"
                               required
+                              disabled={!account?.address || chain?.unsupported === true}
                               hasError={errors()?.[`rally_cohosts.${index}.eth_address`] ? true : false}
                               placeholder="A valid Ethereum address"
                               name={`rally_cohosts.${index}.eth_address`}
@@ -351,6 +389,7 @@ export const FormAudioChat = (props: FormAudioChatProps) => {
             <div className="space-y-5">
               <FormRadioGroup
                 className="!mt-0"
+                disabled={!account?.address || chain?.unsupported === true}
                 defaultValue={data()?.rally_is_gated === true ? true : false}
                 onChange={(value: boolean) => {
                   setData('rally_is_gated', value)
@@ -400,6 +439,7 @@ export const FormAudioChat = (props: FormAudioChatProps) => {
                               </FormField.Description>
                               <FormInput
                                 scale="sm"
+                                disabled={!account?.address || chain?.unsupported === true}
                                 hasError={errors()?.[`rally_access_control_guilds.${index}.guild_id`] ? true : false}
                                 placeholder="Eg: our-guild, layer3, lens-protocol..."
                                 name={`rally_access_control_guilds.${index}.guild_id`}
@@ -419,6 +459,7 @@ export const FormAudioChat = (props: FormAudioChatProps) => {
                               <OptionGuild
                                 index={index}
                                 data={data}
+                                disabled={!account?.address || chain?.unsupported === true}
                                 setData={setData}
                                 id={data()?.rally_access_control_guilds[index]?.guild_id?.trim()}
                               />
@@ -428,6 +469,7 @@ export const FormAudioChat = (props: FormAudioChatProps) => {
                             intent="negative-ghost"
                             className="!mt-6 w-full"
                             scale="sm"
+                            disabled={!account?.address || chain?.unsupported === true}
                             onClick={() => {
                               const updated = data()?.rally_access_control_guilds.filter(
                                 (rallyGuild: any) => rallyGuild.key !== guild.key,
@@ -441,6 +483,7 @@ export const FormAudioChat = (props: FormAudioChatProps) => {
                       )
                     })}
                     <button
+                      disabled={!account?.address || chain?.unsupported === true}
                       className="min-h-[12rem] text-white text-opacity-75 w-full h-full flex flex-col items-center justify-center p-3 border-dashed border rounded-md bg-neutral-1 bg-opacity-50 hover:bg-opacity-75 focus:bg-opacity-90 hover:focus:bg-opacity-95 border-neutral-4"
                       onClick={() => {
                         addField('rally_access_control_guilds', {
@@ -458,6 +501,7 @@ export const FormAudioChat = (props: FormAudioChatProps) => {
               )}
               <FormField>
                 <InputCheckboxToggle
+                  disabled={!account?.address || chain?.unsupported === true}
                   label="Index this rally"
                   checked={data().rally_is_indexed}
                   onChange={(value: boolean) => setData('rally_is_indexed', value)}
@@ -476,6 +520,8 @@ export const FormAudioChat = (props: FormAudioChatProps) => {
               ?.length > 0
           }
           disabled={
+            !account?.address ||
+            chain?.unsupported === true ||
             !isValid() ||
             [state.transaction, state.contract, state.uploadImage, state.uploadData].filter((slice) => slice.isLoading)
               ?.length > 0

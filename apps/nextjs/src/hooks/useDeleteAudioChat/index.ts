@@ -34,8 +34,8 @@ export const useStoreTxUiDeleteRally = create<TxUiDeleteRally>((set) => ({
 
 export function useDeleteAudioChat(stateTxUiDeleteRally: TxUiDeleteRally, refetch: any) {
   const { chain } = useNetwork()
-  const queryClient = useQueryClient()
-  // Query to create a new audio chat
+
+  // Query to delete an audio chat
   const contractWriteDeleteAudioChat = useContractWrite({
     mode: 'recklesslyUnprepared',
     address: CONTRACT_AUDIO_CHATS,
@@ -44,7 +44,7 @@ export function useDeleteAudioChat(stateTxUiDeleteRally: TxUiDeleteRally, refetc
     chainId: chain?.id,
   })
 
-  // Transaction receipt for `contractWriteDeleteAudioChat` (change audiochat state query)
+  // Transaction receipt for `contractWriteDeleteAudioChat` (delete audiochat)
   const txDeleteAudioChat = useWaitForTransaction({
     hash: contractWriteDeleteAudioChat?.data?.hash,
     chainId: chain?.id,
@@ -54,12 +54,8 @@ export function useDeleteAudioChat(stateTxUiDeleteRally: TxUiDeleteRally, refetc
     },
     async onSuccess() {
       try {
-        await queryClient.invalidateQueries({
-          queryKey: ['audio-chat-metadata', stateTxUiDeleteRally.rallyId],
-          type: 'active',
-          exact: true,
-        })
         await refetch()
+
         stateTxUiDeleteRally.resetState()
         toast.success('Your rally was deleted successfully !')
       } catch (e) {
@@ -73,10 +69,6 @@ export function useDeleteAudioChat(stateTxUiDeleteRally: TxUiDeleteRally, refetc
       await contractWriteDeleteAudioChat?.writeAsync?.({
         //@ts-ignore
         recklesslySetUnpreparedArgs: [stateTxUiDeleteRally.rallyId],
-        recklesslySetUnpreparedOverrides: {
-          gasLimit: 2100000,
-          gasPrice: 8000000000,
-        },
       })
     } catch (e) {
       console.error(e)

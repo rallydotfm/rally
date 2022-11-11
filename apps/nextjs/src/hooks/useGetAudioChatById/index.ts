@@ -12,6 +12,7 @@ export function useGetAudioChatById(idAudioChat?: `0x${string}`) {
     functionName: 'getAudioChatById',
     enabled: idAudioChat?.length && chain?.unsupported === false ? true : false,
     args: [idAudioChat as `0x${string}`],
+    cacheOnBlock: true,
     onError(e) {
       console.error(e)
       toast.error(e?.message)

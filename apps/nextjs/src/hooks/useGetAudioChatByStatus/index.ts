@@ -12,6 +12,7 @@ export function useGetAudioChatByState(states: Array<number>) {
     functionName: 'getAudioChatsByState',
     enabled: chain?.unsupported === false ? true : false,
     args: [states],
+    cacheOnBlock: true,
     onError(e) {
       console.error(e)
       toast.error(e?.message)

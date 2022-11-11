@@ -11,6 +11,7 @@ import toast from 'react-hot-toast'
 import LitJsSdk from '@lit-protocol/sdk-browser'
 import { SiweMessage } from 'siwe'
 import { blobToBase64 } from '@helpers/blobToBase64'
+import { DICTIONARY_STATES_AUDIO_CHATS } from '@helpers/mappingAudioChatState'
 
 // -- init litNodeClient
 const litNodeClient = new LitJsSdk.LitNodeClient()
@@ -25,23 +26,29 @@ export interface TxUi {
   setFileRallyCID: (newFileCid?: string) => void
   setImageRallyCID: (newImageCid?: string) => void
   resetState: () => void
+  primedRally: any
+  setPrimedRally: (rally: any) => void
 }
+
 export const useStoreTxUi = create<TxUi>((set) => ({
   setDialogVisibility: (visibility: boolean) => set(() => ({ isDialogVisible: visibility })),
   setRallyId: (newId?: string) => set(() => ({ rallyId: newId })),
   setFileRallyCID: (cid?: string) => set(() => ({ fileRallyCID: cid })),
   setImageRallyCID: (cid?: string) => set(() => ({ imageRallyCID: cid })),
+  setPrimedRally: (rally?: any) => set(() => ({ primedRally: rally })),
   resetState: () =>
     set(() => ({
       isDialogVisible: false,
       rallyId: undefined,
       fileRallyCID: undefined,
       imageRallyCID: undefined,
+      primedRally: undefined,
     })),
   isDialogVisible: false,
   rallyId: undefined,
   fileRallyCID: undefined,
   imageRallyCID: undefined,
+  primedRally: undefined,
 }))
 
 export function useSmartContract(stateTxUi: TxUi) {
@@ -73,12 +80,29 @@ export function useSmartContract(stateTxUi: TxUi) {
       console.error(e)
       toast.error(e?.message)
     },
-    onSuccess(data) {
+    async onSuccess(data) {
       const iface = new utils.Interface(audioChatABI)
       const log = data.logs
       toast.success('Your rally was created successfully !')
-      //@ts-ignore
-      stateTxUi.setRallyId(iface.parseLog(log[0]).args.audio_event_id)
+      const { audio_event_id, is_indexed, start_at, created_at, cid_metadata, current_state } = iface.parseLog(
+        //@ts-ignore
+        log[0],
+      ).args
+
+      stateTxUi.setRallyId(audio_event_id)
+      queryClient.setQueryData(['audio-chat-metadata', stateTxUi.rallyId], {
+        id: audio_event_id,
+        cid: cid_metadata,
+        is_indexed: is_indexed,
+        //@ts-ignore
+        state: DICTIONARY_STATES_AUDIO_CHATS[current_state],
+        creator: account?.address,
+        datetime_start_at: new Date(parseInt(`${start_at}`) * 1000),
+        datetime_created_at: new Date(parseInt(`${created_at}`) * 1000),
+        epoch_time_start_at: parseInt(`${start_at}`) * 1000,
+        epoch_time_created_at: parseInt(`${created_at}`) * 1000,
+        ...stateTxUi.primedRally,
+      })
       stateTxUi.setFileRallyCID()
       stateTxUi.setImageRallyCID()
     },
@@ -101,12 +125,26 @@ export function useSmartContract(stateTxUi: TxUi) {
       console.error(e)
       toast.error(e?.message)
     },
-    async onSuccess(data) {
-      await queryClient.invalidateQueries({
+    onSuccess(data) {
+      queryClient.invalidateQueries({
         queryKey: ['audio-chat-metadata', stateTxUi.rallyId],
-        type: 'active',
-        exact: true,
+        refetchType: 'none',
       })
+      const iface = new utils.Interface(audioChatABI)
+      const log = data.logs
+      //@ts-ignore
+      const { is_indexed, start_at, cid_metadata, current_state } = iface.parseLog(log[0]).args
+      queryClient.setQueryData(['audio-chat-metadata', stateTxUi.rallyId], (prev) => ({
+        //@ts-ignore
+        ...prev,
+        cid: cid_metadata,
+        is_indexed: is_indexed,
+        //@ts-ignore
+        state: DICTIONARY_STATES_AUDIO_CHATS[current_state],
+        datetime_start_at: new Date(parseInt(`${start_at}`) * 1000),
+        epoch_time_start_at: parseInt(`${start_at}`) * 1000,
+        ...stateTxUi.primedRally,
+      }))
 
       toast.success('Your rally was updated successfully !')
     },
@@ -281,30 +319,33 @@ export function useSmartContract(stateTxUi: TxUi) {
         }
 
         if (image && values.rally_image_file) {
-          console.log('has file')
           //@ts-ignore
           rallyData.image = `${image}/${values?.rally_image_file.name}`
         } else {
-          console.log('no file ')
+          //@ts-ignore
           if (values.rally_image_src) rallyData.image = values.rally_image_src
         }
 
-        console.log(rallyData)
         const rallyDataJSON = new File([JSON.stringify(rallyData)], 'data.json', {
           type: 'application/json',
         })
 
         // upload JSON file to IPFS
+        stateTxUi.setPrimedRally(rallyData)
         //@ts-ignore
         metadata = await mutationUploadJsonFile.mutateAsync(rallyDataJSON)
         stateTxUi.setFileRallyCID(metadata)
       }
 
+      const startAt = getUnixTime(new Date(values.rally_start_at))
+      const creatorWalletAddress = account?.address
+      const isIndexed = values.rally_is_indexed
+
       return {
-        startAt: getUnixTime(new Date(values.rally_start_at)),
+        startAt,
         metadata,
-        creatorWalletAddress: account?.address,
-        isIndexed: values.rally_is_indexed,
+        creatorWalletAddress,
+        isIndexed,
       }
     } catch (e) {
       console.error(e)
@@ -320,6 +361,7 @@ export function useSmartContract(stateTxUi: TxUi) {
     stateTxUi.setDialogVisibility(true)
     try {
       const args = await prepareRallyData(values, false)
+      //@ts-ignore
       const { startAt, metadata, creatorWalletAddress, isIndexed } = args
       await contractWriteNewAudioChat?.writeAsync?.({
         //@ts-ignore
@@ -332,6 +374,7 @@ export function useSmartContract(stateTxUi: TxUi) {
               should the audiochat be indexed or not
             */
           startAt,
+          //@ts-ignore
           getUnixTime(new Date()),
           metadata,
           creatorWalletAddress,
@@ -346,11 +389,12 @@ export function useSmartContract(stateTxUi: TxUi) {
   /**
    * Upload form data as a JSON after preparing them (upload image, encrypt cohosts wallet address) and update an audio chat data on chain
    */
-  async function onSubmitEditAudioChat(args) {
+  async function onSubmitEditAudioChat(args: any) {
     const { id, values } = args
     stateTxUi.setDialogVisibility(true)
     try {
       const args = await prepareRallyData(values, true)
+      //@ts-ignore
       const { startAt, metadata } = args
 
       await contractWriteEditAudioChat?.writeAsync?.({

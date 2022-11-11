@@ -4,6 +4,8 @@ import { useForm as useStoreForm } from '@felte/react'
 import { validator } from '@felte/validator-zod'
 import * as tagsInput from '@zag-js/tags-input'
 import { useMachine, normalizeProps } from '@zag-js/react'
+import { useAccount, useNetwork } from 'wagmi'
+import { useEffect } from 'react'
 
 export const schema = object({
   rally_name: string().trim().min(1),
@@ -33,6 +35,9 @@ export const schema = object({
 
 export function useForm(config: { initialValues: any; onSubmit: any }) {
   const { initialValues, onSubmit } = config
+  const account = useAccount()
+  const { chain } = useNetwork()
+
   const formAudioChat = useStoreForm({
     initialValues,
     extend: validator({ schema }),
@@ -43,6 +48,7 @@ export function useForm(config: { initialValues: any; onSubmit: any }) {
     tagsInput.machine({
       id: 'rally-tags-input',
       addOnPaste: true,
+      disabled: !account?.address || chain?.unsupported ? true : false,
       value: initialValues?.rally_tags ?? [],
       onChange: (tags: { values: Array<string> }) => {
         //@ts-ignore

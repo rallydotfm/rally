@@ -5,10 +5,11 @@ interface InputTagsProps extends SystemUiInputProps {
   api: any
   className?: string
   placeholder?: string
+  disabled: boolean
 }
 
 export const InputTags = (props: InputTagsProps) => {
-  const { api, className, intent, scale, appearance, placeholder } = props
+  const { api, disabled, className, intent, scale, appearance, placeholder } = props
   return (
     <div {...api.rootProps}>
       <input
@@ -20,6 +21,7 @@ export const InputTags = (props: InputTagsProps) => {
         })}
         placeholder={placeholder ?? 'Type a tag and press "Enter"'}
         {...api.inputProps}
+        disabled={disabled}
       />
       <div className="mt-2 flex gap-2 flex-wrap">
         {api.value.map((value: string, index: number) => (

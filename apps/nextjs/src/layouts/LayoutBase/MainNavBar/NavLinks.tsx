@@ -1,8 +1,8 @@
-import { HomeIcon, CalendarIcon, RectangleStackIcon } from '@heroicons/react/24/outline'
+import { HomeIcon, CalendarIcon, Squares2X2Icon } from '@heroicons/react/24/outline'
 import {
   HomeIcon as SolidHomeIcon,
   CalendarIcon as SolidCalendarIcon,
-  RectangleStackIcon as SolidRectangleStackIcon,
+  Squares2X2Icon as SolidSquares2X2Icon,
 } from '@heroicons/react/24/solid'
 import { PATHNAME_DASHBOARD, ROUTE_DASHBOARD, ROUTE_HOME, ROUTE_UPCOMING } from '@config/routes'
 import Link from 'next/link'
@@ -26,8 +26,8 @@ const routes = [
   {
     href: ROUTE_DASHBOARD,
     key: 'dashboard',
-    activeIcon: SolidRectangleStackIcon,
-    defaultIcon: RectangleStackIcon,
+    activeIcon: SolidSquares2X2Icon,
+    defaultIcon: Squares2X2Icon,
     label: 'Dashboard',
     subpath: PATHNAME_DASHBOARD,
   },
