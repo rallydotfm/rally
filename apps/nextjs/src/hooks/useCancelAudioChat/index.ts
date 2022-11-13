@@ -33,7 +33,7 @@ export const useStoreTxUiCancelRally = create<TxUiCancelRally>((set) => ({
   rallyId: undefined,
 }))
 
-export function useCancelAudioChat(stateTxUiCancelRally: TxUiCancelRally, refetch: any) {
+export function useCancelAudioChat(stateTxUiCancelRally: TxUiCancelRally) {
   const { chain } = useNetwork()
   const queryClient = useQueryClient()
   // Query to create a new audio chat

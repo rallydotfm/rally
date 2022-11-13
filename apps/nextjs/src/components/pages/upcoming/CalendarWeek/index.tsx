@@ -3,6 +3,7 @@ import { Tab } from '@headlessui/react'
 import { eachDayOfInterval, endOfWeek, format, getDay, isPast, startOfWeek } from 'date-fns'
 import { ROUTE_RALLY_VIEW } from '@config/routes'
 import Link from 'next/link'
+import BadgeRallyState from '@components/BadgeRallyState'
 
 export default function CalendarWeek(props: any) {
   const [weekDay] = useState(
@@ -37,7 +38,7 @@ export default function CalendarWeek(props: any) {
         <Tab.Panels className="mt-6">
           {weekDay.map((tab) => (
             <Tab.Panel key={`panel-${tab.day}`}>
-              <ul className="space-y-4 divide-y divide-neutral-4">
+              <ul className="space-y-8 divide-y divide-neutral-4">
                 {events
                   .filter((event: any) => {
                     return getDay(event.data.datetime_start_at) === getDay(tab.date)
@@ -47,7 +48,7 @@ export default function CalendarWeek(props: any) {
                       <li
                         className={`${
                           isPast(audioChat.data.datetime_start_at) ? 'opacity-50' : ''
-                        } animate-appear relative`}
+                        } pt-6 animate-appear relative`}
                         key={`panel-${audioChat.cid}`}
                       >
                         <span className="font-bold block mb-2">
@@ -69,7 +70,10 @@ export default function CalendarWeek(props: any) {
                           )}
 
                           <div className="px-4 flex-grow flex flex-col xs:px-0">
-                            <h1 className="font-bold">{audioChat.data.name}</h1>
+                            <h1 className="font-bold flex flex-col-reverse">
+                              <span className="py-2">{audioChat.data.name}</span>
+                              <BadgeRallyState state={audioChat.data.state} />
+                            </h1>
                             <p className="text-neutral-12 uppercase font-bold tracking-wide text-2xs mt-2">
                               {audioChat.data.is_gated ? 'Gated access' : 'Free access'}
                             </p>

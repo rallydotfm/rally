@@ -15,9 +15,12 @@ import { useState } from 'react'
 import { useCancelAudioChat, useStoreTxUiCancelRally } from '@hooks/useCancelAudioChat'
 import { useDeleteAudioChat, useStoreTxUiDeleteRally } from '@hooks/useDeleteAudioChat'
 import { useGoLiveAudioChat, useStoreTxUiGoLiveRally } from '@hooks/useGoLiveAudioChat'
+import { useEndLiveAudioChat, useStoreTxUiEndLiveRally } from '@hooks/useEndLiveAudioChat'
+
 import DialogCancelRallyConfirmation from '@components/DialogCancelRallyConfirmation'
 import DialogDeleteRallyConfirmation from '@components/DialogDeleteRallyConfirmation'
 import DialogGoLive from '@components/DialogGoLive'
+import DialogEndLive from '@components/DialogEndLive'
 import BadgeRallyState from '@components/BadgeRallyState'
 import { Menu } from '@headlessui/react'
 import { useRouter } from 'next/router'
@@ -37,15 +40,15 @@ const Page: NextPage = () => {
   const { onClickGoLive, stateGoLive } = useGoLiveAudioChat(stateTxUiRallyGoLive)
 
   const stateTxUiCancelRally = useStoreTxUiCancelRally()
-  const { onClickCancelAudioChat, stateCancelAudioChat } = useCancelAudioChat(
-    stateTxUiCancelRally,
-    queryAudioChatsByAddressRawData.refetch,
-  )
+  const { onClickCancelAudioChat, stateCancelAudioChat } = useCancelAudioChat(stateTxUiCancelRally)
   const stateTxUiDeleteRally = useStoreTxUiDeleteRally()
   const { onClickDeleteAudioChat, stateDeleteAudioChat } = useDeleteAudioChat(
     stateTxUiDeleteRally,
     queryAudioChatsByAddressRawData.refetch,
   )
+  const stateTxUiEndLiveRally = useStoreTxUiEndLiveRally()
+  const { onClickEndLive, stateEndLiveAudioChat } = useEndLiveAudioChat(stateTxUiEndLiveRally)
+
   const { push } = useRouter()
   const [sortOrder, setSortOrder] = useState(SORT_ORDER.START_CLOSEST)
   return (
@@ -127,7 +130,7 @@ const Page: NextPage = () => {
                               <span className="py-2">{audioChat.data.name}</span>
                               <BadgeRallyState state={audioChat.data.state} />
                             </h1>
-                            {audioChat.data.state !== DICTIONARY_STATES_AUDIO_CHATS.CANCELLED.label && (
+                            {audioChat.data.state === DICTIONARY_STATES_AUDIO_CHATS.PLANNED.label && (
                               <>
                                 <p className="mt-2 font-medium flex flex-wrap items-baseline text-neutral-12 text-xs">
                                   <CalendarIcon className="translate-y-1 opacity-90 shrink-0 w-5 mie-2" />
@@ -163,6 +166,19 @@ const Page: NextPage = () => {
                                 Go live
                               </Button>
                             )}
+                          {audioChat.data.state === DICTIONARY_STATES_AUDIO_CHATS.LIVE.label && (
+                            <Button
+                              onClick={async () => {
+                                stateTxUiEndLiveRally.setDialogVisibility(true)
+                                await onClickEndLive(audioChat.data.id)
+                              }}
+                              intent="primary-outline"
+                              scale="sm"
+                              className="w-auto relative z-10"
+                            >
+                              End rally
+                            </Button>
+                          )}
                           <div className="mis-auto">
                             <>
                               {/** @ts-ignore */}
@@ -247,6 +263,7 @@ const Page: NextPage = () => {
         onClickDelete={onClickDeleteAudioChat}
       />
       <DialogGoLive stateTxUi={stateTxUiRallyGoLive} stateGoLiveAudioChat={stateGoLive} />
+      <DialogEndLive stateTxUi={stateTxUiEndLiveRally} stateEndLiveAudioChat={stateEndLiveAudioChat} />
     </>
   )
 }

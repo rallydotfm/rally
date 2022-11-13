@@ -3,7 +3,6 @@ import toast from 'react-hot-toast'
 import create from 'zustand'
 import { audioChatABI } from '@rally/abi'
 import { CONTRACT_AUDIO_CHATS } from '@config/contracts'
-import { useQueryClient } from '@tanstack/react-query'
 
 export interface TxUiDeleteRally {
   isDialogVisible: boolean

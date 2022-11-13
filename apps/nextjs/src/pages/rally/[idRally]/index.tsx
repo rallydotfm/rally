@@ -12,6 +12,11 @@ import { useAccount } from 'wagmi'
 import { DICTIONARY_STATES_AUDIO_CHATS } from '@helpers/mappingAudioChatState'
 import CountdownOpening from '@components/pages/rally/CountdownOpening'
 import { isFuture } from 'date-fns'
+import { useGoLiveAudioChat, useStoreTxUiGoLiveRally } from '@hooks/useGoLiveAudioChat'
+import { useEndLiveAudioChat, useStoreTxUiEndLiveRally } from '@hooks/useEndLiveAudioChat'
+import DialogGoLive from '@components/DialogGoLive'
+import DialogEndLive from '@components/DialogEndLive'
+import Notice from '@components/Notice'
 
 const Page: NextPage = () => {
   const {
@@ -21,10 +26,23 @@ const Page: NextPage = () => {
   //@ts-ignore
   const { queryAudioChatByIdRawData, queryAudioChatMetadata } = useGetAudioChatById(idRally)
   const { address } = useAccount()
+
+  const stateTxUiRallyGoLive = useStoreTxUiGoLiveRally()
+  const { onClickGoLive, stateGoLive } = useGoLiveAudioChat(stateTxUiRallyGoLive)
+
+  const stateTxUiEndLiveRally = useStoreTxUiEndLiveRally()
+  const { onClickEndLive, stateEndLiveAudioChat } = useEndLiveAudioChat(stateTxUiEndLiveRally)
   return (
     <>
       <Head>
-        <title> {queryAudioChatMetadata?.data?.name ?? 'Live audio chat'} - Rally</title>
+        <title>
+          {' '}
+          {queryAudioChatByIdRawData?.data?.audio_event_id ===
+          '0x0000000000000000000000000000000000000000000000000000000000000000'
+            ? 'Not found'
+            : queryAudioChatMetadata?.data?.name ?? 'Live audio chat'}{' '}
+          - Rally
+        </title>
         <meta name="description" content="Rally is the place to be." />
       </Head>
       <div className="animate-appear flex flex-col grow">
@@ -69,34 +87,72 @@ const Page: NextPage = () => {
               queryAudioChatMetadata.data?.state,
             ) && (
               <div className="animate-appear mt-5 flex justify-center">
-                <Button>Start live</Button>
+                <Button
+                  onClick={async () => {
+                    stateTxUiRallyGoLive.setDialogVisibility(true)
+                    await onClickGoLive(queryAudioChatMetadata.data?.id)
+                  }}
+                >
+                  Start live
+                </Button>
               </div>
             )}
 
           {queryAudioChatMetadata?.data?.state === DICTIONARY_STATES_AUDIO_CHATS.LIVE.label && (
             <div className="flex flex-col items-center animate-appear mt-8 justify-center">
-              <Button>Join audio room</Button>
+              <div className="flex space-i-3 items-center">
+                <Button>Join audio room</Button>
+                {queryAudioChatMetadata?.data.creator === address && (
+                  <>
+                    <span className="italic text-neutral-9">or</span>
+                    <Button
+                      onClick={async () => {
+                        stateTxUiEndLiveRally.setDialogVisibility(true)
+                        await onClickEndLive(queryAudioChatMetadata.data?.id)
+                      }}
+                      intent="primary-outline"
+                    >
+                      End rally
+                    </Button>
+                  </>
+                )}
+              </div>
               <p className="text-neutral-11 pt-5 text-2xs">Your mic will be muted when you join.</p>
             </div>
           )}
 
           {!isReady ||
             queryAudioChatByIdRawData?.status === 'loading' ||
-            (queryAudioChatMetadata?.status === 'loading' && (
-              <div className="mx-auto pt-8 px-6 animate-appear flex items-center space-i-1ex">
-                <IconSpinner className="animate-spin text-md " />
-                <p className="font-medium animate-pulse">Loading rally...</p>
-              </div>
-            ))}
+            (queryAudioChatMetadata?.status === 'loading' &&
+              queryAudioChatByIdRawData?.data?.audio_event_id !==
+                '0x0000000000000000000000000000000000000000000000000000000000000000' && (
+                <div className="mx-auto pt-8 px-6 animate-appear flex items-center space-i-1ex">
+                  <IconSpinner className="animate-spin text-md " />
+                  <p className="font-medium animate-pulse">Loading rally...</p>
+                </div>
+              ))}
 
+          {queryAudioChatByIdRawData?.data?.audio_event_id ===
+            '0x0000000000000000000000000000000000000000000000000000000000000000' && (
+            <section>
+              <h2 className="text-3xl mb-4 font-bold">Rally not found.</h2>
+              <p className="mb-8">This rally doesn't exist or was deleted by its creator.</p>
+              <Link href={ROUTE_HOME}>
+                <a className={button({ scale: 'sm', intent: 'neutral-outline' })}>Go back to the homepage</a>
+              </Link>
+            </section>
+          )}
           {queryAudioChatMetadata?.data?.description?.trim()?.length > 0 && (
             <section className="-mx-6 pt-8 px-6 animate-appear">
-              <h2 className="uppercase text-neutral-12 tracking-widest font-bold mb-4">About</h2>
-              <p className="text-md text-neutral-11">{queryAudioChatMetadata?.data?.description}</p>
+              <h2 className="sr-only">About</h2>
+              <p className="text-md text-neutral-12">{queryAudioChatMetadata?.data?.description}</p>
             </section>
           )}
         </main>
       </div>
+
+      <DialogGoLive stateTxUi={stateTxUiRallyGoLive} stateGoLiveAudioChat={stateGoLive} />
+      <DialogEndLive stateTxUi={stateTxUiEndLiveRally} stateEndLiveAudioChat={stateEndLiveAudioChat} />
     </>
   )
 }
