@@ -27,7 +27,7 @@ NEXT_PUBLIC_LENS_HUB_PROXY=0x60Ae865ee4C725cd04353b5AAb364553f56ceF82
 NEXT_PUBLIC_LENS_PERIPHERY=0xD5037d72877808cdE7F669563e9389930AF404E8
 
 # Start the project by running this command in the root folder.
-pnpm start
+pnpm dev
 ```
 
 ### Side-note regarding database
@@ -58,8 +58,20 @@ Rally is a web application at the cross-road of web2 and web3, a social audio pl
 
 Let's deploy the Next.js application to [Vercel](https://vercel.com/). If you have ever deployed a Turborepo app there, the steps are quite straightforward. You can also read the [official Turborepo guide](https://vercel.com/docs/concepts/monorepos/turborepo) on deploying to Vercel.
 
-1. Create a new project on Vercel, select the `apps/nextjs` folder as the root directory and apply the following build settings:
-   <img width="907" alt="CleanShot 2022-09-03 at 22 51 25@2x" src="https://user-images.githubusercontent.com/51714798/188287309-e6ff4cb9-827a-4e50-83ed-e0953d7752f9.png">
+1. Create a new project on Vercel, select the `apps/nextjs` folder as the root directory and apply the following build settings in `Build & Development settings`:
+
+```
+Framework preset: Next.js
+
+Build command : cd ../.. && npx turbo run build --filter nextjs
+Output directory: Next.js default
+Install command: pnpm install
+Development command: next
+```
+
+```
+Root directory: apps/nextjs
+```
 
 2. Add your `DATABASE_URL` environment variable.
 
