@@ -28,7 +28,11 @@ export function useGetAudioChatById(idAudioChat?: `0x${string}`) {
     },
     {
       enabled:
-        queryAudioChatByIdRawData.status === 'success' && queryAudioChatByIdRawData?.data?.cid_metadata ? true : false,
+        queryAudioChatByIdRawData.status === 'success' &&
+        queryAudioChatByIdRawData?.data?.audio_event_id !==
+          '0x0000000000000000000000000000000000000000000000000000000000000000'
+          ? true
+          : false,
     },
   )
 

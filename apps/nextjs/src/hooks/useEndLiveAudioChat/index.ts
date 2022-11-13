@@ -6,16 +6,16 @@ import { CONTRACT_AUDIO_CHATS } from '@config/contracts'
 import { DICTIONARY_STATES_AUDIO_CHATS } from '@helpers/mappingAudioChatState'
 import queryClient from '@config/react-query'
 import { utils } from 'ethers'
-import { ROUTE_RALLY_VIEW } from '@config/routes'
+import { ROUTE_DASHBOARD_RALLIES } from '@config/routes'
 import { useRouter } from 'next/router'
 
-export interface TxUiGoLiveRally {
+export interface TxUiEndLiveRally {
   isDialogVisible: boolean
   setDialogVisibility: (visibility: boolean) => void
   resetState: () => void
 }
 
-export const useStoreTxUiGoLiveRally = create<TxUiGoLiveRally>((set) => ({
+export const useStoreTxUiEndLiveRally = create<TxUiEndLiveRally>((set) => ({
   setDialogVisibility: (visibility: boolean) =>
     set(() => ({
       isDialogVisible: visibility,
@@ -27,11 +27,11 @@ export const useStoreTxUiGoLiveRally = create<TxUiGoLiveRally>((set) => ({
   isDialogVisible: false,
 }))
 
-export function useGoLiveAudioChat(stateTxUiRallyGoLive: TxUiGoLiveRally) {
+export function useEndLiveAudioChat(stateTxUiEndLiveRally: TxUiEndLiveRally) {
   const { chain } = useNetwork()
   const { push } = useRouter()
   // Query to create a new audio chat
-  const contractWriteAudioChatGoLive = useContractWrite({
+  const contractWriteAudioChatEnd = useContractWrite({
     mode: 'recklesslyUnprepared',
     address: CONTRACT_AUDIO_CHATS,
     abi: audioChatABI,
@@ -39,9 +39,9 @@ export function useGoLiveAudioChat(stateTxUiRallyGoLive: TxUiGoLiveRally) {
     chainId: chain?.id,
   })
 
-  // Transaction receipt for `contractWriteAudioChatGoLive` (change audiochat state query)
-  const txAudioChatGoLive = useWaitForTransaction({
-    hash: contractWriteAudioChatGoLive?.data?.hash,
+  // Transaction receipt for `contractWriteAudioChatEnd` (change audiochat state query)
+  const txAudioChatEnd = useWaitForTransaction({
+    hash: contractWriteAudioChatEnd?.data?.hash,
     chainId: chain?.id,
     onError(e) {
       console.error(e)
@@ -62,35 +62,35 @@ export function useGoLiveAudioChat(stateTxUiRallyGoLive: TxUiGoLiveRally) {
         queryClient.setQueryData(['audio-chat-metadata', audio_event_id], (rallyData) => ({
           //@ts-ignore
           ...rallyData,
-          state: DICTIONARY_STATES_AUDIO_CHATS.LIVE.label,
+          state: DICTIONARY_STATES_AUDIO_CHATS.FINISHED.label,
         }))
 
-        stateTxUiRallyGoLive.resetState()
-        toast.success('Your rally is live !')
-        push(ROUTE_RALLY_VIEW.replace('[idRally]', audio_event_id))
+        stateTxUiEndLiveRally.resetState()
+        toast.success('Your rally ended successfully !')
+        push(ROUTE_DASHBOARD_RALLIES)
       } catch (e) {
         console.error(e)
       }
     },
   })
 
-  async function onClickGoLive(id: string) {
+  async function onClickEndLive(id: string) {
     try {
-      await contractWriteAudioChatGoLive?.writeAsync?.({
+      await contractWriteAudioChatEnd?.writeAsync?.({
         //@ts-ignore
-        recklesslySetUnpreparedArgs: [DICTIONARY_STATES_AUDIO_CHATS.LIVE.value, id],
+        recklesslySetUnpreparedArgs: [DICTIONARY_STATES_AUDIO_CHATS.FINISHED.value, id],
       })
     } catch (e) {
       console.error(e)
     }
   }
   return {
-    onClickGoLive,
-    stateGoLive: {
-      contract: contractWriteAudioChatGoLive,
-      transaction: txAudioChatGoLive,
+    onClickEndLive,
+    stateEndLiveAudioChat: {
+      contract: contractWriteAudioChatEnd,
+      transaction: txAudioChatEnd,
     },
   }
 }
 
-export default useGoLiveAudioChat
+export default useEndLiveAudioChat
