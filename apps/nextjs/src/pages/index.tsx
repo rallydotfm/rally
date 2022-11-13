@@ -1,15 +1,15 @@
 import { DICTIONARY_STATES_AUDIO_CHATS } from '@helpers/mappingAudioChatState'
 import useGetAudioChatByState from '@hooks/useGetAudioChatByStatus'
+import { trpc } from '@utils/trpc'
 import type { NextPage } from 'next'
+import { useSession } from 'next-auth/react'
 import Head from 'next/head'
-
 const Home: NextPage = () => {
   const { queriesAudioChatsByStateMetadata, queryAudioChatsByStateRawData } = useGetAudioChatByState([
     DICTIONARY_STATES_AUDIO_CHATS.LIVE.value,
     DICTIONARY_STATES_AUDIO_CHATS.READY.value,
     DICTIONARY_STATES_AUDIO_CHATS.PLANNED.value,
   ])
-
   return (
     <>
       <Head>

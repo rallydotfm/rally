@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@lit-protocol/sdk-browser": "^1.1.228",
+    "@rally/auth": "*",
     "@rally/db": "*",
     "@trpc/client": "10.0.0-proxy-beta.13",
     "@trpc/server": "10.0.0-proxy-beta.13",

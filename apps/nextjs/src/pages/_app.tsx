@@ -13,6 +13,13 @@ import '@rainbow-me/rainbowkit/styles.css'
 import { theme } from '@config/rainbowkit'
 import { Toaster } from 'react-hot-toast'
 import { toastOptions } from '@config/react-hot-toast'
+import { SessionProvider } from 'next-auth/react'
+import { RainbowKitSiweNextAuthProvider } from '@rainbow-me/rainbowkit-siwe-next-auth'
+import type { GetSiweMessageOptions } from '@rainbow-me/rainbowkit-siwe-next-auth'
+
+const getSiweMessageOptions: GetSiweMessageOptions = () => ({
+  statement: 'Sign in to unlock Rally.',
+})
 
 function MyApp({ Component, pageProps }: AppProps) {
   //@ts-ignore
@@ -24,11 +31,15 @@ function MyApp({ Component, pageProps }: AppProps) {
         <meta name="color-scheme" content="dark" />
       </Head>
       <QueryClientProvider client={queryClient}>
-        <WagmiConfig client={wagmiClient}>
-          <RainbowKitProvider theme={theme} chains={chains}>
-            {getLayout(<Component {...pageProps} />)}
-          </RainbowKitProvider>
-        </WagmiConfig>
+        <SessionProvider refetchInterval={0} session={pageProps.session}>
+          <WagmiConfig client={wagmiClient}>
+            <RainbowKitSiweNextAuthProvider getSiweMessageOptions={getSiweMessageOptions}>
+              <RainbowKitProvider theme={theme} chains={chains}>
+                {getLayout(<Component {...pageProps} />)}
+              </RainbowKitProvider>
+            </RainbowKitSiweNextAuthProvider>
+          </WagmiConfig>
+        </SessionProvider>
       </QueryClientProvider>
       {/* @ts-ignore */}
       <Toaster position="top-right" toastOptions={toastOptions} />

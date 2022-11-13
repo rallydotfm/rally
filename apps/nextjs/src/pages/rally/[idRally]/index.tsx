@@ -17,7 +17,7 @@ import { useEndLiveAudioChat, useStoreTxUiEndLiveRally } from '@hooks/useEndLive
 import DialogGoLive from '@components/DialogGoLive'
 import DialogEndLive from '@components/DialogEndLive'
 import Notice from '@components/Notice'
-
+import { trpc } from '@utils/trpc'
 const Page: NextPage = () => {
   const {
     query: { idRally },
@@ -32,6 +32,14 @@ const Page: NextPage = () => {
 
   const stateTxUiEndLiveRally = useStoreTxUiEndLiveRally()
   const { onClickEndLive, stateEndLiveAudioChat } = useEndLiveAudioChat(stateTxUiEndLiveRally)
+  const mutationJoinRoom = trpc.credentials.getRoomCredential.useMutation({
+    onSuccess(data) {
+      // do something hre
+      this.roomService = data?.token
+      // connect to room
+    },
+  })
+
   return (
     <>
       <Head>
@@ -101,7 +109,16 @@ const Page: NextPage = () => {
           {queryAudioChatMetadata?.data?.state === DICTIONARY_STATES_AUDIO_CHATS.LIVE.label && (
             <div className="flex flex-col items-center animate-appear mt-8 justify-center">
               <div className="flex space-i-3 items-center">
-                <Button>Join audio room</Button>
+                <Button
+                  onClick={async () => {
+                    await mutationJoinRoom.mutate({
+                      id_rally: queryAudioChatByIdRawData.data?.audio_event_id,
+                      cid_rally: queryAudioChatByIdRawData.data?.cid_metadata,
+                    })
+                  }}
+                >
+                  Join audio room
+                </Button>
                 {queryAudioChatMetadata?.data.creator === address && (
                   <>
                     <span className="italic text-neutral-9">or</span>
@@ -150,7 +167,6 @@ const Page: NextPage = () => {
           )}
         </main>
       </div>
-
       <DialogGoLive stateTxUi={stateTxUiRallyGoLive} stateGoLiveAudioChat={stateGoLive} />
       <DialogEndLive stateTxUi={stateTxUiEndLiveRally} stateEndLiveAudioChat={stateEndLiveAudioChat} />
     </>
