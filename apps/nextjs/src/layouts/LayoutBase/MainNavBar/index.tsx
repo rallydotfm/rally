@@ -1,6 +1,7 @@
 import button from '@components/Button/styles'
 import { ROUTE_RALLY_NEW } from '@config/routes'
 import { PlusIcon } from '@heroicons/react/24/outline'
+import { useStoreLiveAudioRoom } from '@hooks/useLiveAudioRoom'
 import Link from 'next/link'
 import MenuCurrentUser from '../MenuCurrentUser'
 import NavLinks from './NavLinks'
@@ -28,7 +29,7 @@ export const MainNavBar = (props: MainNavBarProps) => {
         </Link>
       </div>
       {address && address !== null && (
-        <div className="hidden md:mx-auto md:block mt-auto pb-6">
+        <div className="hidden md:mx-auto md:block mt-auto pb-12 md:pt-4 md:pb-24">
           <MenuCurrentUser address={address} />
         </div>
       )}

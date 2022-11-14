@@ -16,8 +16,19 @@ import { useGoLiveAudioChat, useStoreTxUiGoLiveRally } from '@hooks/useGoLiveAud
 import { useEndLiveAudioChat, useStoreTxUiEndLiveRally } from '@hooks/useEndLiveAudioChat'
 import DialogGoLive from '@components/DialogGoLive'
 import DialogEndLive from '@components/DialogEndLive'
-import Notice from '@components/Notice'
-import { trpc } from '@utils/trpc'
+import { useLiveAudioRoom, useStore } from '@hooks/useLiveAudioRoom'
+import { useParticipant } from '@livekit/react-core'
+
+const Participant = ({ participant }) => {
+  const { isSpeaking, connectionQuality, isLocal, cameraPublication, ...rest } = useParticipant(participant)
+  console.log(rest)
+  return (
+    <>
+      {isSpeaking ? 'speaking' : 'not speaking'}
+      {connectionQuality}
+    </>
+  )
+}
 const Page: NextPage = () => {
   const {
     query: { idRally },
@@ -32,13 +43,9 @@ const Page: NextPage = () => {
 
   const stateTxUiEndLiveRally = useStoreTxUiEndLiveRally()
   const { onClickEndLive, stateEndLiveAudioChat } = useEndLiveAudioChat(stateTxUiEndLiveRally)
-  const mutationJoinRoom = trpc.credentials.getRoomCredential.useMutation({
-    onSuccess(data) {
-      // do something hre
-      this.roomService = data?.token
-      // connect to room
-    },
-  })
+
+  const { mutationJoinRoom } = useLiveAudioRoom()
+  const stateAudioRoom = useStore()
 
   return (
     <>
@@ -105,23 +112,32 @@ const Page: NextPage = () => {
                 </Button>
               </div>
             )}
-
           {queryAudioChatMetadata?.data?.state === DICTIONARY_STATES_AUDIO_CHATS.LIVE.label && (
             <div className="flex flex-col items-center animate-appear mt-8 justify-center">
               <div className="flex space-i-3 items-center">
-                <Button
-                  onClick={async () => {
-                    await mutationJoinRoom.mutate({
-                      id_rally: queryAudioChatByIdRawData.data?.audio_event_id,
-                      cid_rally: queryAudioChatByIdRawData.data?.cid_metadata,
-                    })
-                  }}
-                >
-                  Join audio room
-                </Button>
+                {stateAudioRoom?.room?.state === 'disconnected' && (
+                  <Button
+                    disabled={mutationJoinRoom.isLoading}
+                    isLoading={mutationJoinRoom.isLoading}
+                    onClick={async () => {
+                      await mutationJoinRoom.mutate({
+                        id_rally: queryAudioChatByIdRawData.data?.audio_event_id,
+                        cid_rally: queryAudioChatByIdRawData.data?.cid_metadata,
+                      })
+                    }}
+                  >
+                    {mutationJoinRoom.isLoading
+                      ? 'Checking your access...'
+                      : stateAudioRoom.isConnecting
+                      ? 'Joining to the room...'
+                      : 'Join audio room'}
+                  </Button>
+                )}
                 {queryAudioChatMetadata?.data.creator === address && (
                   <>
-                    <span className="italic text-neutral-9">or</span>
+                    {stateAudioRoom?.room?.state === 'disconnected' && (
+                      <span className="italic text-neutral-9">or</span>
+                    )}
                     <Button
                       onClick={async () => {
                         stateTxUiEndLiveRally.setDialogVisibility(true)
@@ -137,7 +153,6 @@ const Page: NextPage = () => {
               <p className="text-neutral-11 pt-5 text-2xs">Your mic will be muted when you join.</p>
             </div>
           )}
-
           {!isReady ||
             queryAudioChatByIdRawData?.status === 'loading' ||
             (queryAudioChatMetadata?.status === 'loading' &&
@@ -148,7 +163,6 @@ const Page: NextPage = () => {
                   <p className="font-medium animate-pulse">Loading rally...</p>
                 </div>
               ))}
-
           {queryAudioChatByIdRawData?.data?.audio_event_id ===
             '0x0000000000000000000000000000000000000000000000000000000000000000' && (
             <section>
@@ -159,13 +173,19 @@ const Page: NextPage = () => {
               </Link>
             </section>
           )}
-          {queryAudioChatMetadata?.data?.description?.trim()?.length > 0 && (
-            <section className="-mx-6 pt-8 px-6 animate-appear">
-              <h2 className="sr-only">About</h2>
-              <p className="text-md text-neutral-12">{queryAudioChatMetadata?.data?.description}</p>
-            </section>
-          )}
+          <div>
+            {queryAudioChatMetadata?.data?.description?.trim()?.length > 0 && (
+              <section className="-mx-6 pt-8 px-6 animate-appear">
+                <h2 className="sr-only">About</h2>
+                <p className="text-md text-neutral-12">{queryAudioChatMetadata?.data?.description}</p>
+              </section>
+            )}
+          </div>
         </main>
+        <h1 className="text-3xl font-bold"></h1>
+        {stateAudioRoom.participants.map((participant) => (
+          <Participant participant={participant} />
+        ))}
       </div>
       <DialogGoLive stateTxUi={stateTxUiRallyGoLive} stateGoLiveAudioChat={stateGoLive} />
       <DialogEndLive stateTxUi={stateTxUiEndLiveRally} stateEndLiveAudioChat={stateEndLiveAudioChat} />
