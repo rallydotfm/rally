@@ -11,10 +11,6 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@rally/abi": "*",
-    "@rally/api": "*",
-    "@rally/auth": "*",
-    "@rally/db": "*",
     "@felte/react": "^1.2.6",
     "@felte/validator-zod": "^1.0.12",
     "@graphql-codegen/fragment-matcher": "^3.3.1",
@@ -25,6 +21,10 @@
     "@livekit/react-core": "^1.0.3",
     "@rainbow-me/rainbowkit": "^0.7.3",
     "@rainbow-me/rainbowkit-siwe-next-auth": "^0.1.4",
+    "@rally/abi": "*",
+    "@rally/api": "*",
+    "@rally/auth": "*",
+    "@rally/db": "*",
     "@react-hookz/web": "^16.1.0",
     "@tanstack/react-query": "^4.13.0",
     "@tanstack/react-table": "^8.5.22",
@@ -52,6 +52,7 @@
     "react-html-props": "^1.0.33",
     "siwe": "^1.1.6",
     "urql": "^3.0.3",
+    "valtio": "^1.7.5",
     "wagmi": "^0.7.5",
     "web3.storage": "^4.4.0",
     "zod": "^3.19.1"

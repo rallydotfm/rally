@@ -16,19 +16,9 @@ import { useGoLiveAudioChat, useStoreTxUiGoLiveRally } from '@hooks/useGoLiveAud
 import { useEndLiveAudioChat, useStoreTxUiEndLiveRally } from '@hooks/useEndLiveAudioChat'
 import DialogGoLive from '@components/DialogGoLive'
 import DialogEndLive from '@components/DialogEndLive'
-import { useLiveAudioRoom, useStore } from '@hooks/useLiveAudioRoom'
-import { useParticipant } from '@livekit/react-core'
+import { useConnectToVoiceChat, useStoreLiveVoiceChat } from '@hooks/useVoiceChat'
+import LiveVoiceChatParticipant from '@components/LiveVoiceChatParticipant'
 
-const Participant = ({ participant }) => {
-  const { isSpeaking, connectionQuality, isLocal, cameraPublication, ...rest } = useParticipant(participant)
-  console.log(rest)
-  return (
-    <>
-      {isSpeaking ? 'speaking' : 'not speaking'}
-      {connectionQuality}
-    </>
-  )
-}
 const Page: NextPage = () => {
   const {
     query: { idRally },
@@ -44,8 +34,8 @@ const Page: NextPage = () => {
   const stateTxUiEndLiveRally = useStoreTxUiEndLiveRally()
   const { onClickEndLive, stateEndLiveAudioChat } = useEndLiveAudioChat(stateTxUiEndLiveRally)
 
-  const { mutationJoinRoom } = useLiveAudioRoom()
-  const stateAudioRoom = useStore()
+  const { mutationJoinRoom } = useConnectToVoiceChat(queryAudioChatMetadata.data)
+  const stateVoiceChat = useStoreLiveVoiceChat()
 
   return (
     <>
@@ -115,7 +105,7 @@ const Page: NextPage = () => {
           {queryAudioChatMetadata?.data?.state === DICTIONARY_STATES_AUDIO_CHATS.LIVE.label && (
             <div className="flex flex-col items-center animate-appear mt-8 justify-center">
               <div className="flex space-i-3 items-center">
-                {stateAudioRoom?.room?.state === 'disconnected' && (
+                {stateVoiceChat?.room?.state === 'disconnected' && (
                   <Button
                     disabled={mutationJoinRoom.isLoading}
                     isLoading={mutationJoinRoom.isLoading}
@@ -128,14 +118,14 @@ const Page: NextPage = () => {
                   >
                     {mutationJoinRoom.isLoading
                       ? 'Checking your access...'
-                      : stateAudioRoom.isConnecting
+                      : stateVoiceChat.isConnecting
                       ? 'Joining to the room...'
                       : 'Join audio room'}
                   </Button>
                 )}
                 {queryAudioChatMetadata?.data.creator === address && (
                   <>
-                    {stateAudioRoom?.room?.state === 'disconnected' && (
+                    {stateVoiceChat?.room?.state === 'disconnected' && (
                       <span className="italic text-neutral-9">or</span>
                     )}
                     <Button
@@ -183,8 +173,8 @@ const Page: NextPage = () => {
           </div>
         </main>
         <h1 className="text-3xl font-bold"></h1>
-        {stateAudioRoom.participants.map((participant) => (
-          <Participant participant={participant} />
+        {stateVoiceChat.participants.map((participant) => (
+          <LiveVoiceChatParticipant participant={participant} />
         ))}
       </div>
       <DialogGoLive stateTxUi={stateTxUiRallyGoLive} stateGoLiveAudioChat={stateGoLive} />

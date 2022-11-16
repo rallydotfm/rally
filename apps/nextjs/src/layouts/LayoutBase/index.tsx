@@ -1,11 +1,10 @@
 import { useAccount } from 'wagmi'
 import { ConnectButton } from '@rainbow-me/rainbowkit'
+import { ProviderLiveVoiceChat } from '@hooks/useVoiceChat/Provider'
 import MobileTopMenu from './MobileTopMenu'
 import MainNavBar from './MainNavBar'
 import ToolbarAudioRoom from './ToolbarAudioRoom'
-import { useRoom } from '@livekit/react-core'
-import create from 'zustand'
-import { Provider as ProviderAudioRoom, useStore as useStoreAudioRoom } from '@hooks/useLiveAudioRoom'
+import { useStoreLiveVoiceChat } from '@hooks/useVoiceChat'
 interface LayoutProps {
   children: React.ReactNode
 }
@@ -13,8 +12,8 @@ interface LayoutProps {
 export const LayoutBase = (props: LayoutProps) => {
   const { children } = props
   const { address, isConnecting } = useAccount()
-  const stateAudioRoom = useStoreAudioRoom()
-  console.log(stateAudioRoom)
+  const stateVoiceChat = useStoreLiveVoiceChat()
+
   return (
     <div className="relative flex-grow flex flex-col">
       {!isConnecting && !address && (
@@ -33,18 +32,18 @@ export const LayoutBase = (props: LayoutProps) => {
         <MobileTopMenu address={address} />
         <div
           className={`pt-8  ${
-            stateAudioRoom.room.state === 'connected' ? 'pb-20 md:pb-48' : 'pb-12 md:pb-32'
+            stateVoiceChat?.room.state === 'connected' ? 'pb-20 md:pb-48' : 'pb-12 md:pb-32'
           } md:border-x flex flex-col md:border-neutral-4 md:border-solid md:col-span-8 px-6 flex-grow`}
         >
           {children}
         </div>
         <div
           className={`transition-all py-2 ${
-            stateAudioRoom.room.state === 'connected' ? 'z-20 translate-y-0' : 'z-[-1] translate-y-full'
+            stateVoiceChat?.room.state === 'connected' ? 'z-20 translate-y-0' : 'z-[-1] translate-y-full'
           } border-transparent flex fixed bottom-12 md:bottom-0 w-full z-20 bg-black border-y-neutral-4 border`}
         >
-          {stateAudioRoom.room.state === 'connected' && (
-            <ToolbarAudioRoom participant={stateAudioRoom.room.localParticipant} />
+          {stateVoiceChat?.room.state === 'connected' && (
+            <ToolbarAudioRoom participant={stateVoiceChat?.room.localParticipant} />
           )}
         </div>
         <div className="hidden md:block md:col-span-1 lg:col-span-2 md:pis-6 pb-6">
@@ -64,25 +63,10 @@ const roomOptions = {
 }
 
 export const getLayout = (page: any) => {
-  const { connect, ...store } = useRoom(roomOptions)
-
   return (
-    <ProviderAudioRoom
-      createStore={() =>
-        create((set) => ({
-          ...store,
-          joinRoom: async (token) => {
-            try {
-              await connect(`wss://${process.env.NEXT_PUBLIC_LIVEKIT_URL}`, token)
-            } catch (e) {
-              console.error(e)
-            }
-          },
-        }))
-      }
-    >
+    <ProviderLiveVoiceChat>
       <LayoutBase>{page}</LayoutBase>
-    </ProviderAudioRoom>
+    </ProviderLiveVoiceChat>
   )
 }
 export default LayoutBase

@@ -1,7 +1,7 @@
 import button from '@components/Button/styles'
 import { ROUTE_RALLY_NEW } from '@config/routes'
 import { PlusIcon } from '@heroicons/react/24/outline'
-import { useStoreLiveAudioRoom } from '@hooks/useLiveAudioRoom'
+import { useStoreLiveAudioRoom } from '@hooks/useVoiceChat'
 import Link from 'next/link'
 import MenuCurrentUser from '../MenuCurrentUser'
 import NavLinks from './NavLinks'

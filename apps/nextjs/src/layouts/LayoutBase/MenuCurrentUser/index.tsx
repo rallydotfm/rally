@@ -1,10 +1,9 @@
 import { Menu } from '@headlessui/react'
 import Link from 'next/link'
-import { useQuery } from '@tanstack/react-query'
 import { useDisconnect, useEnsName } from 'wagmi'
 import { EllipsisHorizontalIcon } from '@heroicons/react/24/outline'
-import { getDefaultProfile } from '@services/lens/profile/getDefaultProfile'
 import { shortenEthereumAddress } from '@helpers/shortenEthereumAddress'
+import useWalletAddressDefaultLensProfile from '@hooks/useWalletAddressDefaultLensProfile'
 import { ROUTE_PROFILE, ROUTE_ACCOUNT_PREFERENCES } from '@config/routes'
 import Profile from './Profile'
 
@@ -14,18 +13,7 @@ interface MenuCurrentUserProps {
 export const MenuCurrentUser = (props: MenuCurrentUserProps) => {
   const { address } = props
   const { disconnect } = useDisconnect()
-  const queryUserProfileLens = useQuery(['lens-profile', address], async () => {
-    try {
-      const result = await getDefaultProfile({
-        ethereumAddress: address,
-      })
-      //@ts-ignore
-      if (result?.error) throw new Error(result?.error)
-      return result?.data?.defaultProfile
-    } catch (e) {
-      console.error(e)
-    }
-  })
+  const queryUserProfileLens = useWalletAddressDefaultLensProfile(address)
 
   const queryEns = useEnsName({
     chainId: 1,
