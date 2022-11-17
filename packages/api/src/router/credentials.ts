@@ -2,7 +2,7 @@ import { AccessToken } from 'livekit-server-sdk'
 import { publicProcedure, router } from '../trpc'
 import { getToken } from 'next-auth/jwt'
 import { object, string } from 'zod'
-import { serialize } from 'cookie'
+
 const secret = process.env.NEXTAUTH_SECRET
 
 export const credentialsRouter = router({
@@ -16,19 +16,28 @@ export const credentialsRouter = router({
     .mutation(async ({ ctx, input }) => {
       const { id_rally, cid_rally } = input
       try {
+        // get current user wallet address from the session
+        //@ts-ignore
         const { sub } = await getToken({ req: ctx.req, secret })
+
+        // if not connected, throw an error
         if (!sub) throw Error('Not connected')
+
         const user_ethereum_address = sub
+
+        // generate basic access token from their wallet address
         const at = new AccessToken(process.env.LIVEKIT_API_KEY, process.env.LIVEKIT_SECRET_KEY, {
           identity: sub,
         })
 
+        // get the information of the rally by fetching the JSON with all its data
         const response = await fetch(`https://${cid_rally}.ipfs.w3s.link/data.json`)
         const result = await response.json()
 
         const {
           access_control: { whitelist, guilds },
         } = result
+
         if (whitelist.includes(user_ethereum_address)) {
           // if the user address is in the whitelist
           // user = admin/mod/cohost
@@ -42,13 +51,15 @@ export const credentialsRouter = router({
             canPublishData: true,
           })
         } else {
-          // if the audioroom is gated
+          // if the audio room is gated
           if (guilds.length > 0) {
             // get user roles
             // and check if the access control list contains those roles
             const response = await fetch(`https://api.guild.xyz/v1/user/membership/${user_ethereum_address}`)
             const result = await response.json()
+            //@ts-ignore
             const user_roles = [].concat(...result.map((guild) => guild.roleIds))
+            //@ts-ignore
             const guild_allowed_roles = [].concat(...guilds.map((guild) => guild.roles))
             const is_user_allowed = guild_allowed_roles.filter((role) => user_roles.includes(role))?.length > 0
             // if the user has the roles

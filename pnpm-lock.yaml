@@ -14,6 +14,8 @@ importers:
 
   apps/nextjs:
     specifiers:
+      '@emoji-mart/data': ^1.0.8
+      '@emoji-mart/react': ^1.0.1
       '@felte/react': ^1.2.6
       '@felte/validator-zod': ^1.0.12
       '@graphql-codegen/cli': ^2.13.7
@@ -54,6 +56,7 @@ importers:
       autoprefixer: ^10.4.12
       class-variance-authority: ^0.2.4
       date-fns: ^2.29.3
+      emoji-mart: ^5.3.2
       eslint: 8.26.0
       eslint-config-next: 12.3.1
       ethers: ^5.7.2
@@ -81,6 +84,8 @@ importers:
       web3.storage: ^4.4.0
       zod: ^3.19.1
     dependencies:
+      '@emoji-mart/data': 1.0.8
+      '@emoji-mart/react': 1.0.1_26n2ievu4rj5ncw7zx7ojbmtrq
       '@felte/react': 1.2.6_react@18.2.0
       '@felte/validator-zod': 1.0.12_zod@3.19.1
       '@graphql-codegen/fragment-matcher': 3.3.1_graphql@16.6.0
@@ -107,6 +112,7 @@ importers:
       '@zag-js/tags-input': 0.2.9
       class-variance-authority: 0.2.4_typescript@4.8.4
       date-fns: 2.29.3
+      emoji-mart: 5.3.2
       ethers: 5.7.2
       graphql: 16.6.0
       iron-session: 6.3.1_next@12.3.1
@@ -917,6 +923,20 @@ packages:
     dependencies:
       '@jridgewell/trace-mapping': 0.3.9
     dev: true
+
+  /@emoji-mart/data/1.0.8:
+    resolution: {integrity: sha512-AMpqLrR80dHfj8ZA6xaf8/t9reBy88vz07fBdwKVVoUX6X2Wi+R2p2uhIZFqNZe8zRd6kga3hKheqK+deElEZw==}
+    dev: false
+
+  /@emoji-mart/react/1.0.1_26n2ievu4rj5ncw7zx7ojbmtrq:
+    resolution: {integrity: sha512-ALhLD96BOL5w+a4NI5NpmfqfF1aVjjj2qJE0dLst/OhjBfVmpteWNgn/h8LZy9ulU6AnbeS+13KnPFzDjCvRRw==}
+    peerDependencies:
+      emoji-mart: ^5.2
+      react: ^16.8 || ^17 || ^18
+    dependencies:
+      emoji-mart: 5.3.2
+      react: 18.2.0
+    dev: false
 
   /@emotion/hash/0.8.0:
     resolution: {integrity: sha512-kBJtf7PH6aWwZ6fka3zQ0p6SBYzx4fl1LoZXE2RrnYST9Xljm7WfKJrU4g/Xr3Beg72MLrp1AWNUmuYJTL7Cow==}
@@ -5059,6 +5079,10 @@ packages:
       inherits: 2.0.4
       minimalistic-assert: 1.0.1
       minimalistic-crypto-utils: 1.0.1
+    dev: false
+
+  /emoji-mart/5.3.2:
+    resolution: {integrity: sha512-og6K4jYkZITe8pnFPHdFE576Tc6fCFl8JPhl98jRunH3bDulk3iqA+6Ue0iUZ/L/GWzLf9XME9QnpBd53N5YTg==}
     dev: false
 
   /emoji-regex/7.0.3:

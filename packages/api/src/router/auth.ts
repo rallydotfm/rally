@@ -5,7 +5,6 @@ export const authRouter = router({
   getSession: publicProcedure.query(async ({ ctx }) => {
     // const token = await getToken({ req })
     const token = await getToken({ req: ctx.req, secret })
-    console.log('JSON Web Token', token)
     return token
   }),
   getSecretMessage: protectedProcedure.query(({ ctx }) => {

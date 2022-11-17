@@ -13,10 +13,8 @@ import { DICTIONARY_STATES_AUDIO_CHATS } from '@helpers/mappingAudioChatState'
 import CountdownOpening from '@components/pages/rally/CountdownOpening'
 import { isFuture } from 'date-fns'
 import { useGoLiveAudioChat, useStoreTxUiGoLiveRally } from '@hooks/useGoLiveAudioChat'
-import { useEndLiveAudioChat, useStoreTxUiEndLiveRally } from '@hooks/useEndLiveAudioChat'
 import DialogGoLive from '@components/DialogGoLive'
-import DialogEndLive from '@components/DialogEndLive'
-import { useConnectToVoiceChat, useStoreLiveVoiceChat } from '@hooks/useVoiceChat'
+import { useConnectToVoiceChat, useStoreLiveVoiceChat, useStoreCurrentLiveRally } from '@hooks/useVoiceChat'
 import LiveVoiceChatParticipant from '@components/LiveVoiceChatParticipant'
 
 const Page: NextPage = () => {
@@ -31,12 +29,9 @@ const Page: NextPage = () => {
   const stateTxUiRallyGoLive = useStoreTxUiGoLiveRally()
   const { onClickGoLive, stateGoLive } = useGoLiveAudioChat(stateTxUiRallyGoLive)
 
-  const stateTxUiEndLiveRally = useStoreTxUiEndLiveRally()
-  const { onClickEndLive, stateEndLiveAudioChat } = useEndLiveAudioChat(stateTxUiEndLiveRally)
-
   const { mutationJoinRoom } = useConnectToVoiceChat(queryAudioChatMetadata.data)
   const stateVoiceChat = useStoreLiveVoiceChat()
-
+  const rally = useStoreCurrentLiveRally((state) => state.rally)
   return (
     <>
       <Head>
@@ -60,27 +55,52 @@ const Page: NextPage = () => {
               </a>
             </Link>
           </nav>
-          {queryAudioChatMetadata?.data?.image && (
-            <div className="relative self-center rounded-md mt-10 w-48 overflow-hidden aspect-square">
-              <div className="bg-neutral-5 absolute w-full h-full inset-0 animate-pulse" />
-              <img
-                src={`https://ipfs.io/ipfs/${queryAudioChatMetadata?.data?.image}`}
-                className="relative z-10 w-full h-full object-cover"
-                alt=""
-                width="192px"
-                height="192px"
-                loading="lazy"
-              />
+          <div
+            className={`${
+              !queryAudioChatMetadata?.data?.image ? 'pt-8 xs:pt-12 pis-10' : ''
+            } flex flex-col space-y-6 xs:space-y-0 xs:flex-row xs:space-i-12`}
+          >
+            {queryAudioChatMetadata?.data?.image && (
+              <div className="relative self-center xs:self-start rounded-md mt-10 w-full aspect-video xs:w-36 overflow-hidden xs:aspect-square">
+                <div className="bg-neutral-5 absolute w-full h-full inset-0 animate-pulse" />
+                <img
+                  src={`https://ipfs.io/ipfs/${queryAudioChatMetadata?.data?.image}`}
+                  className="relative z-10 w-full h-full object-cover"
+                  alt=""
+                  width="192px"
+                  height="192px"
+                  loading="lazy"
+                />
+              </div>
+            )}
+            <div className="xs:self-end">
+              <h1 className="font-bold text-3xl flex flex-col-reverse">
+                <span>{queryAudioChatMetadata?.data?.name}</span>
+                <span className="text-2xs uppercase tracking-wider">{queryAudioChatMetadata?.data?.state}</span>
+              </h1>
+              <div>
+                {queryAudioChatMetadata?.data?.description?.trim()?.length > 0 && (
+                  <section className="pt-2 italic animate-appear">
+                    <h2 className="sr-only">About</h2>
+                    <p className="text-neutral-11">{queryAudioChatMetadata?.data?.description}</p>
+                  </section>
+                )}
+                {queryAudioChatMetadata?.data?.tags?.length > 0 && (
+                  <section>
+                    <ul className="mt-2 flex flex-wrap gap-x-4 gap-y-2 ">
+                      {queryAudioChatMetadata?.data?.tags?.map((tag) => (
+                        <li className="px-3 py-0.5 rounded-md bg-neutral-2 text-2xs font-bold " key={tag}>
+                          {tag}
+                        </li>
+                      ))}
+                    </ul>
+                  </section>
+                )}
+              </div>
             </div>
-          )}
-
-          <h1 className="sr-only">{queryAudioChatMetadata?.data?.name}</h1>
+          </div>
         </header>
         <main className="flex flex-col grow justify-center items-center">
-          <h1 className="font-bold text-4xl flex items-center flex-col-reverse">
-            <span>{queryAudioChatMetadata?.data?.name}</span>
-            <span className="text-2xs uppercase tracking-wider">{queryAudioChatMetadata?.data?.state}</span>
-          </h1>
           {queryAudioChatMetadata?.data?.state === DICTIONARY_STATES_AUDIO_CHATS.PLANNED.label &&
             (isFuture(queryAudioChatMetadata?.data?.datetime_start_at) ?? false) && (
               <div className="animate-appear mx-auto mt-8">
@@ -93,6 +113,7 @@ const Page: NextPage = () => {
             ) && (
               <div className="animate-appear mt-5 flex justify-center">
                 <Button
+                  disabled={rally && rally?.id !== idRally}
                   onClick={async () => {
                     stateTxUiRallyGoLive.setDialogVisibility(true)
                     await onClickGoLive(queryAudioChatMetadata.data?.id)
@@ -107,7 +128,7 @@ const Page: NextPage = () => {
               <div className="flex space-i-3 items-center">
                 {stateVoiceChat?.room?.state === 'disconnected' && (
                   <Button
-                    disabled={mutationJoinRoom.isLoading}
+                    disabled={mutationJoinRoom.isLoading || (rally && rally?.id !== idRally)}
                     isLoading={mutationJoinRoom.isLoading}
                     onClick={async () => {
                       await mutationJoinRoom.mutate({
@@ -123,24 +144,10 @@ const Page: NextPage = () => {
                       : 'Join audio room'}
                   </Button>
                 )}
-                {queryAudioChatMetadata?.data.creator === address && (
-                  <>
-                    {stateVoiceChat?.room?.state === 'disconnected' && (
-                      <span className="italic text-neutral-9">or</span>
-                    )}
-                    <Button
-                      onClick={async () => {
-                        stateTxUiEndLiveRally.setDialogVisibility(true)
-                        await onClickEndLive(queryAudioChatMetadata.data?.id)
-                      }}
-                      intent="primary-outline"
-                    >
-                      End rally
-                    </Button>
-                  </>
-                )}
               </div>
-              <p className="text-neutral-11 pt-5 text-2xs">Your mic will be muted when you join.</p>
+              {stateVoiceChat.room.state === 'disconnected' && (
+                <p className="text-neutral-11 pt-5 text-2xs">Your mic will be muted when you join.</p>
+              )}
             </div>
           )}
           {!isReady ||
@@ -163,22 +170,62 @@ const Page: NextPage = () => {
               </Link>
             </section>
           )}
-          <div>
-            {queryAudioChatMetadata?.data?.description?.trim()?.length > 0 && (
-              <section className="-mx-6 pt-8 px-6 animate-appear">
-                <h2 className="sr-only">About</h2>
-                <p className="text-md text-neutral-12">{queryAudioChatMetadata?.data?.description}</p>
-              </section>
-            )}
-          </div>
         </main>
-        <h1 className="text-3xl font-bold"></h1>
-        {stateVoiceChat.participants.map((participant) => (
-          <LiveVoiceChatParticipant participant={participant} />
-        ))}
+        {stateVoiceChat.room.state === 'connected' && rally?.id === idRally && (
+          <div className="px-12">
+            <div>
+              <ul className="flex flex-wrap gap-4 justify-center">
+                {stateVoiceChat?.participants
+                  ?.filter((participant) => {
+                    if (
+                      participant.permissions.canSubscribe &&
+                      participant.permissions.canPublishData &&
+                      participant.permissions.canPublish
+                    )
+                      return participant
+                  })
+                  .map((participant) => (
+                    <li key={`${participant?.sid}-${rally?.id}`}>
+                      <LiveVoiceChatParticipant participant={participant} />
+                    </li>
+                  ))}
+              </ul>
+            </div>
+            <div>
+              <ul className="flex flex-wrap gap-4 justify-center">
+                {stateVoiceChat?.participants
+                  ?.filter((participant) => {
+                    if (
+                      participant.permissions.canSubscribe &&
+                      !participant.permissions.canPublishData &&
+                      participant.permissions.canPublish
+                    )
+                      return participant
+                  })
+                  .map((participant) => (
+                    <li key={`${participant?.sid}-${rally?.id}`}>
+                      <LiveVoiceChatParticipant participant={participant} />
+                    </li>
+                  ))}
+              </ul>
+            </div>
+            <div>
+              <ul className="flex flex-wrap gap-4 justify-center">
+                {stateVoiceChat?.participants
+                  ?.filter((participant) => {
+                    if (participant.permissions.canSubscribe && !participant.permissions.canPublish) return participant
+                  })
+                  .map((participant) => (
+                    <li key={`${participant?.sid}-${rally?.id}`}>
+                      <LiveVoiceChatParticipant participant={participant} />
+                    </li>
+                  ))}
+              </ul>
+            </div>
+          </div>
+        )}
       </div>
       <DialogGoLive stateTxUi={stateTxUiRallyGoLive} stateGoLiveAudioChat={stateGoLive} />
-      <DialogEndLive stateTxUi={stateTxUiEndLiveRally} stateEndLiveAudioChat={stateEndLiveAudioChat} />
     </>
   )
 }

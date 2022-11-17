@@ -20,7 +20,7 @@ export function useConnectToVoiceChat(rally) {
     async onSuccess(data) {
       try {
         this.roomService = data?.token
-        await state.connect(`wss://${process.env.NEXT_PUBLIC_LIVEKIT_URL}`, data?.token)
+        await state.connect(`wss://${process.env.NEXT_PUBLIC_LIVEKIT_URL}`, data?.token, {})
         setLiveRally(rally)
       } catch (e) {
         setLiveRally(undefined)
