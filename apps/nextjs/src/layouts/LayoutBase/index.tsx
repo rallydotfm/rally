@@ -42,9 +42,7 @@ export const LayoutBase = (props: LayoutProps) => {
             stateVoiceChat?.room.state === 'connected' ? 'z-20 translate-y-0' : 'z-[-1] translate-y-full'
           } border-transparent flex fixed bottom-12 md:bottom-0 w-full z-20 bg-black border-y-neutral-4 border`}
         >
-          {stateVoiceChat?.room.state === 'connected' && (
-            <ToolbarAudioRoom participant={stateVoiceChat?.room.localParticipant} />
-          )}
+          {stateVoiceChat?.room.state === 'connected' && <ToolbarAudioRoom />}
         </div>
         <div className="hidden md:block md:col-span-1 lg:col-span-2 md:pis-6 pb-6">
           <footer className="flex flex-col md:pt-6 text-2xs text-neutral-11">

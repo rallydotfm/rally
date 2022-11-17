@@ -1,4 +1,12 @@
-export const LiveVoiceChatParticipantRole = (props) => {
+interface LiveVoiceChatParticipantRoleProps {
+  permissions: {
+    canSubscribe: boolean
+    canPublishData: boolean
+    canPublish: boolean
+  }
+}
+
+export const LiveVoiceChatParticipantRole = (props: LiveVoiceChatParticipantRoleProps) => {
   const {
     permissions: { canSubscribe, canPublishData, canPublish },
   } = props

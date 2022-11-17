@@ -43,6 +43,46 @@ export const roomRouter = router({
         console.error(e)
       }
     }),
+  update_room_ban_list: publicProcedure
+    .input(
+      object({
+        id_rally: string(),
+        id_user: string(),
+        metadata: string(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { id_rally, id_user, metadata } = input
+
+      const client = new RoomServiceClient(
+        `wss://${process.env.NEXT_PUBLIC_LIVEKIT_URL}`,
+        process.env.LIVEKIT_API_KEY,
+        process.env.LIVEKIT_SECRET_KEY,
+      )
+
+      try {
+        // get current user wallet address from the session
+        //@ts-ignore
+        const { sub } = await getToken({ req: ctx.req, secret })
+
+        // if not connected, throw an error
+        if (!sub) throw Error('Not connected')
+        await client.updateParticipant(id_rally, id_user, undefined, {
+          canPublish: false,
+          canSubscribe: false,
+          canPublishData: false,
+          hidden: false,
+          recorder: false,
+        })
+        await client.updateRoomMetadata(id_rally, metadata)
+        await client.removeParticipant(id_rally, id_user)
+        return {
+          id_user,
+        }
+      } catch (e) {
+        console.error(e)
+      }
+    }),
   update_audience_member_permissions: publicProcedure
     .input(
       object({
@@ -71,15 +111,17 @@ export const roomRouter = router({
         // if not connected, throw an error
         if (!sub) throw Error('Not connected')
 
-        const user_ethereum_address = sub
-
-        await client.updateParticipant(id_rally, user_ethereum_address, undefined, {
+        await client.updateParticipant(id_rally, id_user, undefined, {
           canPublish: permissions.can_publish,
           canSubscribe: permissions.can_subscribe,
           canPublishData: permissions.can_publish_data,
           hidden: false,
           recorder: false,
         })
+        if (!permissions.can_subscribe) await client.removeParticipant(id_rally, id_user)
+        return {
+          id_user,
+        }
       } catch (e) {
         console.error(e)
       }

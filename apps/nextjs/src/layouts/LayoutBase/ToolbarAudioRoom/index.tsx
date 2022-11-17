@@ -1,4 +1,11 @@
-import { MicrophoneIcon, HandRaisedIcon, Cog6ToothIcon, ArrowRightOnRectangleIcon } from '@heroicons/react/20/solid'
+import { useEffect, useState } from 'react'
+import {
+  MicrophoneIcon,
+  HandRaisedIcon as SolidHandRaisedIcon,
+  Cog6ToothIcon,
+  ArrowRightOnRectangleIcon,
+} from '@heroicons/react/20/solid'
+import { HandRaisedIcon } from '@heroicons/react/24/outline'
 import { ROUTE_RALLY_VIEW } from '@config/routes'
 import Button from '@components/Button'
 import { AudioRenderer, useParticipant } from '@livekit/react-core'
@@ -11,12 +18,15 @@ import { useEndLiveAudioChat, useStoreTxUiEndLiveRally } from '@hooks/useEndLive
 import { Listbox } from '@headlessui/react'
 import DialogEndLive from '@components/DialogEndLive'
 import { useAccount } from 'wagmi'
+import type { Participant } from 'livekit-client'
 
-export const ToolbarAudioRoom = (props) => {
-  const { participant } = props
+interface ToolbarAudioRoomProps {
+  participant: Participant
+}
+export const ToolbarAudioRoom = () => {
   const { address } = useAccount()
   const state = useStoreLiveVoiceChat()
-  const { microphonePublication, isSpeaking } = useParticipant(participant)
+  const { microphonePublication, isSpeaking } = useParticipant(state?.room?.localParticipant)
   const {
     pathname,
     query: { idRally },
@@ -26,6 +36,17 @@ export const ToolbarAudioRoom = (props) => {
   const mutationRaiseHand = trpc.room.raise_hand.useMutation()
   const stateTxUiEndLiveRally = useStoreTxUiEndLiveRally()
   const { onClickEndLive, stateEndLiveAudioChat } = useEndLiveAudioChat(stateTxUiEndLiveRally)
+  const [isHandRaised, setIsHandRaised] = useState(false)
+
+  useEffect(() => {
+    if (state?.room?.localParticipant?.metadata) {
+      const userMetadata = JSON.parse(state.room.localParticipant.metadata ?? '')
+      if (userMetadata?.is_hand_raised) {
+        setIsHandRaised(userMetadata.is_hand_raised)
+      }
+    }
+  }, [state?.room?.localParticipant?.metadata])
+
   return (
     <>
       {state.audioTracks.map((track) => {
@@ -68,13 +89,13 @@ export const ToolbarAudioRoom = (props) => {
           {!state.room.localParticipant.permissions.canPublish && (
             <Button
               onClick={() => {
-                mutationRaiseHand.mutate({ id_rally: rally?.id, new_is_hand_raised_value: true })
+                mutationRaiseHand.mutate({ id_rally: rally?.id, new_is_hand_raised_value: !isHandRaised })
               }}
               intent="neutral-ghost"
               scale="sm"
               className="aspect-square"
             >
-              <HandRaisedIcon className="w-7" />
+              {isHandRaised ? <SolidHandRaisedIcon className="w-7" /> : <HandRaisedIcon className="w-7" />}
             </Button>
           )}
           <Listbox
