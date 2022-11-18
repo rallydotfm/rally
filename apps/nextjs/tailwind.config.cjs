@@ -166,6 +166,17 @@ module.exports = {
             transform: 'translateY(0)',
           },
         },
+        'scale-in': {
+          from: {
+            opacity: 0,
+            transform: 'translateY(5px) scale(0.95)',
+          },
+          to: {
+            opacity: 1,
+            transform: 'translateY(0) scale(1)',
+          },
+        },
+
         'scale-up': {
           '0%': { transform: 'scale(0.25)', opacity: 0 },
           '25%': { transform: 'scale(1.25)', opacity: 1 },
@@ -176,6 +187,7 @@ module.exports = {
       },
       animation: {
         appear: 'appear 300ms ease-in forwards',
+        'scale-in': 'scale-in 250ms ease-in-out forwards',
         'scale-up': 'scale-up 2350ms ease-in-out alternate forwards',
       },
       height: {

@@ -110,7 +110,7 @@ export const ToolbarAudioRoom = () => {
             <Listbox.Button as={Button} intent="neutral-ghost" scale="sm" className="aspect-square">
               {<IconLiveReaction className="text-2xl" />}
             </Listbox.Button>
-            <Listbox.Options className="flex top-0 text-xl flex-row absolute -translate-y-3/4 divide-i divide-neutral-7 my-1 max-w-72 w-full overflow-x-auto rounded-md bg-neutral-5  focus:outline-none ">
+            <Listbox.Options className="flex top-[-90%] text-xl flex-row absolute divide-i divide-neutral-7 max-w-72 w-full overflow-x-auto rounded-full bg-neutral-5 animate-scale-in focus:outline-none ">
               {['👋', '👍', '✌️', '❤️', '🔥', '💯', '✨', '🫡', '😂', '😭', '😠'].map((emote) => (
                 <Listbox.Option
                   className="flex-grow cursor-pointer hover:bg-neutral-7 focus:bg-white flex items-center justify-center py-1 px-4 aspect-square shrink-0"
