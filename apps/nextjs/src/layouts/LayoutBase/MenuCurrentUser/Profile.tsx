@@ -1,5 +1,6 @@
 import { IconSpinner } from '@components/Icons'
 import shortenEthereumAddress from '@helpers/shortenEthereumAddress'
+import { useSession } from 'next-auth/react'
 
 interface ProfileProps {
   address: string
@@ -9,6 +10,7 @@ interface ProfileProps {
 
 const Profile = (props: ProfileProps) => {
   const { queryEns, queryLens, address } = props
+  const { status } = useSession()
 
   return (
     <div className="overflow-hidden flex items-center">
@@ -26,14 +28,22 @@ const Profile = (props: ProfileProps) => {
       <div className="flex flex-col whitespace-pre-line">
         {queryLens?.data && (
           <>
-            <span className="font-bold text-xs w-full">{queryLens?.data?.name}&nbsp;</span>
-            <span className="text-[0.75em] opacity-50">@{queryLens?.data?.handle}</span>
+            <span className="font-bold text-2xs w-full">{queryLens?.data?.name}&nbsp;</span>
+            <span className="text-[0.9em] opacity-50">@{queryLens?.data?.handle}</span>
           </>
         )}
-        <span className="text-[0.75em] font-mono opacity-75 text-ellipsis flex items-center overflow-hidden">
+        <span className="text-[0.9em] font-mono opacity-75 text-ellipsis flex items-center overflow-hidden">
           {queryLens?.status === 'loading' && <IconSpinner className="text-sm text-primary-11 mie-1 animate-spin" />}
           {queryEns?.data && queryEns?.data !== null ? queryEns?.data : shortenEthereumAddress(address)}
         </span>
+        {status !== 'authenticated' && (
+          <>
+            <span className="text-[0.9em] font-semibold animate-appear text-negative-10 pt-0.5">
+              Wallet not verified
+            </span>
+            <span className="text-[0.65em] text-negative-12">Sign out and reconnect your wallet to verify it.</span>
+          </>
+        )}
       </div>
     </div>
   )

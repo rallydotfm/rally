@@ -155,7 +155,10 @@ export const roomRouter = router({
         const data = JSON.stringify({
           is_hand_raised: new_is_hand_raised_value,
         })
+
         client.updateParticipant(id_rally, user_ethereum_address, data)
+
+        return new_is_hand_raised_value
       } catch (e) {
         console.error(e)
       }

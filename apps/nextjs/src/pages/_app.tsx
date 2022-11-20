@@ -15,11 +15,7 @@ import { Toaster } from 'react-hot-toast'
 import { toastOptions } from '@config/react-hot-toast'
 import { SessionProvider } from 'next-auth/react'
 import { RainbowKitSiweNextAuthProvider } from '@rainbow-me/rainbowkit-siwe-next-auth'
-import type { GetSiweMessageOptions } from '@rainbow-me/rainbowkit-siwe-next-auth'
-
-const getSiweMessageOptions: GetSiweMessageOptions = () => ({
-  statement: 'Sign in to unlock Rally.',
-})
+import { getSiweMessageOptions } from '@config/siwe'
 
 function MyApp({ Component, pageProps }: AppProps) {
   //@ts-ignore
@@ -31,7 +27,8 @@ function MyApp({ Component, pageProps }: AppProps) {
         <meta name="color-scheme" content="dark" />
       </Head>
       <QueryClientProvider client={queryClient}>
-        <SessionProvider refetchInterval={0} session={pageProps.session}>
+        {/* @ts-ignore */}
+        <SessionProvider refetchInterval={0} session={pageProps?.session}>
           <WagmiConfig client={wagmiClient}>
             <RainbowKitSiweNextAuthProvider getSiweMessageOptions={getSiweMessageOptions}>
               <RainbowKitProvider theme={theme} chains={chains}>

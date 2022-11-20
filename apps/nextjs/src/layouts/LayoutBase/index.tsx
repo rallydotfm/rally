@@ -5,6 +5,9 @@ import MobileTopMenu from './MobileTopMenu'
 import MainNavBar from './MainNavBar'
 import ToolbarAudioRoom from './ToolbarAudioRoom'
 import { useStoreLiveVoiceChat } from '@hooks/useVoiceChat'
+import Button from '@components/Button'
+import { ClipboardIcon, ShareIcon } from '@heroicons/react/24/outline'
+import DialogModalListParticipantsWithRaisedHands from '@components/pages/rally/[idRally]/DialogModalListParticipantsWithRaisedHands'
 interface LayoutProps {
   children: React.ReactNode
 }
@@ -38,11 +41,26 @@ export const LayoutBase = (props: LayoutProps) => {
           {children}
         </div>
         <div
-          className={`transition-all py-2 ${
+          className={`transition-all ${
             stateVoiceChat?.room.state === 'connected' ? 'z-20 translate-y-0' : 'z-[-1] translate-y-full'
-          } border-transparent flex fixed bottom-12 md:bottom-0 w-full z-20 bg-black border-y-neutral-4 border`}
+          } fixed bottom-12 md:bottom-0 w-full pointer-events-none z-20`}
         >
-          {stateVoiceChat?.room.state === 'connected' && <ToolbarAudioRoom />}
+          <div className="grid md:grid-cols-12 px-3 lg:px-6 mb-3 pointer-events-none">
+            <div className="flex flex-col md:col-start-2 lg:col-start-3 md:col-end-10 lg:col-end-11 w-fit-content mis-auto items-end space-y-3 ">
+              <DialogModalListParticipantsWithRaisedHands />
+              <Button scale="sm" className="aspect-square pointer-events-auto w-fit-content" intent="neutral-outline">
+                <ShareIcon className="w-5" />
+              </Button>
+            </div>
+          </div>
+
+          {stateVoiceChat?.room.state === 'connected' && (
+            <div
+              className={`transition-all pointer-events-auto border-transparent flex py-1 bg-neutral-1 md:bg-black border-y-neutral-4 border`}
+            >
+              <ToolbarAudioRoom />
+            </div>
+          )}
         </div>
         <div className="hidden md:block md:col-span-1 lg:col-span-2 md:pis-6 pb-6">
           <footer className="flex flex-col md:pt-6 text-2xs text-neutral-11">
@@ -53,11 +71,6 @@ export const LayoutBase = (props: LayoutProps) => {
       </div>
     </div>
   )
-}
-
-const roomOptions = {
-  adaptiveStream: true,
-  dynacast: true,
 }
 
 export const getLayout = (page: any) => {

@@ -13,11 +13,13 @@ export const ListParticipantsVoiceChat = (props: ListParticipantsVoiceChatProps)
 
   return (
     <ul className="flex flex-wrap gap-4 justify-center">
-      {participants.map((participant: Participant) => (
-        <li className="animate-appear relative focus-within:z-10" key={`${participant?.sid}-${rally?.id}`}>
-          <LiveVoiceChatParticipant participant={participant} />
-        </li>
-      ))}
+      {participants.map((participant: Participant) => {
+        return (
+          <li className="animate-appear relative focus-within:z-10" key={`${participant?.sid}-${rally?.id}`}>
+            <LiveVoiceChatParticipant participant={participant} />
+          </li>
+        )
+      })}
     </ul>
   )
 }

@@ -32,6 +32,7 @@ const Page: NextPage = () => {
   const { mutationJoinRoom } = useConnectToVoiceChat(queryAudioChatMetadata.data)
   const stateVoiceChat = useStoreLiveVoiceChat()
   const rally = useStoreCurrentLiveRally((state) => state.rally)
+
   return (
     <>
       <Head>

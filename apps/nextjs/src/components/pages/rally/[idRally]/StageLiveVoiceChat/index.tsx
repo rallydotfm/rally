@@ -1,5 +1,9 @@
 import ListParticipantsVoiceChat from '@components/pages/rally/[idRally]/ListParticipantsVoiceChat'
+import DialogModalDisplayParticipant, {
+  useStoreDisplayParticipant,
+} from '@components/pages/rally/[idRally]/DialogModalDisplayParticipant'
 import type { Participant } from 'livekit-client'
+
 interface StageLiveVoiceChatProps {
   roomState: string
   participants: Array<Participant>
@@ -8,6 +12,8 @@ interface StageLiveVoiceChatProps {
 
 export const StageLiveVoiceChat = (props: StageLiveVoiceChatProps) => {
   const { roomState, participants, isCurrentRally } = props
+  const pickedParticipant = useStoreDisplayParticipant((state) => state.participant)
+
   return (
     <>
       {roomState === 'connecting' && <p className="font-bold animate-pulse">Connecting, one moment...</p>}
@@ -46,6 +52,7 @@ export const StageLiveVoiceChat = (props: StageLiveVoiceChatProps) => {
           </div>
         </>
       )}
+      {pickedParticipant && <DialogModalDisplayParticipant />}
     </>
   )
 }

@@ -15,7 +15,7 @@ export const MobileTopMenu = (props: MobileTopMenuProps) => {
         📢
       </span>
       {address && address !== null && (
-        <div>
+        <div className="static">
           <MenuCurrentUser address={address} />
         </div>
       )}
