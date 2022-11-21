@@ -8,8 +8,7 @@ interface ListParticipantsVoiceChatProps {
 
 export const ListParticipantsVoiceChat = (props: ListParticipantsVoiceChatProps) => {
   const { participants } = props
-  //@ts-ignore
-  const rally = useStoreCurrentLiveRally((state) => state.rally)
+  const rally = useStoreCurrentLiveRally((state: any) => state.rally)
 
   return (
     <ul className="flex flex-wrap gap-4 justify-center">

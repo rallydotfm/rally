@@ -1,15 +1,12 @@
+import { useEffect, useState } from 'react'
+import { Participant } from 'livekit-client'
 import { useParticipant } from '@livekit/react-core'
-import useWalletAddressDefaultLensProfile from '@hooks/useWalletAddressDefaultLensProfile'
 import { HandRaisedIcon as SolidHandRaisedIcon, SpeakerWaveIcon, SpeakerXMarkIcon } from '@heroicons/react/20/solid'
 import LiveVoiceChatParticipantRole from '@components/LiveVoiceChatParticipantRole'
-import { useEffect, useState } from 'react'
-import { useStoreLiveVoiceChat, useStoreCurrentLiveRally } from '@hooks/useVoiceChat'
-import { Popover } from '@headlessui/react'
-import { Participant, RoomEvent } from 'livekit-client'
-import Button from '@components/Button'
-import { trpc } from '@utils/trpc'
-import toast from 'react-hot-toast'
-import { useStoreDisplayParticipant } from '../DialogModalDisplayParticipant'
+import { useStoreDisplayParticipant } from '@components/pages/rally/[idRally]/DialogModalDisplayParticipant'
+import ParticipantIdentityDisplayedName from '@components/pages/rally/[idRally]/ParticipantIdentityDisplayedName'
+import ParticipantIdentityDisplayedAvatar from '@components/pages/rally/[idRally]/ParticipantIdentityDisplayedAvatar'
+import { MicrophoneIcon } from '@heroicons/react/24/solid'
 
 interface LiveVoiceChatParticipantProps {
   participant: Participant
@@ -18,41 +15,10 @@ interface LiveVoiceChatParticipantProps {
 export const LiveVoiceChatParticipant = (props: LiveVoiceChatParticipantProps) => {
   const { participant } = props
   const { metadata, identity, permissions, isMicrophoneEnabled } = participant
-  const { isSpeaking, ...rest } = useParticipant(participant)
+  const { isSpeaking } = useParticipant(participant)
   const [reaction, setReaction] = useState('')
   const [hasHandRaised, setHasHandRaised] = useState(false)
-  const queryLensProfile = useWalletAddressDefaultLensProfile(identity)
   const selectParticipantToDisplay = useStoreDisplayParticipant((state) => state.selectParticipantToDisplay)
-  //@ts-ignore
-  const { room } = useStoreLiveVoiceChat()
-  const { localParticipant } = room
-
-  const mutationParticipantKickOut = trpc?.room.update_audience_member_permissions.useMutation({
-    onSuccess(data) {
-      toast(`${data?.id_user} was kicked out successfully.`)
-    },
-  })
-
-  const mutationInviteToSpeak = trpc?.room.update_audience_member_permissions.useMutation({
-    onSuccess(data) {
-      toast(`${data?.id_user} was invited to speak.`)
-    },
-  })
-
-  const mutationMoveBackToAudience = trpc?.room.update_audience_member_permissions.useMutation({
-    onSuccess(data) {
-      toast(`${data?.id_user} was moved back to the audience.`)
-    },
-  })
-
-  const mutationRoomAddToBlacklist = trpc?.room.update_room_ban_list.useMutation({
-    onSuccess(data) {
-      toast(`${data?.id_user} is now banned permanently.`)
-    },
-  })
-
-  //@ts-ignore
-  const rally = useStoreCurrentLiveRally((state) => state.rally)
 
   useEffect(() => {
     if (metadata) {
@@ -77,27 +43,32 @@ export const LiveVoiceChatParticipant = (props: LiveVoiceChatParticipantProps) =
           isSpeaking ? 'ring-interactive-11' : 'ring-transparent'
         } w-20 ring-4 relative ring-offset-black group-hover:ring-offset-neutral-2 ring-offset-4 aspect-square rounded-full `}
       >
-        <span className="block w-full h-full relative overflow-hidden rounded-full">
+        <span
+          className={`${
+            participant?.isLocal && !participant?.isMicrophoneEnabled && participant?.permissions?.canPublish
+              ? 'opacity-50'
+              : ''
+          } block w-full h-full border-neutral-4 border relative overflow-hidden rounded-full`}
+        >
           <span className="absolute inset-0 w-full h-full bg-neutral-2" />
-          {/* @ts-ignore */}
-
-          {queryLensProfile?.data?.picture?.original?.url && (
-            <img
-              className="absolute inset-0 w-full h-full object-cover z-10"
-              /* @ts-ignore */
-              src={queryLensProfile?.data?.picture?.original?.url?.replace(
-                'ipfs://',
-                'https://lens.infura-ipfs.io/ipfs/',
-              )}
-              alt={participant.identity}
-            />
-          )}
+          <ParticipantIdentityDisplayedAvatar
+            className="absolute inset-0 w-full h-full object-cover z-10"
+            identity={participant?.identity}
+            alt=""
+          />
           {reaction && reaction !== '' && (
             <span className="animate-scale-up text-2xl inset-0 flex items-center justify-center absolute w-full h-full rounded-full bg-white bg-opacity-75 z-10">
               <span className="animate-appear">{reaction}</span>
             </span>
           )}
         </span>
+        {!participant?.isMicrophoneEnabled && participant?.permissions?.canPublish && (
+          <div
+            className={`absolute bg-negative-3 group-hover:bg-negative-5 text-negative-11 border-4 p-1 rounded-full border-black z-20 inline-end-0 bottom-0 translate-y-1/4 translate-x-1/4`}
+          >
+            <MicrophoneIcon className="w-4 animate-pulse" />
+          </div>
+        )}
 
         {permissions?.canPublish && isMicrophoneEnabled && (
           <div
@@ -110,14 +81,17 @@ export const LiveVoiceChatParticipant = (props: LiveVoiceChatParticipantProps) =
 
       <span className="font-bold flex space-i-1 items-center pt-3">
         {hasHandRaised === true && <SolidHandRaisedIcon className="text-neutral-12 w-[1.05rem]" />}
-        <span className="block text-2xs overflow-hidden text-ellipsis max-w-[15ex]">{identity}</span>
+        <span className="block text-2xs overflow-hidden text-ellipsis max-w-[15ex]">
+          <ParticipantIdentityDisplayedName identity={identity} />
+        </span>
       </span>
 
-      <span className="pt-0.5 text-2xs text-neutral-10 group-hover:text-neutral-12 font-medium">
+      <span className="pt-0.5 text-2xs flex flex-col text-neutral-10 group-hover:text-neutral-12 font-medium">
         <LiveVoiceChatParticipantRole participant={participant} />
       </span>
       <span className="sr-only">
-        {identity} {isSpeaking ? 'is speaking...' : ''} {reaction ? `reacted with ${reaction}` : ''}
+        <ParticipantIdentityDisplayedName identity={identity} /> {isSpeaking ? 'is speaking...' : ''}{' '}
+        {reaction ? `reacted with ${reaction}` : ''}
       </span>
     </button>
   )

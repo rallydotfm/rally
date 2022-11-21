@@ -14,7 +14,7 @@ const Page: NextPage = () => {
     isReady,
   } = useRouter()
   //@ts-ignore
-  const { queryAudioChatByIdRawData, queryAudioChatMetadata, queryDecryptCohostsAddress } =
+  const { queryAudioChatByIdRawData, queryAudioChatMetadata } =
     //@ts-ignore
     useGetAudioChatToEdit(idRally)
 
@@ -41,19 +41,14 @@ const Page: NextPage = () => {
               </>
             ) : (
               <>
-                {queryAudioChatMetadata.isSuccess &&
-                  (queryAudioChatMetadata?.data?.cohosts_list?.length === 0 ||
-                    (queryAudioChatMetadata?.data?.cohosts_list?.length > 0 &&
-                      queryDecryptCohostsAddress?.isSuccess)) && (
-                    <FormEditAudioChat
-                      //@ts-ignore
-                      values={{
-                        ...queryAudioChatMetadata.data,
-                        cohosts_list:
-                          queryAudioChatMetadata?.data?.cohosts_list === 0 ? [] : queryDecryptCohostsAddress.data,
-                      }}
-                    />
-                  )}
+                {queryAudioChatMetadata.isSuccess && (
+                  <FormEditAudioChat
+                    //@ts-ignore
+                    values={{
+                      ...queryAudioChatMetadata.data,
+                    }}
+                  />
+                )}
               </>
             )}
           </>

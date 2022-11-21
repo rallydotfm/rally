@@ -262,7 +262,6 @@ export const FormAudioChat = (props: FormAudioChatProps) => {
                   setData('rally_has_cohosts', value)
                   if (value === true) {
                     addField('rally_cohosts', {
-                      name: '',
                       eth_address: '',
                     })
                   } else {
@@ -283,35 +282,6 @@ export const FormAudioChat = (props: FormAudioChatProps) => {
                         <FormField>
                           <FormField.InputField>
                             <FormField.Label
-                              className="text-xs"
-                              hasError={errors()?.[`rally_cohosts.${index}.name`] ? true : false}
-                              htmlFor={`rally_cohosts.${index}.name`}
-                            >
-                              Name
-                            </FormField.Label>
-                            <FormField.Description id={`input-rally_cohosts.${index}.name-description`}>
-                              The name of your co-host.
-                            </FormField.Description>
-                            <FormInput
-                              scale="sm"
-                              disabled={!account?.address || chain?.unsupported === true}
-                              hasError={errors()?.[`rally_cohosts.${index}.name`] ? true : false}
-                              placeholder="Eg: Lili, Koopah, DollarFifty..."
-                              name={`rally_cohosts.${index}.name`}
-                              id={`rally_cohosts.${index}.name`}
-                              aria-describedby={`input-rally_cohosts.${index}.name-description input-rally_cohosts.${index}.name-helpblock`}
-                            />
-                          </FormField.InputField>
-                          <FormField.HelpBlock
-                            hasError={errors()?.[`rally_cohosts.${index}.name`] ? true : false}
-                            id={`input-rally_cohosts.${index}.name-helpblock`}
-                          >
-                            The name that will be displayed for this co-host.
-                          </FormField.HelpBlock>
-                        </FormField>
-                        <FormField>
-                          <FormField.InputField>
-                            <FormField.Label
                               className="text-xs !pb-1"
                               hasError={errors()?.[`rally_cohosts.${index}.eth_address`] ? true : false}
                               htmlFor={`rally_cohosts.${index}.eth_address`}
@@ -319,7 +289,7 @@ export const FormAudioChat = (props: FormAudioChatProps) => {
                               Ethereum address
                             </FormField.Label>
                             <FormField.Description id={`input-rally_cohosts.${index}.eth_address-description`}>
-                              We will use this Ethereum address to grant moderator powers to your co-host. <br />
+                              We will use this Ethereum address to grant moderator privileges to your co-host. <br />
                             </FormField.Description>
                             <FormInput
                               scale="sm"
@@ -342,7 +312,7 @@ export const FormAudioChat = (props: FormAudioChatProps) => {
                       </div>
                       {!errors()?.rally_cohosts[index]?.eth_address?.length &&
                         data()?.rally_cohosts[index]?.eth_address && (
-                          <div className="mt-4 pt-3 animate-appear border-t border-neutral-6">
+                          <div className="mt-4 pt-3 text-xs animate-appear">
                             <EthereumAddress
                               shortenOnFallback={true}
                               displayLensProfile={true}
@@ -384,6 +354,91 @@ export const FormAudioChat = (props: FormAudioChatProps) => {
               </div>
             )}
           </fieldset>
+          <fieldset className="space-y-5">
+            <legend className="uppercase text-sm font-bold">Guests whitelist</legend>
+            <p className="!mt-1 text-neutral-12 text-xs">
+              Don't worry, you'll be able to add/remove guests during your rally as well.
+            </p>
+
+            <div className="grid grid-cols-1 xs:grid-cols-2 gap-3 animate-appear">
+              {data().rally_guests.map((guest: { key: string }, index: number) => {
+                return (
+                  <div
+                    className="animate-appear space-y-3 p-3 border rounded-md  bg-neutral-1 border-neutral-4"
+                    key={`guest-${guest.key}`}
+                  >
+                    <div className="space-y-4">
+                      <FormField>
+                        <FormField.InputField>
+                          <FormField.Label
+                            className="text-xs !pb-1"
+                            hasError={errors()?.[`rally_guests.${index}.eth_address`] ? true : false}
+                            htmlFor={`rally_guests.${index}.eth_address`}
+                          >
+                            Ethereum address
+                          </FormField.Label>
+                          <FormField.Description id={`input-rally_guests.${index}.eth_address-description`}>
+                            We will use this Ethereum address to grant speaker privileges to your guest <br />
+                          </FormField.Description>
+                          <FormInput
+                            scale="sm"
+                            required
+                            disabled={!account?.address || chain?.unsupported === true}
+                            hasError={errors()?.[`rally_guests.${index}.eth_address`] ? true : false}
+                            placeholder="A valid Ethereum address"
+                            name={`rally_guests.${index}.eth_address`}
+                            id={`rally_guests.${index}.eth_address`}
+                            aria-describedby={`input-rally_guests.${index}.eth_address-description input-rally_guests.${index}.eth_address-helpblock`}
+                          />
+                        </FormField.InputField>
+                        <FormField.HelpBlock
+                          hasError={errors()?.[`rally_guests.${index}.eth_address`] ? true : false}
+                          id={`input-rally_guests.${index}.eth_address-helpblock`}
+                        >
+                          The address of your co-host must be a valid Ethereum address.
+                        </FormField.HelpBlock>
+                      </FormField>
+                    </div>
+                    {!errors()?.rally_guests[index]?.eth_address?.length && data()?.rally_guests[index]?.eth_address && (
+                      <div className="mt-4 pt-3 text-xs animate-appear">
+                        <EthereumAddress
+                          shortenOnFallback={true}
+                          displayLensProfile={true}
+                          address={data()?.rally_guests[index]?.eth_address}
+                        />
+                      </div>
+                    )}
+                    <Button
+                      intent="negative-ghost"
+                      className="!mt-6 w-full"
+                      scale="sm"
+                      onClick={() => {
+                        const updated = data()?.rally_guests.filter((rallyCohost: any) => rallyCohost.key !== guest.key)
+                        setData('rally_guests', updated)
+                      }}
+                    >
+                      Remove guest
+                    </Button>
+                  </div>
+                )
+              })}
+              {data()?.rally_guests?.length < 5 && (
+                <button
+                  className="min-h-[12rem] text-white text-opacity-75 w-full h-full flex flex-col items-center justify-center p-3 border-dashed border rounded-md bg-neutral-1 bg-opacity-50 hover:bg-opacity-75 focus:bg-opacity-90 hover:focus:bg-opacity-95 border-neutral-4"
+                  onClick={() => {
+                    addField('rally_guests', {
+                      eth_address: '',
+                    })
+                  }}
+                  type="button"
+                >
+                  <PlusIcon className="w-8 mb-3" />
+                  <span className="text-xs">Add another guest</span>
+                </button>
+              )}
+            </div>
+          </fieldset>
+
           <fieldset>
             <legend className="mb-4 uppercase text-sm font-bold">Privacy</legend>
             <div className="space-y-5">
@@ -455,7 +510,7 @@ export const FormAudioChat = (props: FormAudioChatProps) => {
                             </FormField.HelpBlock>
                           </FormField>
                           {data()?.rally_access_control_guilds[index]?.guild_id !== '' && (
-                            <div className="mt-4 pt-3 animate-appear border-t border-neutral-6">
+                            <div className="mt-4 pt-3 animate-appear">
                               <OptionGuild
                                 index={index}
                                 data={data}

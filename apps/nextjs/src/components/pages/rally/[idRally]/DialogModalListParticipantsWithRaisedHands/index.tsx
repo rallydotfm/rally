@@ -4,67 +4,51 @@ import { useStoreCurrentLiveRally, useStoreLiveVoiceChat } from '@hooks/useVoice
 import { useEffect, useState } from 'react'
 import { RoomEvent } from 'livekit-client'
 import { HandRaisedIcon } from '@heroicons/react/24/outline'
-import type {Participant } from 'livekit-client'
+import type { Participant } from 'livekit-client'
 import useLiveVoiceChatInteractions from '@hooks/useLiveVoiceChatInteractions'
-//@TODO: synchronize with the user metada on participant metadata change
+import { MicrophoneIcon } from '@heroicons/react/20/solid'
+import ParticipantIdentityDisplayedName from '@components/pages/rally/[idRally]/ParticipantIdentityDisplayedName'
+import ParticipantIdentityDisplayedAvatar from '../ParticipantIdentityDisplayedAvatar'
+
 export const DialogModalListParticipantsWithRaisedHands = () => {
-  //@ts-ignore
-  const rally = useStoreCurrentLiveRally((state) => state.rally)
+  const rally = useStoreCurrentLiveRally((state: any) => state.rally)
   const [isDialogVisible, setDialogVisibility] = useState(false)
-  const stateVoiceChat = useStoreLiveVoiceChat()
-  const {mutationInviteToSpeak} = useLiveVoiceChatInteractions()
+  const stateVoiceChat: any = useStoreLiveVoiceChat()
+  const { mutationInviteToSpeak } = useLiveVoiceChatInteractions()
   const [listParticipantsWithRaisedHand, setListParticipantsWithRaisedHand] = useState(
-    //@ts-ignore
     stateVoiceChat?.participants?.filter((participant: Participant) => {
       const metadata = participant?.metadata !== '' ? JSON.parse(participant?.metadata ?? '') : ''
 
       return metadata !== '' && metadata?.is_hand_raised === true
-    }) ?? []
+    }) ?? [],
   )
 
-  
   useEffect(() => {
-    //@ts-ignore
     stateVoiceChat.room?.on(RoomEvent.ParticipantMetadataChanged, (prevMetadata: string, participant: Participant) => {
       const metadata = participant?.metadata !== '' ? JSON.parse(participant?.metadata ?? '') : ''
-      console.log(metadata)
-      console.log(participant)
-      if (metadata?.is_hand_raised){
+      if (metadata?.is_hand_raised) {
         setListParticipantsWithRaisedHand([...listParticipantsWithRaisedHand, participant])
-      }
-      else {
+      } else {
         const updatedList = listParticipantsWithRaisedHand.filter((p: Participant) => {
           return p.identity !== participant.identity
         })
         setListParticipantsWithRaisedHand(updatedList)
       }
-
     })
-
   }, [])
-
 
   return (
     <>
       <Button
         scale="sm"
-        disabled={
-          //@ts-ignore
-          listParticipantsWithRaisedHand?.length === 0
-        }
+        disabled={listParticipantsWithRaisedHand?.length === 0}
         onClick={() => setDialogVisibility(true)}
         className="pointer-events-auto relative aspect-square w-fit-content"
         intent="neutral-outline"
       >
         <HandRaisedIcon className="w-6" />
-        {/* @ts-ignore */}
         {listParticipantsWithRaisedHand?.length > 0 && (
-          <span className="text-[0.75rem] font-bold self-end">
-            {
-              //@ts-ignore
-              listParticipantsWithRaisedHand?.length
-            }
-          </span>
+          <span className="text-[0.75rem] font-bold self-end">{listParticipantsWithRaisedHand?.length}</span>
         )}
       </Button>
       <DialogModal
@@ -72,26 +56,51 @@ export const DialogModalListParticipantsWithRaisedHands = () => {
         isOpen={isDialogVisible}
         setIsOpen={setDialogVisibility}
       >
-        {/* @ts-ignore */}
-        {listParticipantsWithRaisedHand?.map((participantWithHandRaised: Participant) => (
-            
-            <li key={`hand-raised-${participantWithHandRaised?.identity}-${participantWithHandRaised?.sid}`}>
-              {participantWithHandRaised?.identity} {participantWithHandRaised.isLocal ?  " (You)" : 
-              <> {participantWithHandRaised.permissions?.canPublish === false && <Button
-                onClick={ async () => {
-                  await mutationInviteToSpeak.mutateAsync({
-                    id_rally: rally?.id, 
-                    id_user: participantWithHandRaised.identity, 
-                    can_publish: true, can_join: true,
-                     can_publish_data: false, 
-                    can_subscribe: true
-                  })
-                }}
-                scale="sm"
-                >Invite to speak</Button>}
-              </> }
-            </li>
-          ))}
+        {listParticipantsWithRaisedHand?.length > 0 && (
+          <ul className="space-y-6  pt-8">
+            {listParticipantsWithRaisedHand?.map((participantWithHandRaised: Participant) => (
+              <li
+                className="w-full flex justify-between 2xs:justify-start 2xs:grid items-center gap-1.5 2xs:gap-4 grid-cols-12 text-2xs"
+                key={`hand-raised-${participantWithHandRaised?.identity}-${participantWithHandRaised?.sid}`}
+              >
+                <>
+                  <div className="2xs:col-span-6 flex 2xs:space-i-3 items-baseline">
+                    <div className="hidden 2xs:block rounded-md w-8 h-8 overflow-hidden">
+                      <ParticipantIdentityDisplayedAvatar identity={participantWithHandRaised.identity} />
+                    </div>
+                    <span className="font-bold justify-center block overflow-hidden text-ellipsis">
+                      <ParticipantIdentityDisplayedName identity={participantWithHandRaised.identity} />
+                    </span>
+                  </div>
+                  <div className="2xs:col-span-6 2xs:justify-self-end block overflow-hidden text-ellipsis">
+                    {participantWithHandRaised.permissions?.canPublish === false ? (
+                      <Button
+                        onClick={async () => {
+                          await mutationInviteToSpeak.mutateAsync({
+                            id_rally: rally?.id,
+                            id_user: participantWithHandRaised.identity,
+                            can_publish: true,
+                            can_join: true,
+                            can_publish_data: false,
+                            can_subscribe: true,
+                          })
+                        }}
+                        className="w-full xs:w-fit-content xs:!px-5"
+                        intent="primary-outline"
+                        scale="sm"
+                      >
+                        <MicrophoneIcon className="w-4 mie-2" />
+                        Invite to speak
+                      </Button>
+                    ) : (
+                      <span className="font-semibold block text-center 2xs:text-end text-neutral-9">(You)</span>
+                    )}
+                  </div>
+                </>
+              </li>
+            ))}
+          </ul>
+        )}
       </DialogModal>
     </>
   )

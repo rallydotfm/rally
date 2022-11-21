@@ -2,20 +2,12 @@ import { getUnixTime } from 'date-fns'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { makeStorageClient } from '@config/web3storage'
 import { CONTRACT_AUDIO_CHATS } from '@config/contracts'
-import { useContractWrite, useAccount, useWaitForTransaction, useNetwork, chainId, useSignMessage } from 'wagmi'
+import { useContractWrite, useAccount, useWaitForTransaction, useNetwork } from 'wagmi'
 import { audioChatABI } from '@rally/abi'
 import { utils } from 'ethers'
 import create from 'zustand'
 import toast from 'react-hot-toast'
-//@ts-ignore
-import LitJsSdk from '@lit-protocol/sdk-browser'
-import { SiweMessage } from 'siwe'
-import { blobToBase64 } from '@helpers/blobToBase64'
 import { DICTIONARY_STATES_AUDIO_CHATS } from '@helpers/mappingAudioChatState'
-
-// -- init litNodeClient
-const litNodeClient = new LitJsSdk.LitNodeClient()
-litNodeClient.connect()
 export interface TxUi {
   isDialogVisible: boolean
   rallyId: string | undefined
@@ -55,13 +47,6 @@ export function useSmartContract(stateTxUi: TxUi) {
   const account = useAccount()
   const { chain } = useNetwork()
   const queryClient = useQueryClient()
-
-  const { signMessageAsync, ...mutationSignMessage } = useSignMessage({
-    onError(e) {
-      console.error(e)
-      toast.error(e?.message)
-    },
-  })
 
   // Query to create a new audio chat
   const contractWriteNewAudioChat = useContractWrite({
@@ -187,98 +172,6 @@ export function useSmartContract(stateTxUi: TxUi) {
   })
 
   /**
-   * Get Lit access controls conditions for cohosts address encryption
-   */
-  function getAccessControlsConditionsCohostAddress() {
-    const litChain = chain?.id === chainId.polygon ? 'polygon' : 'mumbai'
-    const accessControlConditions = [
-      {
-        contractAddress: '',
-        standardContractType: '',
-        chain: litChain,
-        method: '',
-        parameters: [':userAddress'],
-        returnValueTest: {
-          comparator: '=',
-          value: account.address,
-        },
-      },
-    ]
-    return accessControlConditions
-  }
-
-  /**
-   * Get SIWE message to encrypt data with Lit
-   */
-  function getPreparedMessageCohostAddress() {
-    const message = new SiweMessage({
-      domain: window.location.host,
-      address: account?.address,
-      statement: 'Create signature to encrypt/decrypt co-hosts Ethereum address',
-      uri: window.location.origin,
-      version: '1',
-      chainId: chain?.id,
-    })
-    const preparedMessage = message.prepareMessage()
-    return preparedMessage
-  }
-
-  /**
-   * Encrypt a cohost ethereum address with Lit so that only the audio chat creator can access them
-   */
-  async function encryptCohostEthAddress(config: { accessControlConditions: any; authSig: any; cohost: any }) {
-    const { accessControlConditions, authSig, cohost } = config
-    try {
-      const { encryptedString, symmetricKey } = await LitJsSdk.encryptString(cohost.eth_address)
-      const encryptedSymmetricKey = await litNodeClient.saveEncryptionKey({
-        accessControlConditions,
-        symmetricKey,
-        authSig,
-        chain: accessControlConditions?.[0]?.chain,
-      })
-      const encryptedStringAsText = await blobToBase64(encryptedString)
-      return {
-        name: cohost?.name,
-        encrypted_address: encryptedStringAsText,
-        encryptedSymmetricKey: LitJsSdk.uint8arrayToString(encryptedSymmetricKey, 'base16'),
-      }
-    } catch (e) {
-      console.error(e)
-    }
-  }
-
-  /**
-   * Encrypt all cohosts address
-   */
-  async function encryptListCohosts(cohosts: Array<{ name: string; eth_address: string }>) {
-    try {
-      const accessControlConditions = getAccessControlsConditionsCohostAddress()
-      const preparedMessage = getPreparedMessageCohostAddress()
-      const signature = await signMessageAsync({
-        message: preparedMessage,
-      })
-      const authSig = {
-        sig: signature,
-        derivedVia: 'web3.eth.personal.sign',
-        signedMessage: preparedMessage,
-        address: account.address,
-      }
-      const encryptedList = await Promise.all(
-        cohosts.map(async (cohost: any) => {
-          const encryptedCohost = await encryptCohostEthAddress({
-            accessControlConditions,
-            authSig,
-            cohost,
-          })
-          return encryptedCohost
-        }),
-      )
-      return encryptedList
-    } catch (e) {
-      console.error(e)
-    }
-  }
-  /**
    *  Upload Rally image to IPFS (if necessary) and format and upload Rally data as a JSON file to IPFS (if necessary)
    * @param values - values returned by our form
    */
@@ -296,19 +189,26 @@ export function useSmartContract(stateTxUi: TxUi) {
       if (!stateTxUi.fileRallyCID?.length || isUpdate === true) {
         // create JSON file with form values + uploaded image URL
         let rally_cohosts = []
+        let rally_guests = []
         let whitelist
-        // encrypt cohosts addresses
+
         if (values?.rally_cohosts?.length > 0) {
           //@ts-ignore
-          rally_cohosts = await encryptListCohosts(values.rally_cohosts)
+          rally_cohosts = values.rally_cohosts
+        }
+
+        if (values?.rally_guests?.length > 0) {
+          //@ts-ignore
+          rally_guests = values.rally_guests
         }
 
         const rallyData = {
           name: values.rally_name,
           description: values.rally_description,
           tags: values.rally_tags,
-          has_cohosts: values.rally_has_cohosts,
+          has_cohosts: rally_cohosts?.length > 0,
           cohosts_list: rally_cohosts,
+          guests_list: rally_guests,
           will_be_recorded: values.rally_is_recorded,
           is_gated: values.rally_is_gated,
           max_attendees: values.rally_max_attendees,
@@ -422,14 +322,12 @@ export function useSmartContract(stateTxUi: TxUi) {
     onSubmitEditAudioChat,
     stateEditAudioChat: {
       contract: contractWriteEditAudioChat,
-      signEncryption: mutationSignMessage,
       transaction: txEditAudioChat,
       uploadImage: mutationUploadImageFile,
       uploadData: mutationUploadJsonFile,
     },
     stateNewAudioChat: {
       contract: contractWriteNewAudioChat,
-      signEncryption: mutationSignMessage,
       transaction: txCreateAudioChat,
       uploadImage: mutationUploadImageFile,
       uploadData: mutationUploadJsonFile,

@@ -23,23 +23,28 @@ import DialogModalSpeakerInvitation from '@components/pages/rally/[idRally]/Dial
 import { useAccount } from 'wagmi'
 import { RoomEvent } from 'livekit-client'
 import Link from 'next/link'
+import type { Participant, Track } from 'livekit-client'
 
 export const ToolbarAudioRoom = () => {
   const { address } = useAccount()
-  const state = useStoreLiveVoiceChat()
+  const state: any = useStoreLiveVoiceChat()
   const { microphonePublication, isSpeaking } = useParticipant(state?.room?.localParticipant)
   const {
     pathname,
     query: { idRally },
   } = useRouter()
-  const rally = useStoreCurrentLiveRally((state) => state.rally)
-  const displaySpeakerInvitationModal = useStoreCurrentLiveRally((state) => state.displaySpeakerInvitationModal)
-  const setDisplaySpeakerInvitationModal = useStoreCurrentLiveRally((state) => state.setDisplaySpeakerInvitationModal)
-  const localUserPermissions = useStoreCurrentLiveRally((state) => state.localUserPermissions)
-  const setLocalUserPermissions = useStoreCurrentLiveRally((state) => state.setLocalUserPermissions)
-  const mutationReaction = trpc.room.react.useMutation()
+  const rally: any = useStoreCurrentLiveRally((state: any) => state.rally)
+  const displaySpeakerInvitationModal: any = useStoreCurrentLiveRally(
+    (state: any) => state.displaySpeakerInvitationModal,
+  )
+  const setDisplaySpeakerInvitationModal: any = useStoreCurrentLiveRally(
+    (state: any) => state.setDisplaySpeakerInvitationModal,
+  )
+  const localUserPermissions: any = useStoreCurrentLiveRally((state: any) => state.localUserPermissions)
+  const setLocalUserPermissions: any = useStoreCurrentLiveRally((state: any) => state.setLocalUserPermissions)
+  const mutationReaction: any = trpc.room.react.useMutation()
   const mutationRaiseHand = trpc.room.raise_hand.useMutation({
-    onSuccess(data) {
+    onSuccess(data: any) {
       setIsHandRaised(data)
     },
   })
@@ -48,7 +53,7 @@ export const ToolbarAudioRoom = () => {
   const [isHandRaised, setIsHandRaised] = useState(false)
 
   useEffect(() => {
-    state.room?.on(RoomEvent.ParticipantPermissionsChanged, (prevPermissions: any, participant: [[Participant]]) => {
+    state.room?.on(RoomEvent.ParticipantPermissionsChanged, (prevPermissions: any, participant: Participant) => {
       if (participant?.permissions?.canPublish === true && prevPermissions?.canPublish === false)
         setDisplaySpeakerInvitationModal(
           participant?.permissions?.canPublish === true && prevPermissions?.canPublish === false ? true : false,
@@ -60,7 +65,7 @@ export const ToolbarAudioRoom = () => {
 
   return (
     <>
-      {state.audioTracks.map((track) => {
+      {state.audioTracks.map((track: Track) => {
         return (
           <>
             <AudioRenderer track={track} isLocal={false} />
@@ -152,30 +157,32 @@ export const ToolbarAudioRoom = () => {
           >
             {isHandRaised ? <SolidHandRaisedIcon className="w-7" /> : <HandRaisedIcon className="w-7" />}
           </Button>
-          <Listbox
-            onChange={(value) => {
-              mutationReaction.mutate({
-                id_rally: idRally,
-                reaction: value,
-              })
-            }}
-            horizontal
-          >
-            <Listbox.Button as={Button} intent="neutral-ghost" scale="sm" className="aspect-square shrink-0">
-              {<HeartIcon className="w-7" />}
-            </Listbox.Button>
-            <Listbox.Options className="flex top-[-90%] text-xl flex-row absolute divide-i divide-neutral-7 max-w-72 w-full overflow-x-auto rounded-full bg-neutral-5 animate-scale-in focus:outline-none ">
-              {['👋', '👍', '✌️', '❤️', '🔥', '💯', '✨', '🫡', '😂', '😭', '😠'].map((emote) => (
-                <Listbox.Option
-                  className="flex-grow cursor-pointer hover:bg-neutral-7 focus:bg-white flex items-center justify-center py-1 px-4 aspect-square shrink-0"
-                  key={emote}
-                  value={emote}
-                >
-                  {emote}
-                </Listbox.Option>
-              ))}
-            </Listbox.Options>
-          </Listbox>
+          <div className="shrink-0 relative">
+            <Listbox
+              onChange={(value) => {
+                mutationReaction.mutate({
+                  id_rally: idRally as string,
+                  reaction: value,
+                })
+              }}
+              horizontal
+            >
+              <Listbox.Button as={Button} intent="neutral-ghost" scale="sm" className="aspect-square">
+                {<HeartIcon className="w-7" />}
+              </Listbox.Button>
+              <Listbox.Options className="flex -top-full left-1/2 -translate-y-3 -translate-x-1/2 text-xl flex-row absolute divide-i divide-neutral-7 max-w-72 w-fit-content overflow-x-auto rounded-full bg-neutral-5 focus:outline-none ">
+                {['👋', '👍', '✌️', '❤️', '🔥', '💯', '✨', '🫡', '😂', '😭', '😠'].map((emote) => (
+                  <Listbox.Option
+                    className="flex-grow cursor-pointer hover:bg-neutral-7 focus:bg-white flex items-center justify-center py-1 px-4 aspect-square shrink-0"
+                    key={emote}
+                    value={emote}
+                  >
+                    {emote}
+                  </Listbox.Option>
+                ))}
+              </Listbox.Options>
+            </Listbox>
+          </div>
         </div>
         <div className="col-span-1 grow-1 flex items-center justify-end">
           {rally?.creator !== address ? (

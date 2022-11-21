@@ -4,8 +4,6 @@ import FormAudioEvent from '@components/pages/rally/FormAudioChat'
 import { useSmartContract, useStoreTxUi } from '@components/pages/rally/FormAudioChat/useSmartContract'
 import useForm from '@components/pages/rally/FormAudioChat/useForm'
 import DialogModal from '@components/DialogModal'
-import { IconSpinner } from '@components/Icons'
-import { CheckCircleIcon, ExclamationTriangleIcon } from '@heroicons/react/20/solid'
 import { ROUTE_DASHBOARD, ROUTE_RALLY_VIEW } from '@config/routes'
 import Link from 'next/link'
 import Button from '@components/Button'
@@ -26,12 +24,11 @@ const Page: NextPage = () => {
       rally_is_indexed: false,
       rally_tags: [],
       rally_cohosts: [],
+      rally_guests: [],
       rally_name: '',
       rally_description: '',
       rally_start_at: '',
       rally_access_control_guilds: [],
-      rally_access_control_blacklist: [],
-      rally_access_control_whitelist: [],
     },
   })
   useUnmountEffect(() => {
@@ -77,21 +74,6 @@ const Page: NextPage = () => {
               </DeploymentStep>
             </li>
           )}
-          {formAudioChat.data()?.rally_has_cohosts === true && (
-            <li
-              className={`
-              flex items-center
-             ${stateNewAudioChat.uploadData.isIdle ? 'text-neutral-11' : 'text-white'}`}
-            >
-              <DeploymentStep
-                isLoading={stateNewAudioChat.signEncryption.isLoading}
-                isError={stateNewAudioChat.signEncryption.isError}
-                isSuccess={stateNewAudioChat.signEncryption.isSuccess}
-              >
-                Confirming co-hosts Etheurem address encryption
-              </DeploymentStep>
-            </li>
-          )}
           <li
             className={`
             flex items-center
@@ -133,7 +115,6 @@ const Page: NextPage = () => {
           </li>
         </ol>
         {[
-          stateNewAudioChat.signEncryption,
           stateNewAudioChat.transaction,
           stateNewAudioChat.contract,
           stateNewAudioChat.uploadImage,
@@ -141,7 +122,6 @@ const Page: NextPage = () => {
         ].filter((slice) => slice.isError)?.length > 0 && (
           <div className="mt-6 animate-appear">
             {[
-              stateNewAudioChat.signEncryption,
               stateNewAudioChat.transaction,
               stateNewAudioChat.contract,
               stateNewAudioChat.uploadImage,

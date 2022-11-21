@@ -16,23 +16,23 @@ import { useGoLiveAudioChat, useStoreTxUiGoLiveRally } from '@hooks/useGoLiveAud
 import DialogGoLive from '@components/DialogGoLive'
 import { useConnectToVoiceChat, useStoreLiveVoiceChat, useStoreCurrentLiveRally } from '@hooks/useVoiceChat'
 import StageLiveVoiceChat from '@components/pages/rally/[idRally]/StageLiveVoiceChat'
-import DisplayGattedRequirements from '@components/pages/rally/[idRally]/DisplayGattedRequirements'
+import DisplayGatedRequirements from '@components/pages/rally/[idRally]/DisplayGatedRequirements'
 
 const Page: NextPage = () => {
   const {
     query: { idRally },
     isReady,
   } = useRouter()
-  //@ts-ignore
-  const { queryAudioChatByIdRawData, queryAudioChatMetadata } = useGetAudioChatById(idRally)
+  const { queryAudioChatByIdRawData, queryAudioChatMetadata } = useGetAudioChatById(idRally as `0x${string}`)
   const { address } = useAccount()
 
   const stateTxUiRallyGoLive = useStoreTxUiGoLiveRally()
   const { onClickGoLive, stateGoLive } = useGoLiveAudioChat(stateTxUiRallyGoLive)
 
   const { mutationJoinRoom } = useConnectToVoiceChat(queryAudioChatMetadata.data)
-  const stateVoiceChat = useStoreLiveVoiceChat()
-  const rally = useStoreCurrentLiveRally((state) => state.rally)
+  const stateVoiceChat: any = useStoreLiveVoiceChat()
+  const rally = useStoreCurrentLiveRally((state: any) => state.rally)
+
   return (
     <>
       <Head>
@@ -89,7 +89,7 @@ const Page: NextPage = () => {
                 {queryAudioChatMetadata?.data?.tags?.length > 0 && (
                   <section>
                     <ul className="mt-2 flex flex-wrap gap-x-4 gap-y-2 ">
-                      {queryAudioChatMetadata?.data?.tags?.map((tag) => (
+                      {queryAudioChatMetadata?.data?.tags?.map((tag: string) => (
                         <li className="px-3 py-0.5 rounded-md bg-neutral-2 text-2xs font-bold " key={tag}>
                           {tag}
                         </li>
@@ -103,7 +103,8 @@ const Page: NextPage = () => {
         </header>
         <div className="flex flex-col grow justify-center items-center">
           <main>
-            {queryAudioChatMetadata?.data?.state === DICTIONARY_STATES_AUDIO_CHATS.PLANNED.label &&
+            {(!stateVoiceChat?.room || stateVoiceChat?.room?.state === 'disconnected') &&
+              queryAudioChatMetadata?.data?.state === DICTIONARY_STATES_AUDIO_CHATS.PLANNED.label &&
               (isFuture(queryAudioChatMetadata?.data?.datetime_start_at) ?? false) && (
                 <div className="animate-appear mx-auto mt-8">
                   <CountdownOpening startsAt={queryAudioChatMetadata?.data?.datetime_start_at} />
@@ -123,9 +124,6 @@ const Page: NextPage = () => {
                   >
                     Start live
                   </Button>
-                  <div className="animate-appear mx-auto mt-8">
-                    <DisplayGattedRequirements requirements={queryAudioChatMetadata?.data?.access_control.guilds}/>
-                  </div>
                 </div>
               )}
             {queryAudioChatMetadata?.data?.state === DICTIONARY_STATES_AUDIO_CHATS.LIVE.label && (
@@ -137,8 +135,8 @@ const Page: NextPage = () => {
                       isLoading={mutationJoinRoom.isLoading}
                       onClick={async () => {
                         await mutationJoinRoom.mutate({
-                          id_rally: queryAudioChatByIdRawData.data?.audio_event_id,
-                          cid_rally: queryAudioChatByIdRawData.data?.cid_metadata,
+                          id_rally: queryAudioChatByIdRawData.data?.audio_event_id as `0x${string}`,
+                          cid_rally: queryAudioChatByIdRawData.data?.cid_metadata as string,
                         })
                       }}
                     >
@@ -175,12 +173,24 @@ const Page: NextPage = () => {
                 </Link>
               </section>
             )}
+            {['connecting', 'connected']?.includes(stateVoiceChat?.room?.state) ? (
+              <div className="animate-appear">
+                <StageLiveVoiceChat
+                  roomState={stateVoiceChat?.room?.state}
+                  participants={stateVoiceChat?.participants}
+                  isCurrentRally={rally?.id === idRally}
+                />
+              </div>
+            ) : (
+              <>
+                {queryAudioChatMetadata?.data?.access_control?.guilds && (
+                  <div className="animate-appear mx-auto mt-8">
+                    <DisplayGatedRequirements requirements={queryAudioChatMetadata?.data?.access_control?.guilds} />
+                  </div>
+                )}
+              </>
+            )}
           </main>
-          <StageLiveVoiceChat
-            roomState={stateVoiceChat.room.state}
-            participants={stateVoiceChat?.participants}
-            isCurrentRally={rally?.id === idRally}
-          />
         </div>
       </div>
       <DialogGoLive stateTxUi={stateTxUiRallyGoLive} stateGoLiveAudioChat={stateGoLive} />

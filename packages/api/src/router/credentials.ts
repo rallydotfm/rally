@@ -38,7 +38,7 @@ export const credentialsRouter = router({
           access_control: { whitelist, guilds },
         } = result
 
-        if (whitelist.includes(user_ethereum_address)) {
+        if (whitelist?.includes(user_ethereum_address)) {
           // if the user address is in the whitelist
           // user = admin/mod/cohost
           at.addGrant({
@@ -49,6 +49,21 @@ export const credentialsRouter = router({
             canPublish: true,
             canSubscribe: true,
             canPublishData: true,
+          })
+        } else if (
+          result?.guests_list &&
+          result?.guests_list?.length > 0 &&
+          result?.guests_list.map((guest: { eth_address: string }) => guest.eth_address).includes(user_ethereum_address)
+        ) {
+          // if there's a guest list and the user address is in it
+          at.addGrant({
+            room: id_rally,
+            roomRecord: false,
+            roomJoin: true,
+            roomAdmin: false,
+            canPublish: true,
+            canSubscribe: true,
+            canPublishData: false,
           })
         } else {
           // if the audio room is gated

@@ -45,16 +45,16 @@ export const LayoutBase = (props: LayoutProps) => {
             stateVoiceChat?.room.state === 'connected' ? 'z-20 translate-y-0' : 'z-[-1] translate-y-full'
           } fixed bottom-12 md:bottom-0 w-full pointer-events-none z-20`}
         >
-          {
-          stateVoiceChat?.room?.localParticipant?.permissions?.canPublishData === true && <div className="grid md:grid-cols-12 px-3 lg:px-6 mb-3 pointer-events-none">
-            <div className="flex flex-col md:col-start-2 lg:col-start-3 md:col-end-10 lg:col-end-11 w-fit-content mis-auto items-end space-y-3 ">
-              <DialogModalListParticipantsWithRaisedHands />
-              <Button scale="sm" className="aspect-square pointer-events-auto w-fit-content" intent="neutral-outline">
-                <ShareIcon className="w-5" />
-              </Button>
+          {stateVoiceChat?.room?.localParticipant?.permissions?.canPublishData === true && (
+            <div className="grid md:grid-cols-12 px-3 lg:px-6 mb-3 pointer-events-none">
+              <div className="flex flex-col md:col-start-2 lg:col-start-3 md:col-end-10 lg:col-end-11 w-fit-content mis-auto items-end space-y-3 ">
+                <DialogModalListParticipantsWithRaisedHands />
+                <Button scale="sm" className="aspect-square pointer-events-auto w-fit-content" intent="neutral-outline">
+                  <ShareIcon className="w-5" />
+                </Button>
+              </div>
             </div>
-          </div>
-          }
+          )}
           {stateVoiceChat?.room.state === 'connected' && (
             <div
               className={`transition-all pointer-events-auto border-transparent flex py-1 bg-neutral-1 md:bg-black border-y-neutral-4 border`}

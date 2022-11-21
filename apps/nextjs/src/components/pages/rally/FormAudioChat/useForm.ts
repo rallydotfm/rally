@@ -5,7 +5,6 @@ import { validator } from '@felte/validator-zod'
 import * as tagsInput from '@zag-js/tags-input'
 import { useMachine, normalizeProps } from '@zag-js/react'
 import { useAccount, useNetwork } from 'wagmi'
-import { useEffect } from 'react'
 
 export const schema = object({
   rally_name: string().trim().min(1),
@@ -18,7 +17,11 @@ export const schema = object({
   rally_has_cohosts: boolean(),
   rally_cohosts: array(
     object({
-      name: string().optional(),
+      eth_address: string().regex(/^0x[a-fA-F0-9]{40}$/),
+    }),
+  ).optional(),
+  rally_guests: array(
+    object({
       eth_address: string().regex(/^0x[a-fA-F0-9]{40}$/),
     }),
   ).optional(),

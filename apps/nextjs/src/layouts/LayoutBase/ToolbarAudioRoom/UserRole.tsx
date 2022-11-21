@@ -1,4 +1,11 @@
-export const UserRole = (props) => {
+interface UserRoleProps {
+  permissions: {
+    canSubscribe: boolean
+    canPublishData: boolean
+    canPublish: boolean
+  }
+}
+export const UserRole = (props: UserRoleProps) => {
   const {
     permissions: { canSubscribe, canPublishData, canPublish },
   } = props
