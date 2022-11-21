@@ -16,6 +16,7 @@ import { useGoLiveAudioChat, useStoreTxUiGoLiveRally } from '@hooks/useGoLiveAud
 import DialogGoLive from '@components/DialogGoLive'
 import { useConnectToVoiceChat, useStoreLiveVoiceChat, useStoreCurrentLiveRally } from '@hooks/useVoiceChat'
 import StageLiveVoiceChat from '@components/pages/rally/[idRally]/StageLiveVoiceChat'
+import DisplayGattedRequirements from '@components/pages/rally/[idRally]/DisplayGattedRequirements'
 
 const Page: NextPage = () => {
   const {
@@ -32,7 +33,6 @@ const Page: NextPage = () => {
   const { mutationJoinRoom } = useConnectToVoiceChat(queryAudioChatMetadata.data)
   const stateVoiceChat = useStoreLiveVoiceChat()
   const rally = useStoreCurrentLiveRally((state) => state.rally)
-
   return (
     <>
       <Head>
@@ -123,6 +123,9 @@ const Page: NextPage = () => {
                   >
                     Start live
                   </Button>
+                  <div className="animate-appear mx-auto mt-8">
+                    <DisplayGattedRequirements requirements={queryAudioChatMetadata?.data?.access_control.guilds}/>
+                  </div>
                 </div>
               )}
             {queryAudioChatMetadata?.data?.state === DICTIONARY_STATES_AUDIO_CHATS.LIVE.label && (

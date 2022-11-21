@@ -7,6 +7,7 @@ import { trpc } from '@utils/trpc'
 import toast from 'react-hot-toast'
 import { useStoreCurrentLiveRally, useStoreLiveVoiceChat } from '@hooks/useVoiceChat'
 import useWalletAddressDefaultLensProfile from '@hooks/useWalletAddressDefaultLensProfile'
+import useLiveVoiceChatInteractions from '@hooks/useLiveVoiceChatInteractions'
 
 export interface ParticipantToDisplay {
   isDialogVisible: boolean
@@ -39,38 +40,14 @@ export const DialogModalDisplayParticipant = (props: any) => {
   const isDialogVisible = useStoreDisplayParticipant((state) => state.isDialogVisible)
   const setDialogVisibility = useStoreDisplayParticipant((state) => state.setDialogVisibility)
   const pickedParticipant = useStoreDisplayParticipant((state) => state.participant)
+
   const {
     //@ts-ignore
     room: { localParticipant, ...dataRoom },
   } = useStoreLiveVoiceChat()
+  const {mutationParticipantKickOut, mutationInviteToSpeak, mutationMoveBackToAudience, mutationRoomAddToBlacklist} = useLiveVoiceChatInteractions()
 
-  const mutationParticipantKickOut = trpc?.room.update_audience_member_permissions.useMutation({
-    onSuccess(data) {
-      toast(`${data?.id_user} was kicked out successfully.`)
-      setDialogVisibility(false)
-    },
-  })
 
-  const mutationInviteToSpeak = trpc?.room.update_audience_member_permissions.useMutation({
-    onSuccess(data) {
-      toast(`${data?.id_user} was invited to speak.`)
-      setDialogVisibility(false)
-    },
-  })
-
-  const mutationMoveBackToAudience = trpc?.room.update_audience_member_permissions.useMutation({
-    onSuccess(data) {
-      toast(`${data?.id_user} was moved back to the audience.`)
-      setDialogVisibility(false)
-    },
-  })
-
-  const mutationRoomAddToBlacklist = trpc?.room.update_room_ban_list.useMutation({
-    onSuccess(data) {
-      toast(`${data?.id_user} is now banned permanently.`)
-      setDialogVisibility(false)
-    },
-  })
 
   //@ts-ignore
   const rally = useStoreCurrentLiveRally((state) => state.rally)
