@@ -43,6 +43,22 @@ export const roomRouter = router({
         console.error(e)
       }
     }),
+    pin_message_in_chat: publicProcedure
+    .input(object({
+      id_rally: string(),
+      pinned_media_url: string(),
+      pinned_media_message: string()
+    }),
+    ).mutation(async ({ctx, input}) => {
+      const { id_rally, pinned_media_url, pinned_media_message } = input
+      const client = new RoomServiceClient(
+        `wss://${process.env.NEXT_PUBLIC_LIVEKIT_URL}`,
+        process.env.LIVEKIT_API_KEY,
+        process.env.LIVEKIT_SECRET_KEY,
+      )
+      await client.updateRoomMetadata(id_rally ,JSON.stringify({url: pinned_media_url, description: pinned_media_message}))
+    })
+    ,
   update_room_ban_list: publicProcedure
     .input(
       object({
