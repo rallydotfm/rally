@@ -2,22 +2,21 @@ import ListParticipantsVoiceChat from '@components/pages/rally/[idRally]/ListPar
 import DialogModalDisplayParticipant, {
   useStoreDisplayParticipant,
 } from '@components/pages/rally/[idRally]/DialogModalDisplayParticipant'
-import type { Participant } from 'livekit-client'
+import { Participant } from 'livekit-client'
 
 interface StageLiveVoiceChatProps {
-  roomState: string
+  roomStatus: string
   participants: Array<Participant>
   isCurrentRally: boolean
 }
 
 export const StageLiveVoiceChat = (props: StageLiveVoiceChatProps) => {
-  const { roomState, participants, isCurrentRally } = props
+  const { roomStatus, participants, isCurrentRally } = props
   const pickedParticipant = useStoreDisplayParticipant((state) => state.participant)
-
   return (
     <>
-      {roomState === 'connecting' && <p className="font-bold animate-pulse">Connecting, one moment...</p>}
-      {roomState === 'connected' && isCurrentRally && (
+      {roomStatus === 'connecting' && <p className="font-bold animate-pulse">Connecting, one moment...</p>}
+      {roomStatus === 'connected' && isCurrentRally && (
         <>
           <div>
             <ListParticipantsVoiceChat

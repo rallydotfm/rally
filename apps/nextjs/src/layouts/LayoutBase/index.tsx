@@ -6,9 +6,11 @@ import MainNavBar from './MainNavBar'
 import ToolbarAudioRoom from './ToolbarAudioRoom'
 import { useStoreLiveVoiceChat } from '@hooks/useVoiceChat'
 import Button from '@components/Button'
-import { ClipboardIcon, ShareIcon } from '@heroicons/react/24/outline'
-import  DialogModalListParticipantsWithRaisedHands  from '@components/pages/rally/[idRally]/DialogModalListParticipantsWithRaisedHands'
-import DialogModalListPinnedItems from '@components/pages/rally/[idRally]/DialogModalListPinnedItems'
+import { ShareIcon } from '@heroicons/react/24/outline'
+import DialogModalListParticipantsWithRaisedHands from '@components/pages/rally/[idRally]/DialogModalListParticipantsWithRaisedHands'
+
+// The feature below will be disabled until the `updateRoomMetadata` feature is fixed on Livekit server
+// import DialogModalPinItem from '@components/pages/rally/[idRally]/DialogModalPinItem'
 interface LayoutProps {
   children: React.ReactNode
 }
@@ -16,8 +18,8 @@ interface LayoutProps {
 export const LayoutBase = (props: LayoutProps) => {
   const { children } = props
   const { address, isConnecting } = useAccount()
-  const stateVoiceChat = useStoreLiveVoiceChat()
-  
+  const stateVoiceChat: any = useStoreLiveVoiceChat()
+
   return (
     <div className="relative flex-grow flex flex-col">
       {!isConnecting && !address && (
@@ -50,10 +52,7 @@ export const LayoutBase = (props: LayoutProps) => {
             <div className="grid md:grid-cols-12 px-3 lg:px-6 mb-3 pointer-events-none">
               <div className="flex flex-col md:col-start-2 lg:col-start-3 md:col-end-10 lg:col-end-11 w-fit-content mis-auto items-end space-y-3 ">
                 <DialogModalListParticipantsWithRaisedHands />
-                <DialogModalListPinnedItems />
-                <Button scale="sm" className="aspect-square pointer-events-auto w-fit-content" intent="neutral-outline">
-                  <ShareIcon className="w-5" />
-                </Button>
+                {/* <DialogModalPinItem /> */}
               </div>
             </div>
           )}

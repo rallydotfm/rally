@@ -4,8 +4,6 @@ import {
   HandRaisedIcon as SolidHandRaisedIcon,
   Cog6ToothIcon,
   ArrowRightOnRectangleIcon,
-  BellAlertIcon,
-  MapPinIcon,
 } from '@heroicons/react/20/solid'
 
 import { HandRaisedIcon, HeartIcon, MicrophoneIcon } from '@heroicons/react/24/outline'

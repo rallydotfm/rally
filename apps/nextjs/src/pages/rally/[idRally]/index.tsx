@@ -176,7 +176,7 @@ const Page: NextPage = () => {
             {['connecting', 'connected']?.includes(stateVoiceChat?.room?.state) ? (
               <div className="animate-appear">
                 <StageLiveVoiceChat
-                  roomState={stateVoiceChat?.room?.state}
+                  roomStatus={stateVoiceChat?.room?.state}
                   participants={stateVoiceChat?.participants}
                   isCurrentRally={rally?.id === idRally}
                 />
