@@ -1,12 +1,12 @@
 import { AccessToken } from 'livekit-server-sdk'
-import { publicProcedure, router } from '../trpc'
+import { public_procedure, router } from '../trpc'
 import { getToken } from 'next-auth/jwt'
 import { object, string } from 'zod'
 
 const secret = process.env.NEXTAUTH_SECRET
 
 export const credentialsRouter = router({
-  getRoomCredential: publicProcedure
+  getRoomCredential: public_procedure
     .input(
       object({
         id_rally: string(),

@@ -1,5 +1,5 @@
 import { RoomServiceClient } from 'livekit-server-sdk'
-import { publicProcedure, router } from '../trpc'
+import { public_procedure, router } from '../trpc'
 import { getToken } from 'next-auth/jwt'
 import { boolean, object, string } from 'zod'
 
@@ -11,7 +11,7 @@ const client = new RoomServiceClient(
 )
 
 export const roomRouter = router({
-  react: publicProcedure
+  react: public_procedure
     .input(
       object({
         id_rally: string(),
@@ -42,7 +42,7 @@ export const roomRouter = router({
         console.error(e)
       }
     }),
-  pin_message: publicProcedure
+  pin_message: public_procedure
     .input(
       object({
         id_rally: string(),
@@ -87,7 +87,8 @@ export const roomRouter = router({
         }
       }
     }),
-  update_room_ban_list: publicProcedure
+
+  update_room_ban_list: public_procedure
     .input(
       object({
         id_rally: string(),
@@ -121,7 +122,7 @@ export const roomRouter = router({
         console.error(e)
       }
     }),
-  update_audience_member_permissions: publicProcedure
+  update_audience_member_permissions: public_procedure
     .input(
       object({
         id_rally: string(),
@@ -158,7 +159,7 @@ export const roomRouter = router({
         console.error(e)
       }
     }),
-  raise_hand: publicProcedure
+  raise_hand: public_procedure
     .input(
       object({
         id_rally: string(),
@@ -189,4 +190,8 @@ export const roomRouter = router({
         console.error(e)
       }
     }),
+  //@TODO
+  // add delete_room procedure
+  // uses `client.deleteRoom` under the room
+  // see docs https://docs.livekit.io/server/room-management/#deleteroom
 })

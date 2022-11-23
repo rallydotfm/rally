@@ -13,10 +13,12 @@ import { DICTIONARY_STATES_AUDIO_CHATS } from '@helpers/mappingAudioChatState'
 import CountdownOpening from '@components/pages/rally/[idRally]/CountdownOpening'
 import { isFuture } from 'date-fns'
 import { useGoLiveAudioChat, useStoreTxUiGoLiveRally } from '@hooks/useGoLiveAudioChat'
+import { useGetGuildMembershipsByWalletAddress } from '@hooks/useGetGuildMembershipsByWalletAddress'
 import DialogGoLive from '@components/DialogGoLive'
 import { useConnectToVoiceChat, useStoreLiveVoiceChat, useStoreCurrentLiveRally } from '@hooks/useVoiceChat'
 import StageLiveVoiceChat from '@components/pages/rally/[idRally]/StageLiveVoiceChat'
-import DisplayGatedRequirements from '@components/pages/rally/[idRally]/DisplayGatedRequirements'
+import CardGuild from '@components/pages/rally/[idRally]/CardGuild'
+import EthereumAddress from '@components/EthereumAddress'
 
 const Page: NextPage = () => {
   const {
@@ -25,7 +27,9 @@ const Page: NextPage = () => {
   } = useRouter()
   const { queryAudioChatByIdRawData, queryAudioChatMetadata } = useGetAudioChatById(idRally as `0x${string}`)
   const { address } = useAccount()
-
+  const queryCurrentUserGuildMemberships = useGetGuildMembershipsByWalletAddress(address as `0x${string}`, {
+    enabled: address && queryAudioChatMetadata?.data?.access_control?.guilds?.length > 0 ? true : false,
+  })
   const stateTxUiRallyGoLive = useStoreTxUiGoLiveRally()
   const { onClickGoLive, stateGoLive } = useGoLiveAudioChat(stateTxUiRallyGoLive)
 
@@ -46,8 +50,8 @@ const Page: NextPage = () => {
         </title>
         <meta name="description" content="Rally is the place to be." />
       </Head>
-      <div className="animate-appear flex flex-col grow">
-        <header className="bg-gradient-to-b from-neutral-1 flex-col flex relative overflow-hidden px-6 pt-1 -mt-8 -mx-6">
+      <>
+        <div className="overflow-hidden px-6 pb-8 pt-1 -mt-8 -mx-6">
           <nav>
             <Link href={ROUTE_HOME}>
               <a className={button({ intent: 'neutral-ghost', scale: 'sm' })}>
@@ -56,143 +60,318 @@ const Page: NextPage = () => {
               </a>
             </Link>
           </nav>
-          <div
-            className={`${
-              !queryAudioChatMetadata?.data?.image ? 'pt-8 xs:pt-12 pis-10' : ''
-            } flex flex-col space-y-6 xs:space-y-0 xs:flex-row xs:space-i-12`}
-          >
-            {queryAudioChatMetadata?.data?.image && (
-              <div className="relative self-center xs:self-start rounded-md mt-10 w-full aspect-video xs:w-36 overflow-hidden xs:aspect-square">
-                <div className="bg-neutral-5 absolute w-full h-full inset-0 animate-pulse" />
-                <img
-                  src={`https://ipfs.io/ipfs/${queryAudioChatMetadata?.data?.image}`}
-                  className="relative z-10 w-full h-full object-cover"
-                  alt=""
-                  width="192px"
-                  height="192px"
-                  loading="lazy"
-                />
-              </div>
-            )}
-            <div className="xs:self-end">
-              <h1 className="font-bold text-3xl flex flex-col-reverse">
-                <span>{queryAudioChatMetadata?.data?.name}</span>
-                <span className="text-2xs uppercase tracking-wider">{queryAudioChatMetadata?.data?.state}</span>
-              </h1>
-              <div>
-                {queryAudioChatMetadata?.data?.description?.trim()?.length > 0 && (
-                  <section className="pt-2 italic animate-appear">
-                    <h2 className="sr-only">About</h2>
-                    <p className="text-neutral-11">{queryAudioChatMetadata?.data?.description}</p>
-                  </section>
-                )}
-                {queryAudioChatMetadata?.data?.tags?.length > 0 && (
-                  <section>
-                    <ul className="mt-2 flex flex-wrap gap-x-4 gap-y-2 ">
-                      {queryAudioChatMetadata?.data?.tags?.map((tag: string) => (
-                        <li className="px-3 py-0.5 rounded-md bg-neutral-2 text-2xs font-bold " key={tag}>
-                          {tag}
-                        </li>
-                      ))}
-                    </ul>
-                  </section>
-                )}
-              </div>
-            </div>
-          </div>
-        </header>
-        <div className="flex flex-col grow justify-center items-center">
-          <main>
-            {(!stateVoiceChat?.room || stateVoiceChat?.room?.state === 'disconnected') &&
-              queryAudioChatMetadata?.data?.state === DICTIONARY_STATES_AUDIO_CHATS.PLANNED.label &&
-              (isFuture(queryAudioChatMetadata?.data?.datetime_start_at) ?? false) && (
-                <div className="animate-appear mx-auto mt-8">
-                  <CountdownOpening startsAt={queryAudioChatMetadata?.data?.datetime_start_at} />
-                </div>
-              )}
-            {address === queryAudioChatMetadata?.data?.creator &&
-              [DICTIONARY_STATES_AUDIO_CHATS.READY.label, DICTIONARY_STATES_AUDIO_CHATS.PLANNED.label].includes(
-                queryAudioChatMetadata.data?.state,
-              ) && (
-                <div className="animate-appear mt-5 flex justify-center">
-                  <Button
-                    disabled={rally && rally?.id !== idRally}
-                    onClick={async () => {
-                      stateTxUiRallyGoLive.setDialogVisibility(true)
-                      await onClickGoLive(queryAudioChatMetadata.data?.id)
-                    }}
-                  >
-                    Start live
-                  </Button>
-                </div>
-              )}
-            {queryAudioChatMetadata?.data?.state === DICTIONARY_STATES_AUDIO_CHATS.LIVE.label && (
-              <div className="flex flex-col items-center animate-appear mt-8 justify-center">
-                <div className="flex space-i-3 items-center">
-                  {stateVoiceChat?.room?.state === 'disconnected' && (
-                    <Button
-                      disabled={mutationJoinRoom.isLoading || (rally && rally?.id !== idRally)}
-                      isLoading={mutationJoinRoom.isLoading}
-                      onClick={async () => {
-                        await mutationJoinRoom.mutate({
-                          id_rally: queryAudioChatByIdRawData.data?.audio_event_id as `0x${string}`,
-                          cid_rally: queryAudioChatByIdRawData.data?.cid_metadata as string,
-                        })
-                      }}
-                    >
-                      {mutationJoinRoom.isLoading
-                        ? 'Checking your access...'
-                        : stateVoiceChat.isConnecting
-                        ? 'Joining to the room...'
-                        : 'Join audio room'}
-                    </Button>
-                  )}
-                </div>
-                {stateVoiceChat.room.state === 'disconnected' && (
-                  <p className="text-neutral-11 pt-5 text-2xs">Your mic will be muted when you join.</p>
-                )}
-              </div>
-            )}
+        </div>
+        {!queryAudioChatMetadata?.data ? (
+          <>
             {!isReady ||
               queryAudioChatByIdRawData?.status === 'loading' ||
               (queryAudioChatMetadata?.status === 'loading' &&
                 queryAudioChatByIdRawData?.data?.audio_event_id !==
                   '0x0000000000000000000000000000000000000000000000000000000000000000' && (
-                  <div className="mx-auto pt-8 px-6 animate-appear flex items-center space-i-1ex">
+                  <main className="mx-auto pt-8 px-6 animate-appear flex items-center space-i-1ex">
                     <IconSpinner className="animate-spin text-md " />
                     <p className="font-medium animate-pulse">Loading rally...</p>
-                  </div>
+                  </main>
                 ))}
             {queryAudioChatByIdRawData?.data?.audio_event_id ===
               '0x0000000000000000000000000000000000000000000000000000000000000000' && (
-              <section>
+              <main className="animate-appear">
                 <h2 className="text-3xl mb-4 font-bold">Rally not found.</h2>
                 <p className="mb-8">This rally doesn't exist or was deleted by its creator.</p>
                 <Link href={ROUTE_HOME}>
                   <a className={button({ scale: 'sm', intent: 'neutral-outline' })}>Go back to the homepage</a>
                 </Link>
-              </section>
+              </main>
             )}
-            {['connecting', 'connected']?.includes(stateVoiceChat?.room?.state) ? (
-              <div className="animate-appear">
-                <StageLiveVoiceChat
-                  roomStatus={stateVoiceChat?.room?.state}
-                  participants={stateVoiceChat?.participants}
-                  isCurrentRally={rally?.id === idRally}
-                />
+          </>
+        ) : (
+          <>
+            {['connecting', 'connected']?.includes(stateVoiceChat?.room?.state) && rally?.id === idRally ? (
+              <div className="animate-appear h-full">
+                <div className="pb-8 flex gap-4 flex-col 2xs:flex-row leading-loose -mis-8 -mie-6 pis-8 pie-6 border-neutral-4 border-b">
+                  {queryAudioChatMetadata?.data?.image && (
+                    <div className="relative overflow-hidden w-full 2xs:w-36 aspect-twitter-banner 2xs:aspect-square rounded-md">
+                      <div className="bg-neutral-5 absolute w-full h-full inset-0 animate-pulse" />
+                      <img
+                        alt=""
+                        loading="lazy"
+                        width="128px"
+                        height="128px"
+                        src={`https://ipfs.io/ipfs/${queryAudioChatMetadata.data.image}`}
+                        className="relative z-10 block w-full h-full object-cover "
+                      />
+                    </div>
+                  )}
+                  <div>
+                    <h1 className="text-2xl font-bold">{queryAudioChatMetadata?.data?.name}</h1>
+                    {queryAudioChatMetadata?.data?.description && (
+                      <p className="leading-wide text-neutral-11">{queryAudioChatMetadata?.data?.description}</p>
+                    )}
+                  </div>
+                </div>
+                <div className="px-8 h-full flex flex-col pt-6">
+                  <StageLiveVoiceChat
+                    roomStatus={stateVoiceChat?.room?.state}
+                    participants={stateVoiceChat?.participants}
+                    isCurrentRally={rally?.id === idRally}
+                  />
+                </div>
               </div>
             ) : (
               <>
-                {queryAudioChatMetadata?.data?.access_control?.guilds && (
-                  <div className="animate-appear mx-auto mt-8">
-                    <DisplayGatedRequirements requirements={queryAudioChatMetadata?.data?.access_control?.guilds} />
-                  </div>
-                )}
+                <main className="h-full flex flex-col animate-appear items-center justify-center">
+                  <article className="w-full max-w-[22rem]">
+                    <header>
+                      <h1 className="text-center text-lg flex flex-col-reverse pb-6 leading-relaxed items-center justify-center font-bold">
+                        <span>{queryAudioChatMetadata?.data?.name}</span>
+                        <span className="text-xs text-neutral-12 uppercase font-semibold">
+                          {queryAudioChatMetadata?.data?.state}
+                        </span>
+                      </h1>
+                    </header>
+                    <div className="bg-neutral-1 pb-6 border rounded-md border-neutral-4">
+                      <section className="flex flex-col">
+                        {queryAudioChatMetadata?.data?.image && (
+                          <div className="mt-9 mx-auto relative overflow-hidden w-32 aspect-square rounded-t-md xs:rounded-b-md">
+                            <div className="bg-neutral-5 absolute w-full h-full inset-0 animate-pulse" />
+                            <img
+                              alt=""
+                              loading="lazy"
+                              width="128px"
+                              height="128px"
+                              src={`https://ipfs.io/ipfs/${queryAudioChatMetadata.data.image}`}
+                              className="relative z-10 block w-full h-full object-cover "
+                            />
+                          </div>
+                        )}
+
+                        {queryAudioChatMetadata?.data?.description && (
+                          <p className="px-6 text-center italic text-neutral-12 mt-6">
+                            {queryAudioChatMetadata?.data?.description}
+                          </p>
+                        )}
+
+                        <div className="px-8 text-2xs flex flex-col text-neutral-12 pt-6">
+                          <span className="font-medium text-center text-[0.75rem]">Hosted by</span>
+                          <ul className="flex flex-col mt-4 gap-6">
+                            <li className="text-start">
+                              <EthereumAddress
+                                shortenOnFallback={true}
+                                address={queryAudioChatMetadata?.data?.creator}
+                                displayLensProfile={true}
+                              />
+                            </li>
+                            {queryAudioChatMetadata?.data?.cohosts_list?.map((cohost) => (
+                              <li key={`cohost-${cohost?.eth_address}`} className="text-start">
+                                <EthereumAddress
+                                  shortenOnFallback={true}
+                                  address={cohost?.eth_address}
+                                  displayLensProfile={true}
+                                />
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      </section>
+                      {queryAudioChatMetadata?.data?.tags?.length > 0 && (
+                        <section className="px-8 flex flex-col mt-4">
+                          {queryAudioChatMetadata?.data?.tags?.length > 0 && (
+                            <ul className="mx-auto text-2xs flex justify-center flex-wrap gap-2">
+                              {queryAudioChatMetadata?.data?.tags.map((tag: string, key: number) => (
+                                <li
+                                  className="bg-neutral-3 text-neutral-12 rounded-md px-3 py-0.5 font-semibold text-medium"
+                                  key={`${queryAudioChatMetadata?.data?.id_rally}_${key}`}
+                                >
+                                  {tag}
+                                </li>
+                              ))}
+                            </ul>
+                          )}
+                        </section>
+                      )}
+                      <section className="border-t border-neutral-4 pt-4 mt-6">
+                        {queryAudioChatMetadata?.data?.is_gated === true ||
+                        queryAudioChatMetadata?.data?.access_control?.guilds?.length > 0 ? (
+                          <div className="px-8">
+                            <p className="pb-8 font-semibold text-center text-xs">
+                              This rally can only be joined by :{' '}
+                            </p>
+                            <ul className="space-y-10">
+                              {queryAudioChatMetadata?.data?.access_control?.guilds?.map((guild: any) => (
+                                <li key={`guild-${guild.id}`}>
+                                  <CardGuild guild={guild} />
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        ) : (
+                          <p className="px-8 font-semibold text-center text-xs">Free to join</p>
+                        )}
+                        {([
+                          DICTIONARY_STATES_AUDIO_CHATS.READY.label,
+                          DICTIONARY_STATES_AUDIO_CHATS.PLANNED.label,
+                        ].includes(queryAudioChatMetadata.data?.state) ||
+                          (queryAudioChatMetadata?.data?.state === DICTIONARY_STATES_AUDIO_CHATS.LIVE.label &&
+                            stateVoiceChat?.room?.state === 'disconnected')) && (
+                          <div className="mt-4 pt-6 border-t border-neutral-4 px-8 flex flex-col">
+                            {[
+                              DICTIONARY_STATES_AUDIO_CHATS.READY.label,
+                              DICTIONARY_STATES_AUDIO_CHATS.PLANNED.label,
+                            ].includes(queryAudioChatMetadata.data?.state) && (
+                              <>
+                                {queryAudioChatMetadata?.data?.state === DICTIONARY_STATES_AUDIO_CHATS.PLANNED.label &&
+                                  (isFuture(queryAudioChatMetadata?.data?.datetime_start_at) ?? false) && (
+                                    <>
+                                      {(rally?.id !== idRally ||
+                                        (rally?.id === idRally &&
+                                          (!stateVoiceChat?.room ||
+                                            stateVoiceChat?.room?.state === 'disconnected'))) && (
+                                        <>
+                                          <div className="animate-appear mx-auto">
+                                            <CountdownOpening
+                                              startsAt={queryAudioChatMetadata?.data?.datetime_start_at}
+                                            />
+                                          </div>
+                                        </>
+                                      )}
+                                    </>
+                                  )}
+                                {address === queryAudioChatMetadata?.data?.creator && (
+                                  <div className="animate-appear mt-5 flex flex-col justify-center">
+                                    <Button
+                                      disabled={rally && rally?.id !== idRally}
+                                      onClick={async () => {
+                                        stateTxUiRallyGoLive.setDialogVisibility(true)
+                                        await onClickGoLive(queryAudioChatMetadata.data?.id)
+                                      }}
+                                    >
+                                      Start live
+                                    </Button>
+                                    {rally && rally?.id !== idRally && (
+                                      <p className="animate-appear text-center text-2xs text-neutral-11 pt-4">
+                                        You're already in a rally - finish/leave it first!
+                                      </p>
+                                    )}
+                                  </div>
+                                )}
+                              </>
+                            )}
+                            {queryAudioChatMetadata?.data?.state === DICTIONARY_STATES_AUDIO_CHATS.LIVE.label &&
+                              stateVoiceChat?.room?.state === 'disconnected' && (
+                                <>
+                                  {queryAudioChatMetadata?.data?.access_control?.guilds?.length === 0 ||
+                                  queryAudioChatMetadata?.data?.access_control?.whitelist.includes(address) ||
+                                  queryAudioChatMetadata?.data?.guests_list.includes(address) ? (
+                                    <>
+                                      <Button
+                                        className="animate-appear"
+                                        disabled={mutationJoinRoom.isLoading || (rally && rally?.id !== idRally)}
+                                        isLoading={mutationJoinRoom.isLoading}
+                                        onClick={async () => {
+                                          await mutationJoinRoom.mutate({
+                                            id_rally: queryAudioChatByIdRawData.data?.audio_event_id as `0x${string}`,
+                                            cid_rally: queryAudioChatByIdRawData.data?.cid_metadata as string,
+                                          })
+                                        }}
+                                      >
+                                        {mutationJoinRoom.isLoading
+                                          ? 'Checking your access...'
+                                          : stateVoiceChat.isConnecting
+                                          ? 'Joining ...'
+                                          : '✨ Join now ✨'}
+                                      </Button>
+                                      <p className="text-center text-neutral-11 pt-3 text-2xs">
+                                        Your mic will be muted when you join.
+                                      </p>
+                                    </>
+                                  ) : (
+                                    <>
+                                      {queryCurrentUserGuildMemberships?.isLoading ? (
+                                        <p className="animate-pulse font-bold text-2xs">Checking your membership...</p>
+                                      ) : queryCurrentUserGuildMemberships?.isError ? (
+                                        <p className="animate-appear">
+                                          Something went wrong while checking your Guild memberships.
+                                        </p>
+                                      ) : (
+                                        <>
+                                          {[]
+                                            .concat(
+                                              ...queryAudioChatMetadata?.data?.access_control?.guilds.map(
+                                                (guild: any) => guild.roles,
+                                              ),
+                                            )
+                                            .filter((role) =>
+                                              queryCurrentUserGuildMemberships?.data?.roles.includes(role),
+                                            )?.length > 0 ? (
+                                            <>
+                                              <Button
+                                                className="animate-appear"
+                                                disabled={
+                                                  mutationJoinRoom.isLoading || (rally && rally?.id !== idRally)
+                                                }
+                                                isLoading={mutationJoinRoom.isLoading}
+                                                onClick={async () => {
+                                                  await mutationJoinRoom.mutate({
+                                                    id_rally: queryAudioChatByIdRawData.data
+                                                      ?.audio_event_id as `0x${string}`,
+                                                    cid_rally: queryAudioChatByIdRawData.data?.cid_metadata as string,
+                                                  })
+                                                }}
+                                              >
+                                                {mutationJoinRoom.isLoading
+                                                  ? 'Checking your access...'
+                                                  : stateVoiceChat.isConnecting
+                                                  ? 'Joining ...'
+                                                  : '✨ Join now ✨'}
+                                              </Button>
+                                              <p className="text-center text-neutral-11 pt-3 text-2xs">
+                                                Your mic will be muted when you join.
+                                              </p>
+                                            </>
+                                          ) : (
+                                            <div className="animate-appear text-2xs text-center">
+                                              <p className="font-semibold mb-2  text-neutral-11">
+                                                Your wallet doesn't qualify to join this rally.
+                                              </p>
+                                              <p className="font-bold mb-4">
+                                                Try to join one of the allowed guild and claim one of the roles on{' '}
+                                                <span className="font-bold">Guild</span> to qualify.
+                                              </p>
+                                              <a
+                                                target="_blank"
+                                                className={button({
+                                                  intent: 'neutral-outline',
+                                                  scale: 'sm',
+                                                  class: 'w-full',
+                                                })}
+                                                href={`https://guild.xyz`}
+                                              >
+                                                Explore and join guilds
+                                              </a>
+                                            </div>
+                                          )}
+                                        </>
+                                      )}
+                                    </>
+                                  )}
+                                </>
+                              )}
+                          </div>
+                        )}
+                      </section>
+                    </div>
+                    <footer className="pt-4">
+                      <p className="text-2xs text-center text-neutral-9">
+                        Max. {queryAudioChatMetadata?.data?.max_attendees ?? 100} attendees
+                      </p>
+                    </footer>
+                  </article>
+                </main>
               </>
             )}
-          </main>
-        </div>
-      </div>
+          </>
+        )}
+      </>
       <DialogGoLive stateTxUi={stateTxUiRallyGoLive} stateGoLiveAudioChat={stateGoLive} />
     </>
   )
