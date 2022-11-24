@@ -25,6 +25,8 @@ function MyApp({ Component, pageProps }: AppProps) {
     <>
       <Head>
         <meta name="color-scheme" content="dark" />
+        <link rel="preload" href="/Satoshi-Variable.ttf" as="font" type="font/ttf" />
+        <link rel="preload" href="/Satoshi-VariableItalic.ttf" as="font" type="font/ttf" />
       </Head>
       <QueryClientProvider client={queryClient}>
         {/* @ts-ignore */}

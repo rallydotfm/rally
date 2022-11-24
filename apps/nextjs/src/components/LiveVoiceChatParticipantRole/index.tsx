@@ -13,7 +13,14 @@ export const LiveVoiceChatParticipantRole = (props: LiveVoiceChatParticipantRole
   } = participant
 
   if (canSubscribe && canPublishData && canPublish)
-    return <>Host {!isMicrophoneEnabled && <span>(activate your mic)</span>}</>
+    return (
+      <>
+        Host{' '}
+        {!isMicrophoneEnabled && (
+          <span className="font-bold animate-pulse text-[0.75em] text-interactive-12">(mic disabled)</span>
+        )}
+      </>
+    )
   if (canSubscribe && canPublish)
     return (
       <>

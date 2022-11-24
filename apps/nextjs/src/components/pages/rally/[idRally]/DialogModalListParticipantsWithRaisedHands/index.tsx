@@ -60,41 +60,44 @@ export const DialogModalListParticipantsWithRaisedHands = () => {
           <ul className="space-y-6  pt-8">
             {listParticipantsWithRaisedHand?.map((participantWithHandRaised: Participant) => (
               <li
-                className="w-full flex justify-between 2xs:justify-start 2xs:grid items-center gap-1.5 2xs:gap-4 grid-cols-12 text-2xs"
+                className="w-full flex justify-between 2xs:justify-start 2xs:grid items-center gap-1.5 2xs:gap-4 grid-cols-12 text-xs"
                 key={`hand-raised-${participantWithHandRaised?.identity}-${participantWithHandRaised?.sid}`}
               >
                 <>
-                  <div className="2xs:col-span-6 flex 2xs:space-i-3 items-baseline">
+                  <div className="2xs:col-span-6 flex 2xs:space-i-3 xs:space-i-6 items-center">
                     <div className="hidden 2xs:block rounded-md w-8 h-8 overflow-hidden">
-                      <ParticipantIdentityDisplayedAvatar identity={participantWithHandRaised.identity} />
+                      <ParticipantIdentityDisplayedAvatar
+                        metadata={participantWithHandRaised?.metadata as string}
+                        identity={participantWithHandRaised.identity}
+                      />
                     </div>
                     <span className="font-bold justify-center block overflow-hidden text-ellipsis">
-                      <ParticipantIdentityDisplayedName identity={participantWithHandRaised.identity} />
+                      <ParticipantIdentityDisplayedName
+                        metadata={participantWithHandRaised?.metadata as string}
+                        identity={participantWithHandRaised.identity}
+                      />
                     </span>
                   </div>
                   <div className="2xs:col-span-6 2xs:justify-self-end block overflow-hidden text-ellipsis">
-                    {participantWithHandRaised.permissions?.canPublish === false ? (
-                      <Button
-                        onClick={async () => {
-                          await mutationInviteToSpeak.mutateAsync({
-                            id_rally: rally?.id,
-                            id_user: participantWithHandRaised.identity,
-                            can_publish: true,
-                            can_join: true,
-                            can_publish_data: false,
-                            can_subscribe: true,
-                          })
-                        }}
-                        className="w-full xs:w-fit-content xs:!px-5"
-                        intent="primary-outline"
-                        scale="sm"
-                      >
-                        <MicrophoneIcon className="w-4 mie-2" />
-                        Invite to speak
-                      </Button>
-                    ) : (
-                      <span className="font-semibold block text-center 2xs:text-end text-neutral-9">(You)</span>
-                    )}
+                    <Button
+                      disabled={participantWithHandRaised.permissions?.canPublish === false}
+                      onClick={async () => {
+                        await mutationInviteToSpeak.mutateAsync({
+                          id_rally: rally?.id,
+                          id_user: participantWithHandRaised.identity,
+                          can_publish: true,
+                          can_join: true,
+                          can_publish_data: false,
+                          can_subscribe: true,
+                        })
+                      }}
+                      className="w-full xs:w-fit-content xs:!px-5"
+                      intent="primary-outline"
+                      scale="sm"
+                    >
+                      <MicrophoneIcon className="w-4 mie-2" />
+                      Invite to speak
+                    </Button>
                   </div>
                 </>
               </li>

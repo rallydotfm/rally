@@ -17,13 +17,19 @@ export const useStoreCurrentLiveRally = create((set) => ({
   setDisplaySpeakerInvitationModal: (shouldBeDisplayed: boolean) =>
     set(() => ({ displaySpeakerInvitationModal: shouldBeDisplayed })),
   setLiveRally: (rally: any) => set(() => ({ rally })),
+  resetState: () =>
+    set(() => ({
+      rally: undefined,
+      localUserPermissions: undefined,
+      displaySpeakerInvitationModal: false,
+    })),
 }))
 
 //@ts-ignore
 export function useConnectToVoiceChat(rally) {
   const state = useStoreLiveVoiceChat()
-  //@ts-ignore
-  const setLiveRally = useStoreCurrentLiveRally((state) => state.setLiveRally)
+  const setLiveRally = useStoreCurrentLiveRally((currentLiveRallyState: any) => currentLiveRallyState.setLiveRally)
+  const resetState = useStoreCurrentLiveRally((currentLiveRallyState: any) => currentLiveRallyState.resetState)
   const mutationJoinRoom = trpc.credentials.getRoomCredential.useMutation({
     async onSuccess(data) {
       try {
@@ -37,10 +43,10 @@ export function useConnectToVoiceChat(rally) {
           toast.error(
             "Something went wrong and you couldn't join the rally. Make you joined one of the the required guilds and claimed one of the whitelisted roles and try again.",
           )
-          setLiveRally(undefined)
+          resetState()
         }
       } catch (e) {
-        setLiveRally(undefined)
+        resetState()
       }
     },
   })

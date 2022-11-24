@@ -55,6 +55,7 @@ export const DialogModalDisplayParticipant = (props: any) => {
       <div className="pt-6 flex space-y-3 flex-col justify-center items-center 2xs:space-y-0 2xs:flex-row 2xs:justify-start 2xs:items-start 2xs:space-i-6">
         <div className="w-24 shrink-0 relative aspect-square overflow-hidden border-neutral-4 border rounded-full">
           <ParticipantIdentityDisplayedAvatar
+            metadata={pickedParticipant?.metadata as string}
             className="absolute inset-0 w-full h-full object-cover z-10"
             /* @ts-ignore */
             identity={pickedParticipant.identity}
@@ -63,7 +64,10 @@ export const DialogModalDisplayParticipant = (props: any) => {
         <div>
           <div className="leading-tight">
             <p className="break-all flex flex-col font-semibold text-sm max-x-fit-content">
-              <ParticipantIdentityDisplayedName identity={pickedParticipant?.identity as string} />
+              <ParticipantIdentityDisplayedName
+                metadata={pickedParticipant?.metadata as string}
+                identity={pickedParticipant?.identity as string}
+              />
             </p>
             {queryLensProfile?.data?.handle && (
               <p className="mt-1 text-2xs text-neutral-9">{queryLensProfile?.data?.handle}</p>
@@ -100,6 +104,7 @@ export const DialogModalDisplayParticipant = (props: any) => {
           {queryLensProfile?.data?.followModule && !pickedParticipant?.isLocal && (
             <div className="mt-4">
               <Button
+                disabled={true}
                 scale="xs"
                 intent={queryLensProfile?.data?.isFollowedByMe ? 'negative-outline' : 'primary-outline'}
               >
@@ -110,7 +115,7 @@ export const DialogModalDisplayParticipant = (props: any) => {
         </div>
       </div>
       <div className="pt-8">
-        <ul className="pt-2 border-t-neutral-4 border-transparent border -mis-6 -mie-9 text-2xs font-semibold">
+        <ul className="pt-2 border-t-neutral-4 border-transparent border -mis-6 -mie-9 text-2xs">
           {pickedParticipant?.isLocal &&
             pickedParticipant?.permissions?.canPublish &&
             !pickedParticipant?.isMicrophoneEnabled && (
@@ -119,7 +124,7 @@ export const DialogModalDisplayParticipant = (props: any) => {
                   onClick={async () => {
                     await localParticipant.setMicrophoneEnabled(true)
                   }}
-                  className="text-start px-6 py-3 w-full focus:bg-neutral-12 hover:bg-neutral-3 focus:text-interactive-9"
+                  className="font-semibold text-start px-6 py-3 w-full focus:bg-neutral-12 hover:bg-neutral-3 focus:text-interactive-9"
                 >
                   Enable your microphone
                 </button>
@@ -133,7 +138,9 @@ export const DialogModalDisplayParticipant = (props: any) => {
             <>
               <li>
                 <button
-                  disabled={!pickedParticipant?.permissions?.canPublish}
+                  disabled={
+                    !pickedParticipant?.permissions?.canPublish || pickedParticipant.isMicrophoneEnabled === false
+                  }
                   onClick={() => {
                     //@ts-ignore
                     publications[0].setSubscribed(!publications[0]?.isSubscribed)
@@ -153,13 +160,14 @@ export const DialogModalDisplayParticipant = (props: any) => {
                             mutationInviteToSpeak.mutateAsync({
                               id_rally: rally?.id,
                               id_user: pickedParticipant?.identity as string,
+                              display_name: JSON.parse(pickedParticipant?.metadata as string)?.display_name,
                               can_join: true,
                               can_publish_data: false,
                               can_subscribe: true,
                               can_publish: true,
                             })
                           }
-                          className="text-start px-6 py-3 w-full focus:bg-neutral-12 hover:bg-neutral-3 focus:text-interactive-9"
+                          className="disabled:opacity-50 disabled:cursor-not-allowed text-start px-6 py-3 w-full focus:bg-neutral-12 hover:bg-neutral-3 focus:text-interactive-9"
                         >
                           Invite to speak
                         </button>
@@ -168,56 +176,62 @@ export const DialogModalDisplayParticipant = (props: any) => {
                     {pickedParticipant?.permissions?.canPublish && (
                       <li>
                         <button
+                          disabled={pickedParticipant?.permissions?.canPublishData}
                           onClick={() =>
                             mutationMoveBackToAudience.mutateAsync({
                               id_rally: rally?.id,
                               id_user: pickedParticipant?.identity,
+                              display_name: JSON.parse(pickedParticipant?.metadata as string)?.display_name,
                               can_join: true,
                               can_publish_data: false,
                               can_subscribe: true,
                               can_publish: false,
                             })
                           }
-                          className="text-start px-6 py-3 w-full focus:bg-neutral-12 hover:bg-neutral-3  focus:text-interactive-9"
+                          className="disabled:opacity-50 disabled:cursor-not-allowed text-start px-6 py-3 w-full focus:bg-neutral-12 hover:bg-neutral-3  focus:text-interactive-9"
                         >
-                          Move to audience
+                          Move to the audience
                         </button>
                       </li>
                     )}
 
                     <li>
                       <button
-                        disabled={mutationParticipantKickOut?.isLoading}
+                        disabled={
+                          mutationParticipantKickOut?.isLoading || pickedParticipant?.permissions?.canPublishData
+                        }
                         onClick={() =>
                           mutationParticipantKickOut.mutateAsync({
                             id_rally: rally?.id,
                             id_user: pickedParticipant?.identity as string,
+                            display_name: JSON.parse(pickedParticipant?.metadata as string)?.display_name,
                             can_join: false,
                             can_publish_data: false,
                             can_subscribe: false,
                             can_publish: false,
                           })
                         }
-                        className="text-start text-negative-10 hover:bg-negative-1 hover:text-negative-11 focus:text-negative-11 focus:bg-negative-2 px-6 py-3 w-full "
+                        className="disabled:opacity-50 disabled:cursor-not-allowed text-start text-negative-10 hover:bg-negative-1 hover:text-negative-11 focus:text-negative-11 focus:bg-negative-2 px-6 py-3 w-full "
                       >
                         Kick out
                       </button>
                     </li>
                     <li>
                       <button
-                        disabled={mutationParticipantKickOut?.isLoading}
+                        disabled={true}
                         onClick={async () => {
                           let roomMetadata = JSON.parse(dataRoom?.metadata ?? '')
                           await mutationRoomAddToBlacklist.mutateAsync({
                             id_rally: rally?.id,
                             id_user: pickedParticipant?.identity as string,
+                            display_name: JSON.parse(pickedParticipant?.metadata as string)?.display_name,
                             metadata: JSON.stringify({
                               ...roomMetadata,
                               blacklist: [...roomMetadata.blacklist, pickedParticipant?.identity],
                             }),
                           })
                         }}
-                        className="text-start text-negative-10 hover:bg-negative-1 hover:text-negative-11 focus:text-negative-11 focus:bg-negative-2 px-6 py-3 w-full "
+                        className="disabled:opacity-50 text-start text-negative-10 hover:bg-negative-1 hover:text-negative-11 focus:text-negative-11 focus:bg-negative-2 px-6 py-3 w-full "
                       >
                         Ban permanently from this rally
                       </button>

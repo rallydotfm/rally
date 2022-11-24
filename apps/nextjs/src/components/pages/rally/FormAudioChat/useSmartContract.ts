@@ -2,12 +2,13 @@ import { getUnixTime } from 'date-fns'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { makeStorageClient } from '@config/web3storage'
 import { CONTRACT_AUDIO_CHATS } from '@config/contracts'
-import { useContractWrite, useAccount, useWaitForTransaction, useNetwork } from 'wagmi'
+import { useContractWrite, useAccount, useWaitForTransaction } from 'wagmi'
 import { audioChatABI } from '@rally/abi'
 import { utils } from 'ethers'
 import create from 'zustand'
 import toast from 'react-hot-toast'
 import { DICTIONARY_STATES_AUDIO_CHATS } from '@helpers/mappingAudioChatState'
+import { chainId } from '@config/wagmi'
 export interface TxUi {
   isDialogVisible: boolean
   rallyId: string | undefined
@@ -45,7 +46,6 @@ export const useStoreTxUi = create<TxUi>((set) => ({
 
 export function useSmartContract(stateTxUi: TxUi) {
   const account = useAccount()
-  const { chain } = useNetwork()
   const queryClient = useQueryClient()
 
   // Query to create a new audio chat
@@ -54,13 +54,13 @@ export function useSmartContract(stateTxUi: TxUi) {
     address: CONTRACT_AUDIO_CHATS,
     abi: audioChatABI,
     functionName: 'createNewAudioChat',
-    chainId: chain?.id,
+    chainId,
   })
 
   // Transaction receipt for `contractWriteNewAudioChat` (create new audio chat query)
   const txCreateAudioChat = useWaitForTransaction({
     hash: contractWriteNewAudioChat?.data?.hash,
-    chainId: chain?.id,
+    chainId,
     onError(e) {
       console.error(e)
       toast.error(e?.message)
@@ -99,13 +99,13 @@ export function useSmartContract(stateTxUi: TxUi) {
     address: CONTRACT_AUDIO_CHATS,
     abi: audioChatABI,
     functionName: 'updateAudioChat',
-    chainId: chain?.id,
+    chainId,
   })
 
   // Transaction receipt for `recklesslyUnprepared` (edit audio chat data query)
   const txEditAudioChat = useWaitForTransaction({
     hash: contractWriteEditAudioChat?.data?.hash,
-    chainId: chain?.id,
+    chainId,
     onError(e) {
       console.error(e)
       toast.error(e?.message)

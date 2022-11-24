@@ -125,7 +125,7 @@ export const ToolbarAudioRoom = () => {
               {!microphonePublication ? (
                 <>
                   <MicrophoneIcon className="w-7" />
-                  <Cog6ToothIcon className="absolute animate-bounce bottom-0 inline-end-0 pointer-events-none text-neutral-9 w-4" />
+                  <Cog6ToothIcon className="absolute animate-bounce bottom-1 inline-end-1 pointer-events-none text-neutral-9 w-3" />
                 </>
               ) : (
                 <>
@@ -147,6 +147,7 @@ export const ToolbarAudioRoom = () => {
               await mutationRaiseHand.mutate({
                 id_rally: rally?.id,
                 new_is_hand_raised_value: isHandRaised ? false : true,
+                user_previous_metadata: state.room.localParticipant?.metadata,
               })
             }}
             intent="neutral-ghost"
@@ -161,6 +162,7 @@ export const ToolbarAudioRoom = () => {
                 mutationReaction.mutate({
                   id_rally: idRally as string,
                   reaction: value,
+                  user_previous_metadata: state.room.localParticipant?.metadata,
                 })
               }}
               horizontal

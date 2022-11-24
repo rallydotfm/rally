@@ -5,8 +5,6 @@ import MobileTopMenu from './MobileTopMenu'
 import MainNavBar from './MainNavBar'
 import ToolbarAudioRoom from './ToolbarAudioRoom'
 import { useStoreLiveVoiceChat } from '@hooks/useVoiceChat'
-import Button from '@components/Button'
-import { ShareIcon } from '@heroicons/react/24/outline'
 import DialogModalListParticipantsWithRaisedHands from '@components/pages/rally/[idRally]/DialogModalListParticipantsWithRaisedHands'
 
 // The feature below will be disabled until the `updateRoomMetadata` feature is fixed on Livekit server
@@ -17,8 +15,13 @@ interface LayoutProps {
 
 export const LayoutBase = (props: LayoutProps) => {
   const { children } = props
-  const { address, isConnecting } = useAccount()
   const stateVoiceChat: any = useStoreLiveVoiceChat()
+
+  const { address, isConnecting } = useAccount({
+    async onDisconnect() {
+      await stateVoiceChat?.room?.disconnect()
+    },
+  })
 
   return (
     <div className="relative flex-grow flex flex-col">

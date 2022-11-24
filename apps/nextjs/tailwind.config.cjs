@@ -1,6 +1,7 @@
+/** @type {import('tailwindcss').plugin} */
 /** @type {import('tailwindcss').Config} */
 /** @type { import('@radix-ui/colors') } */
-
+const plugin = require('tailwindcss/plugin')
 const colors = require('@radix-ui/colors')
 const { greenDark, limeDark, grayDark, crimsonDark, plumDark } = colors
 const typography = {
@@ -64,7 +65,7 @@ module.exports = {
       '3xl': remToPx(100),
     },
     fontFamily: {
-      sans: ['sans-serif'],
+      sans: ['"Satoshi", sans-serif'],
       mono: ['monospace'],
     },
     fontSize: {
@@ -79,6 +80,16 @@ module.exports = {
       '2xl': clamp(2),
       '3xl': clamp(3),
       '4xl': clamp(5),
+    },
+    fontVariationWidth: {
+      125: 125,
+      200: 200,
+      250: 250,
+      300: 300,
+      400: 400,
+      600: 600,
+      800: 800,
+      900: 900,
     },
     extend: {
       colors: {
@@ -226,5 +237,18 @@ module.exports = {
   variants: {
     extend: {},
   },
-  plugins: [require('@headlessui/tailwindcss'), require('tailwindcss-logical'), require('@tailwindcss/typography')],
+  plugins: [
+    plugin(({ addUtilities, theme, e }) => {
+      const values = theme('fontVariationWidth')
+      var utilities = Object.entries(values).map(([key, value]) => {
+        return {
+          [`.${e(`font-variation-width-${key}`)}`]: { 'font-variation-settings': `'wdth' ${value}` },
+        }
+      })
+      addUtilities(utilities)
+    }),
+    require('@headlessui/tailwindcss'),
+    require('tailwindcss-logical'),
+    require('@tailwindcss/typography'),
+  ],
 }

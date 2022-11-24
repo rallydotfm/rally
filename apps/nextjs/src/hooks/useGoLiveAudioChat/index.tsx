@@ -8,6 +8,7 @@ import queryClient from '@config/react-query'
 import { utils } from 'ethers'
 import { ROUTE_RALLY_VIEW } from '@config/routes'
 import { useRouter } from 'next/router'
+import { chainId } from '@config/wagmi'
 
 export interface TxUiGoLiveRally {
   isDialogVisible: boolean
@@ -28,7 +29,6 @@ export const useStoreTxUiGoLiveRally = create<TxUiGoLiveRally>((set) => ({
 }))
 
 export function useGoLiveAudioChat(stateTxUiRallyGoLive: TxUiGoLiveRally) {
-  const { chain } = useNetwork()
   const { push } = useRouter()
   // Query to create a new audio chat
   const contractWriteAudioChatGoLive = useContractWrite({
@@ -36,13 +36,13 @@ export function useGoLiveAudioChat(stateTxUiRallyGoLive: TxUiGoLiveRally) {
     address: CONTRACT_AUDIO_CHATS,
     abi: audioChatABI,
     functionName: 'changeState',
-    chainId: chain?.id,
+    chainId,
   })
 
   // Transaction receipt for `contractWriteAudioChatGoLive` (change audiochat state query)
   const txAudioChatGoLive = useWaitForTransaction({
     hash: contractWriteAudioChatGoLive?.data?.hash,
-    chainId: chain?.id,
+    chainId,
     onError(e) {
       console.error(e)
       toast.error(e?.message)

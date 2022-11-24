@@ -4,7 +4,7 @@ import { httpBatchLink } from '@trpc/client'
 import type { AppRouter } from '@rally/api'
 import { transformer } from '@rally/api/transformer'
 
-export let roomService
+export let roomService: any
 
 const getBaseUrl = () => {
   if (typeof window !== 'undefined') return '' // browser should use relative url

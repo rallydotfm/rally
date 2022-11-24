@@ -4,39 +4,45 @@ import { useRouter } from 'next/router'
 import { useGetAudioChatById } from '@hooks/useGetAudioChatById'
 import { IconSpinner } from '@components/Icons'
 import { ROUTE_HOME } from '@config/routes'
+import { useConnectModal, useChainModal } from '@rainbow-me/rainbowkit'
+import { useSession } from 'next-auth/react'
 import Link from 'next/link'
 import button from '@components/Button/styles'
 import { ArrowLeftIcon } from '@heroicons/react/20/solid'
 import Button from '@components/Button'
-import { useAccount } from 'wagmi'
+import { useAccount, useDisconnect, useNetwork } from 'wagmi'
 import { DICTIONARY_STATES_AUDIO_CHATS } from '@helpers/mappingAudioChatState'
 import CountdownOpening from '@components/pages/rally/[idRally]/CountdownOpening'
 import { isFuture } from 'date-fns'
 import { useGoLiveAudioChat, useStoreTxUiGoLiveRally } from '@hooks/useGoLiveAudioChat'
 import { useGetGuildMembershipsByWalletAddress } from '@hooks/useGetGuildMembershipsByWalletAddress'
 import DialogGoLive from '@components/DialogGoLive'
-import { useConnectToVoiceChat, useStoreLiveVoiceChat, useStoreCurrentLiveRally } from '@hooks/useVoiceChat'
+import { useStoreLiveVoiceChat, useStoreCurrentLiveRally } from '@hooks/useVoiceChat'
 import StageLiveVoiceChat from '@components/pages/rally/[idRally]/StageLiveVoiceChat'
 import CardGuild from '@components/pages/rally/[idRally]/CardGuild'
-import EthereumAddress from '@components/EthereumAddress'
+import HostProfile from '@components/pages/rally/[idRally]/HostProfile'
+import FormJoinRoomAs from '@components/pages/rally/[idRally]/FormJoinRoomAs'
 
 const Page: NextPage = () => {
   const {
     query: { idRally },
     isReady,
   } = useRouter()
-  const { queryAudioChatByIdRawData, queryAudioChatMetadata } = useGetAudioChatById(idRally as `0x${string}`)
+  const { chain } = useNetwork()
   const { address } = useAccount()
+  const { data: session } = useSession()
+  const { openChainModal } = useChainModal()
+  const { openConnectModal } = useConnectModal()
+  const { queryAudioChatByIdRawData, queryAudioChatMetadata } = useGetAudioChatById(idRally as `0x${string}`)
   const queryCurrentUserGuildMemberships = useGetGuildMembershipsByWalletAddress(address as `0x${string}`, {
     enabled: address && queryAudioChatMetadata?.data?.access_control?.guilds?.length > 0 ? true : false,
   })
   const stateTxUiRallyGoLive = useStoreTxUiGoLiveRally()
   const { onClickGoLive, stateGoLive } = useGoLiveAudioChat(stateTxUiRallyGoLive)
 
-  const { mutationJoinRoom } = useConnectToVoiceChat(queryAudioChatMetadata.data)
   const stateVoiceChat: any = useStoreLiveVoiceChat()
   const rally = useStoreCurrentLiveRally((state: any) => state.rally)
-
+  const { disconnect } = useDisconnect()
   return (
     <>
       <Head>
@@ -153,28 +159,22 @@ const Page: NextPage = () => {
 
                         <div className="px-8 text-2xs flex flex-col text-neutral-12 pt-6">
                           <span className="font-medium text-center text-[0.75rem]">Hosted by</span>
-                          <ul className="flex flex-col mt-4 gap-6">
-                            <li className="text-start">
-                              <EthereumAddress
-                                shortenOnFallback={true}
-                                address={queryAudioChatMetadata?.data?.creator}
-                                displayLensProfile={true}
-                              />
+                          <ul className="flex flex-wrap justify-center mt-4 gap-6">
+                            <li>
+                              <HostProfile address={queryAudioChatMetadata?.data?.creator} />
                             </li>
-                            {queryAudioChatMetadata?.data?.cohosts_list?.map((cohost) => (
-                              <li key={`cohost-${cohost?.eth_address}`} className="text-start">
-                                <EthereumAddress
-                                  shortenOnFallback={true}
-                                  address={cohost?.eth_address}
-                                  displayLensProfile={true}
-                                />
-                              </li>
-                            ))}
+                            {queryAudioChatMetadata?.data?.cohosts_list?.map(
+                              (cohost: { eth_address: `0x${string}` }) => (
+                                <li key={`cohost-${cohost?.eth_address}`} className="text-start">
+                                  <HostProfile address={cohost?.eth_address} />
+                                </li>
+                              ),
+                            )}
                           </ul>
                         </div>
                       </section>
                       {queryAudioChatMetadata?.data?.tags?.length > 0 && (
-                        <section className="px-8 flex flex-col mt-4">
+                        <section className="px-8 flex flex-col mt-6">
                           {queryAudioChatMetadata?.data?.tags?.length > 0 && (
                             <ul className="mx-auto text-2xs flex justify-center flex-wrap gap-2">
                               {queryAudioChatMetadata?.data?.tags.map((tag: string, key: number) => (
@@ -189,16 +189,16 @@ const Page: NextPage = () => {
                           )}
                         </section>
                       )}
-                      <section className="border-t border-neutral-4 pt-4 mt-6">
+                      <section className=" animate-appear border-t border-neutral-4 pt-4 mt-6">
                         {queryAudioChatMetadata?.data?.is_gated === true ||
                         queryAudioChatMetadata?.data?.access_control?.guilds?.length > 0 ? (
-                          <div className="px-8">
-                            <p className="pb-8 font-semibold text-center text-xs">
+                          <div className="px-8 animate-appear">
+                            <p className="pb-8 animate-appear font-semibold text-center text-xs">
                               This rally can only be joined by :{' '}
                             </p>
                             <ul className="space-y-10">
                               {queryAudioChatMetadata?.data?.access_control?.guilds?.map((guild: any) => (
-                                <li key={`guild-${guild.id}`}>
+                                <li className="animate-appear" key={`guild-${guild.id}`}>
                                   <CardGuild guild={guild} />
                                 </li>
                               ))}
@@ -256,106 +256,108 @@ const Page: NextPage = () => {
                                 )}
                               </>
                             )}
-                            {queryAudioChatMetadata?.data?.state === DICTIONARY_STATES_AUDIO_CHATS.LIVE.label &&
-                              stateVoiceChat?.room?.state === 'disconnected' && (
-                                <>
-                                  {queryAudioChatMetadata?.data?.access_control?.guilds?.length === 0 ||
-                                  queryAudioChatMetadata?.data?.access_control?.whitelist.includes(address) ||
-                                  queryAudioChatMetadata?.data?.guests_list.includes(address) ? (
-                                    <>
-                                      <Button
-                                        className="animate-appear"
-                                        disabled={mutationJoinRoom.isLoading || (rally && rally?.id !== idRally)}
-                                        isLoading={mutationJoinRoom.isLoading}
-                                        onClick={async () => {
-                                          await mutationJoinRoom.mutate({
-                                            id_rally: queryAudioChatByIdRawData.data?.audio_event_id as `0x${string}`,
-                                            cid_rally: queryAudioChatByIdRawData.data?.cid_metadata as string,
-                                          })
-                                        }}
-                                      >
-                                        {mutationJoinRoom.isLoading
-                                          ? 'Checking your access...'
-                                          : stateVoiceChat.isConnecting
-                                          ? 'Joining ...'
-                                          : '✨ Join now ✨'}
-                                      </Button>
-                                      <p className="text-center text-neutral-11 pt-3 text-2xs">
-                                        Your mic will be muted when you join.
-                                      </p>
-                                    </>
-                                  ) : (
-                                    <>
-                                      {queryCurrentUserGuildMemberships?.isLoading ? (
-                                        <p className="animate-pulse font-bold text-2xs">Checking your membership...</p>
-                                      ) : queryCurrentUserGuildMemberships?.isError ? (
-                                        <p className="animate-appear">
-                                          Something went wrong while checking your Guild memberships.
-                                        </p>
-                                      ) : (
-                                        <>
-                                          {[]
-                                            .concat(
-                                              ...queryAudioChatMetadata?.data?.access_control?.guilds.map(
-                                                (guild: any) => guild.roles,
-                                              ),
-                                            )
-                                            .filter((role) =>
-                                              queryCurrentUserGuildMemberships?.data?.roles.includes(role),
-                                            )?.length > 0 ? (
-                                            <>
-                                              <Button
-                                                className="animate-appear"
-                                                disabled={
-                                                  mutationJoinRoom.isLoading || (rally && rally?.id !== idRally)
-                                                }
-                                                isLoading={mutationJoinRoom.isLoading}
-                                                onClick={async () => {
-                                                  await mutationJoinRoom.mutate({
-                                                    id_rally: queryAudioChatByIdRawData.data
-                                                      ?.audio_event_id as `0x${string}`,
-                                                    cid_rally: queryAudioChatByIdRawData.data?.cid_metadata as string,
-                                                  })
-                                                }}
-                                              >
-                                                {mutationJoinRoom.isLoading
-                                                  ? 'Checking your access...'
-                                                  : stateVoiceChat.isConnecting
-                                                  ? 'Joining ...'
-                                                  : '✨ Join now ✨'}
-                                              </Button>
-                                              <p className="text-center text-neutral-11 pt-3 text-2xs">
-                                                Your mic will be muted when you join.
+                            {queryAudioChatMetadata?.data?.state === DICTIONARY_STATES_AUDIO_CHATS.LIVE.label && (
+                              <>
+                                {!address ? (
+                                  <>
+                                    <Button onClick={openConnectModal}>Connect first</Button>
+                                  </>
+                                ) : chain?.unsupported ? (
+                                  <Button onClick={openChainModal}>Switch chain first</Button>
+                                ) : !session ? (
+                                  <>
+                                    <Button
+                                      onClick={async () => {
+                                        await disconnect()
+                                        //@ts-ignore
+                                        openConnectModal()
+                                      }}
+                                    >
+                                      Verify first
+                                    </Button>
+                                  </>
+                                ) : (
+                                  <>
+                                    {stateVoiceChat?.room?.state === 'disconnected' && (
+                                      <>
+                                        {queryAudioChatMetadata?.data?.access_control?.guilds?.length === 0 ||
+                                        queryAudioChatMetadata?.data?.access_control?.whitelist.includes(address) ||
+                                        queryAudioChatMetadata?.data?.guests_list.includes(address) ? (
+                                          <>
+                                            <FormJoinRoomAs
+                                              stateVoiceChat={stateVoiceChat}
+                                              rallyJoined={rally}
+                                              idRallyToJoin={`${idRally}`}
+                                              dataAudioChat={queryAudioChatMetadata?.data}
+                                            />
+                                            <p className="text-center text-neutral-11 pt-3 text-2xs">
+                                              Your mic will be muted when you join.
+                                            </p>
+                                          </>
+                                        ) : (
+                                          <>
+                                            {queryCurrentUserGuildMemberships?.isLoading ? (
+                                              <p className="animate-pulse font-bold text-2xs">
+                                                Checking your membership...
                                               </p>
-                                            </>
-                                          ) : (
-                                            <div className="animate-appear text-2xs text-center">
-                                              <p className="font-semibold mb-2  text-neutral-11">
-                                                Your wallet doesn't qualify to join this rally.
+                                            ) : queryCurrentUserGuildMemberships?.isError ? (
+                                              <p className="animate-appear">
+                                                Something went wrong while checking your Guild memberships.
                                               </p>
-                                              <p className="font-bold mb-4">
-                                                Try to join one of the allowed guild and claim one of the roles on{' '}
-                                                <span className="font-bold">Guild</span> to qualify.
-                                              </p>
-                                              <a
-                                                target="_blank"
-                                                className={button({
-                                                  intent: 'neutral-outline',
-                                                  scale: 'sm',
-                                                  class: 'w-full',
-                                                })}
-                                                href={`https://guild.xyz`}
-                                              >
-                                                Explore and join guilds
-                                              </a>
-                                            </div>
-                                          )}
-                                        </>
-                                      )}
-                                    </>
-                                  )}
-                                </>
-                              )}
+                                            ) : (
+                                              <>
+                                                {[]
+                                                  .concat(
+                                                    ...queryAudioChatMetadata?.data?.access_control?.guilds.map(
+                                                      (guild: any) => guild.roles,
+                                                    ),
+                                                  )
+                                                  .filter((role) =>
+                                                    queryCurrentUserGuildMemberships?.data?.roles.includes(role),
+                                                  )?.length > 0 ? (
+                                                  <>
+                                                    <FormJoinRoomAs
+                                                      stateVoiceChat={stateVoiceChat}
+                                                      rallyJoined={rally}
+                                                      idRallyToJoin={`${idRally}`}
+                                                      dataAudioChat={queryAudioChatMetadata?.data}
+                                                    />
+                                                    <p className="text-center text-neutral-11 pt-3 text-2xs">
+                                                      Your mic will be muted when you join.
+                                                    </p>
+                                                  </>
+                                                ) : (
+                                                  <div className="animate-appear text-2xs text-center">
+                                                    <p className="font-semibold mb-2  text-neutral-11">
+                                                      Your wallet doesn't qualify to join this rally.
+                                                    </p>
+                                                    <p className="font-bold mb-4">
+                                                      Try to join one of the allowed guild and claim one of the roles on{' '}
+                                                      <span className="font-bold">Guild</span> to qualify.
+                                                    </p>
+                                                    <a
+                                                      target="_blank"
+                                                      className={button({
+                                                        intent: 'neutral-outline',
+                                                        scale: 'sm',
+                                                        class: 'w-full',
+                                                      })}
+                                                      href={`https://guild.xyz`}
+                                                    >
+                                                      Explore and join guilds
+                                                    </a>
+                                                  </div>
+                                                )}
+                                              </>
+                                            )}
+                                          </>
+                                        )}
+                                      </>
+                                    )}
+                                  </>
+                                )}
+                              </>
+                            )}
                           </div>
                         )}
                       </section>

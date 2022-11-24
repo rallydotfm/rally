@@ -1,24 +1,23 @@
-import Button from '@components/Button'
 import { IconSpinner } from '@components/Icons'
 import { DICTIONARY_STATES_AUDIO_CHATS } from '@helpers/mappingAudioChatState'
 import { isThisWeek } from 'date-fns'
 import type { NextPage } from 'next'
 import Head from 'next/head'
 
-import { useContractRead, useNetwork } from 'wagmi'
+import { useContractRead } from 'wagmi'
 import { contractConfigAudioChat } from '@config/contracts'
 import { useQueries } from '@tanstack/react-query'
 import { useState } from 'react'
 import CalendarWeek from '@components/pages/upcoming/CalendarWeek'
+import { chainId } from '@config/wagmi'
 
 export function useUpcomingAudioChats() {
-  const { chain } = useNetwork()
   const [weeklyAudioChats, setWeeklyAudioChats] = useState([])
   const queryAudioChatsByStateRawData = useContractRead({
     ...contractConfigAudioChat,
-    chainId: chain?.id,
+    chainId,
     functionName: 'getAudioChatsByState',
-    enabled: chain?.unsupported === false ? true : false,
+    enabled: true,
     args: [
       [
         DICTIONARY_STATES_AUDIO_CHATS.PLANNED.value,

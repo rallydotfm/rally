@@ -16,10 +16,11 @@ export const roomRouter = router({
       object({
         id_rally: string(),
         reaction: string(),
+        user_previous_metadata: string(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      const { id_rally, reaction } = input
+      const { id_rally, user_previous_metadata, reaction } = input
 
       try {
         // get current user wallet address from the session
@@ -30,16 +31,25 @@ export const roomRouter = router({
         if (!sub) throw Error('Not connected')
 
         const user_ethereum_address = sub
+        const user_metadata_base = JSON.parse(user_previous_metadata === '' ? '{}' : user_previous_metadata)
 
-        const data = JSON.stringify({
+        const user_newest_metadata = JSON.stringify({
+          ...user_metadata_base,
           reaction: {
             emoji: reaction,
             emitted_at: Date.now(),
           },
         })
-        client.updateParticipant(id_rally, user_ethereum_address, data)
+
+        await client.updateParticipant(id_rally, user_ethereum_address, user_newest_metadata)
+        return {
+          ok: true,
+        }
       } catch (e) {
         console.error(e)
+        return {
+          err: e,
+        }
       }
     }),
   pin_message: public_procedure
@@ -79,7 +89,10 @@ export const roomRouter = router({
           ],
         })
 
-        client.updateRoomMetadata(id_rally, room_newest_metadata)
+        await client.updateRoomMetadata(id_rally, room_newest_metadata)
+        return {
+          ok: true,
+        }
       } catch (e) {
         console.error(e)
         return {
@@ -87,17 +100,17 @@ export const roomRouter = router({
         }
       }
     }),
-
   update_room_ban_list: public_procedure
     .input(
       object({
         id_rally: string(),
         id_user: string(),
+        display_name: string().optional(),
         metadata: string(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      const { id_rally, id_user, metadata } = input
+      const { id_rally, id_user, display_name, metadata } = input
 
       try {
         // get current user wallet address from the session
@@ -116,15 +129,20 @@ export const roomRouter = router({
         await client.updateRoomMetadata(id_rally, metadata)
         await client.removeParticipant(id_rally, id_user)
         return {
+          display_name: display_name ?? id_user,
           id_user,
         }
       } catch (e) {
         console.error(e)
+        return {
+          err: e,
+        }
       }
     }),
   update_audience_member_permissions: public_procedure
     .input(
       object({
+        display_name: string().optional(),
         id_rally: string(),
         id_user: string(),
         can_publish: boolean(),
@@ -134,7 +152,7 @@ export const roomRouter = router({
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      const { id_rally, id_user, ...permissions } = input
+      const { id_rally, display_name, id_user, ...permissions } = input
 
       try {
         // get current user wallet address from the session
@@ -154,9 +172,13 @@ export const roomRouter = router({
         if (!permissions.can_subscribe) await client.removeParticipant(id_rally, id_user)
         return {
           id_user,
+          display_name: display_name ?? id_user,
         }
       } catch (e) {
         console.error(e)
+        return {
+          err: e,
+        }
       }
     }),
   raise_hand: public_procedure
@@ -164,10 +186,11 @@ export const roomRouter = router({
       object({
         id_rally: string(),
         new_is_hand_raised_value: boolean(),
+        user_previous_metadata: string(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      const { id_rally, new_is_hand_raised_value } = input
+      const { id_rally, user_previous_metadata, new_is_hand_raised_value } = input
 
       try {
         // get current user wallet address from the session
@@ -178,20 +201,51 @@ export const roomRouter = router({
         if (!sub) throw Error('Not connected')
 
         const user_ethereum_address = sub
+        const user_metadata_base = JSON.parse(user_previous_metadata === '' ? '{}' : user_previous_metadata)
 
-        const data = JSON.stringify({
+        const user_newest_metadata = JSON.stringify({
+          ...user_metadata_base,
           is_hand_raised: new_is_hand_raised_value,
         })
 
-        client.updateParticipant(id_rally, user_ethereum_address, data)
+        await client.updateParticipant(id_rally, user_ethereum_address, user_newest_metadata)
 
         return new_is_hand_raised_value
       } catch (e) {
         console.error(e)
+        return {
+          err: e,
+        }
       }
     }),
-  //@TODO
-  // add delete_room procedure
-  // uses `client.deleteRoom` under the room
-  // see docs https://docs.livekit.io/server/room-management/#deleteroom
+
+  end_room: public_procedure
+    .input(
+      object({
+        id_rally: string(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { id_rally } = input
+
+      try {
+        // get current user wallet address from the session
+        //@ts-ignore
+        const { sub } = await getToken({ req: ctx.req, secret })
+
+        // if not connected, throw an error
+        if (!sub) throw Error('Not connected')
+
+        await client.deleteRoom(id_rally)
+
+        return {
+          ok: true,
+        }
+      } catch (e) {
+        console.error(e)
+        return {
+          err: e,
+        }
+      }
+    }),
 })

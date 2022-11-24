@@ -52,6 +52,7 @@ export const LiveVoiceChatParticipant = (props: LiveVoiceChatParticipantProps) =
         >
           <span className="absolute inset-0 w-full h-full bg-neutral-2" />
           <ParticipantIdentityDisplayedAvatar
+            metadata={participant?.metadata as string}
             className="absolute inset-0 w-full h-full object-cover z-10"
             identity={participant?.identity}
             alt=""
@@ -82,16 +83,21 @@ export const LiveVoiceChatParticipant = (props: LiveVoiceChatParticipantProps) =
       <span className="font-bold flex space-i-1 items-center pt-3">
         {hasHandRaised === true && <SolidHandRaisedIcon className="text-neutral-12 w-[1.05rem]" />}
         <span className="block text-2xs overflow-hidden text-ellipsis max-w-[15ex]">
-          <ParticipantIdentityDisplayedName identity={identity} />
+          <ParticipantIdentityDisplayedName metadata={participant?.metadata as string} identity={identity} />
         </span>
       </span>
+      {participant?.isLocal && (
+        <span className="block mt-1 text-[0.75rem] bg-interactive-12 font-bold text-interactive-9 px-2 rounded-md">
+          you
+        </span>
+      )}
 
       <span className="pt-0.5 text-2xs flex flex-col text-neutral-10 group-hover:text-neutral-12 font-medium">
         <LiveVoiceChatParticipantRole participant={participant} />
       </span>
       <span className="sr-only">
-        <ParticipantIdentityDisplayedName identity={identity} /> {isSpeaking ? 'is speaking...' : ''}{' '}
-        {reaction ? `reacted with ${reaction}` : ''}
+        <ParticipantIdentityDisplayedName metadata={participant?.metadata as string} identity={identity} />{' '}
+        {isSpeaking ? 'is speaking...' : ''} {reaction ? `reacted with ${reaction}` : ''}
       </span>
     </button>
   )

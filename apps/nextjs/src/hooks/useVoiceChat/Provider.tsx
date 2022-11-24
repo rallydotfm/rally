@@ -4,8 +4,9 @@ const roomOptions = {
   adaptiveStream: true,
   dynacast: true,
 }
-export const ProviderLiveVoiceChat = ({ children }) => {
+export const ProviderLiveVoiceChat = ({ children }: any) => {
   const stateRoom = useRoom(roomOptions)
+  //@ts-ignore
   return <ContextLiveVoiceChat.Provider value={stateRoom}>{children}</ContextLiveVoiceChat.Provider>
 }
 

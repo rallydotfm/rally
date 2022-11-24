@@ -12,7 +12,7 @@ interface MainNavBarProps {
 
 export const MainNavBar = (props: MainNavBarProps) => {
   const { address } = props
-  const { room } = useStoreLiveVoiceChat()
+  const { room }: any = useStoreLiveVoiceChat()
 
   return (
     <nav className="bg-black z-20 border-t-2 md:border-none border-neutral-4 fixed h-auto left-0 w-full bottom-0 md:w-auto md:sticky md:top-0 md:inline-start-0 md:h-full md:max-h-screen md:pt-6 flex flex-col md:col-span-1 lg:col-span-2">
