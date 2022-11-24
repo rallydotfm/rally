@@ -9,10 +9,12 @@ import useLiveVoiceChatInteractions from '@hooks/useLiveVoiceChatInteractions'
 import { MicrophoneIcon } from '@heroicons/react/20/solid'
 import ParticipantIdentityDisplayedName from '@components/pages/rally/[idRally]/ParticipantIdentityDisplayedName'
 import ParticipantIdentityDisplayedAvatar from '../ParticipantIdentityDisplayedAvatar'
+import { useAccount } from 'wagmi'
 
 export const DialogModalListParticipantsWithRaisedHands = () => {
   const rally = useStoreCurrentLiveRally((state: any) => state.rally)
   const [isDialogVisible, setDialogVisibility] = useState(false)
+  const account = useAccount()
   const stateVoiceChat: any = useStoreLiveVoiceChat()
   const { mutationInviteToSpeak } = useLiveVoiceChatInteractions()
   const [listParticipantsWithRaisedHand, setListParticipantsWithRaisedHand] = useState(
@@ -80,7 +82,10 @@ export const DialogModalListParticipantsWithRaisedHands = () => {
                   </div>
                   <div className="2xs:col-span-6 2xs:justify-self-end block overflow-hidden text-ellipsis">
                     <Button
-                      disabled={participantWithHandRaised.permissions?.canPublish === false}
+                      disabled={
+                        participantWithHandRaised.identity === account?.address ||
+                        participantWithHandRaised.permissions?.canPublish === true
+                      }
                       onClick={async () => {
                         await mutationInviteToSpeak.mutateAsync({
                           id_rally: rally?.id,
