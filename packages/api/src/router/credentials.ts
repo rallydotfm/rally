@@ -17,6 +17,7 @@ export const credentialsRouter = router({
     )
     .mutation(async ({ ctx, input }) => {
       const { id_rally, cid_rally, display_name, avatar_url } = input
+
       try {
         // get current user wallet address from the session
         //@ts-ignore
@@ -27,7 +28,6 @@ export const credentialsRouter = router({
 
         const user_ethereum_address = sub
 
-        console.log(process.env.LIVEKIT_API_KEY, process.env.LIVEKIT_SECRET_KEY)
         // generate basic access token from their wallet address
         const at = new AccessToken(process.env.LIVEKIT_API_KEY, process.env.LIVEKIT_SECRET_KEY, {
           identity: sub,

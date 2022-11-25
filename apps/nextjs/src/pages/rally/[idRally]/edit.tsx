@@ -22,7 +22,10 @@ const Page: NextPage = () => {
     <>
       <Head>
         <title>Edit rally - Rally</title>
-        <meta name="description" content="Rally is the place to be." />
+        <meta
+          name="description"
+          content="Edit your upcoming audio room on Rally, the open-source alternative to Clubhouse and Twitter Space for Web3 communities."
+        />
       </Head>
       <main>
         <h1 className="font-bold text-2xl mb-3">Edit rally</h1>

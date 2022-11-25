@@ -4,6 +4,7 @@ import {
   HandRaisedIcon as SolidHandRaisedIcon,
   Cog6ToothIcon,
   ArrowRightOnRectangleIcon,
+  SignalSlashIcon,
 } from '@heroicons/react/20/solid'
 
 import { HandRaisedIcon, HeartIcon, MicrophoneIcon } from '@heroicons/react/24/outline'
@@ -71,7 +72,7 @@ export const ToolbarAudioRoom = () => {
         )
       })}
 
-      <div className={`w-full justify-evenly flex xs:grid xs:grid-cols-3 2xs:gap-6 xs:gap-8 px-3 xs:px-6`}>
+      <div className={`w-full justify-evenly flex xs:grid xs:grid-cols-3 2xs:gap-6 xs:gap-8 px-3 md:px-6`}>
         <div
           className={`col-span-1 flex items-baseline ${
             localUserPermissions?.canPublishData ? 'max-w-[5ex]' : 'max-w-[8ex]'
@@ -130,7 +131,9 @@ export const ToolbarAudioRoom = () => {
               ) : (
                 <>
                   {microphonePublication.isMuted ? (
-                    <MicrophoneIcon className="w-7" />
+                    <>
+                      <MicrophoneIcon className="w-7" />
+                    </>
                   ) : (
                     <SolidMicrophoneIcon className="w-7" />
                   )}
@@ -170,10 +173,10 @@ export const ToolbarAudioRoom = () => {
               <Listbox.Button as={Button} intent="neutral-ghost" scale="sm" className="aspect-square">
                 {<HeartIcon className="w-7" />}
               </Listbox.Button>
-              <Listbox.Options className="flex -top-full left-1/2 -translate-y-3 -translate-x-1/2 text-xl flex-row absolute divide-i divide-neutral-7 max-w-72 w-fit-content overflow-x-auto rounded-full bg-neutral-5 focus:outline-none ">
+              <Listbox.Options className="border-neutral-7 flex -top-full left-1/2 -translate-y-3 -translate-x-1/2 text-xl flex-row absolute divide-i divide-neutral-7 max-w-72 w-fit-content overflow-x-auto rounded-md bg-neutral-5 focus:outline-none ">
                 {['👋', '👍', '✌️', '❤️', '🔥', '💯', '✨', '🫡', '😂', '😭', '😠'].map((emote) => (
                   <Listbox.Option
-                    className="flex-grow cursor-pointer hover:bg-neutral-7 focus:bg-white flex items-center justify-center py-1 px-4 aspect-square shrink-0"
+                    className="flex-grow cursor-pointer hover:bg-neutral-7 focus:bg-white flex items-center justify-center py-1 px-4 border-neutral-5 aspect-square shrink-0"
                     key={emote}
                     value={emote}
                   >
@@ -199,7 +202,7 @@ export const ToolbarAudioRoom = () => {
                 await onClickEndLive(rally?.id)
               }}
             >
-              <ArrowRightOnRectangleIcon className="w-6 xs:w-5" />
+              <SignalSlashIcon className="w-6 xs:w-5" />
               <span className="sr-only xs:not-sr-only xs:px-1ex">End rally</span>
             </Button>
           )}

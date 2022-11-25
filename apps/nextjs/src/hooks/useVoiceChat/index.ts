@@ -40,9 +40,7 @@ export function useConnectToVoiceChat(rally) {
         if (didConnect?.localParticipant) {
           setLiveRally(rally)
         } else {
-          toast.error(
-            "Something went wrong and you couldn't join the rally. Make you joined one of the the required guilds and claimed one of the whitelisted roles and try again.",
-          )
+          toast.error("Something went wrong and you couldn't join the rally. Please try again.")
           resetState()
         }
       } catch (e) {

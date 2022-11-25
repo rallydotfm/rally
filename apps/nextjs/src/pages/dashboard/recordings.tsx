@@ -7,7 +7,10 @@ const Page: NextPage = () => {
     <>
       <Head>
         <title>Dashboard - Rally</title>
-        <meta name="description" content="Rally is the place to be." />
+        <meta
+          name="description"
+          content="Manage your recordings on Rally, the open-source alternative to Clubhouse and Twitter Space for Web3 communities."
+        />
       </Head>
       <p>This page is under construction.</p>
     </>

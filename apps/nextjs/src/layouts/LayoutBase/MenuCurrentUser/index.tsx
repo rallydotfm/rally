@@ -92,11 +92,11 @@ export const MenuCurrentUser = (props: MenuCurrentUserProps) => {
           </Menu.Item>
           {queryUserProfileLens?.data?.id && (
             <Menu.Item as={Link} href={ROUTE_PROFILE.replace('[idLensProfile]', queryUserProfileLens?.data?.id)}>
-              <a className="ui-active:bg-interactive-10 px-3 py-2">My profile</a>
+              <a className="hover:bg-interactive-10 ui-active:bg-interactive-10 px-3 py-2">My profile</a>
             </Menu.Item>
           )}
           <Menu.Item as={Link} href={ROUTE_ACCOUNT_PREFERENCES}>
-            <a className="ui-active:bg-interactive-10 px-3 py-2">Preferences</a>
+            <a className="hover:bg-interactive-10 ui-active:bg-interactive-10 px-3 py-2">Preferences</a>
           </Menu.Item>
           <Menu.Item
             as="button"

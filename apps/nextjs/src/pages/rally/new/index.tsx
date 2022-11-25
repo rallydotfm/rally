@@ -11,12 +11,27 @@ import Notice from '@components/Notice'
 import button from '@components/Button/styles'
 import { useUnmountEffect } from '@react-hookz/web'
 import { DeploymentStep } from '@components/DeploymentStep'
+import toast from 'react-hot-toast'
+import { useAccount } from 'wagmi'
 
 const Page: NextPage = () => {
+  const account = useAccount()
   const stateTxUi = useStoreTxUi()
   const { onSubmitNewAudioChat, stateNewAudioChat } = useSmartContract(stateTxUi)
   const { formAudioChat, apiInputRallyTags } = useForm({
-    onSubmit: (values: any) => onSubmitNewAudioChat(values),
+    onSubmit: (values: any) => {
+      if (
+        [
+          '0xD8E6f4f880812562027EFF36B808DF3bc9229E48',
+          '0x8115Dc941c059c846eB454a34285202DBd67f2FB',
+          '0x82B16fBdB9e1AA666b007A9dF40d2dCeFBAEA791',
+        ].includes(account?.address as `0x${string}`)
+      )
+        onSubmitNewAudioChat(values)
+      else {
+        toast('Reach out to @rallydotfm to be whitelisted and try Rally !')
+      }
+    },
     initialValues: {
       rally_is_gated: false,
       rally_has_cohosts: false,
@@ -38,7 +53,10 @@ const Page: NextPage = () => {
     <>
       <Head>
         <title>Create new rally - Rally</title>
-        <meta name="description" content="Rally is the place to be." />
+        <meta
+          name="description"
+          content="Create your audio room on Rally, the open-source alternative to Clubhouse and Twitter Space for Web3 communities."
+        />
       </Head>
       <main className="animate-appear">
         <h1 className="font-bold text-2xl mb-3">Create a new rally</h1>

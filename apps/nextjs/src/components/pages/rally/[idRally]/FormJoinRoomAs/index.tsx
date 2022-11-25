@@ -24,9 +24,9 @@ export const FormJoinRoomAs = (props: FormJoinRoomAsProps) => {
     <div className="animate-appear">
       <p className="font-bold text-xs mb-4 text-center">Setup your profile for this rally</p>
       <form className="flex flex-col" ref={form}>
-        <fieldset className="space-y-3 mb-6">
+        <fieldset className="space-y-4 mb-6">
           <FormRadioGroup
-            className="text-xs"
+            className="text-xs space-y-3"
             defaultValue={data()?.useLensProfile === true ? 'lens' : 'custom'}
             onChange={(value: string) => {
               setData('useLensProfile', value === 'lens' ? true : false)
@@ -37,10 +37,10 @@ export const FormJoinRoomAs = (props: FormJoinRoomAsProps) => {
             }}
           >
             <RadioGroup.Label className="sr-only">How should we call you ?</RadioGroup.Label>
+            <FormRadioOption value="custom">Use a custom profile</FormRadioOption>
             <FormRadioOption disabled={queryLensProfile?.isLoading || !queryLensProfile?.data?.name} value="lens">
               Use my Lens profile
             </FormRadioOption>
-            <FormRadioOption value="custom">Use a custom profile</FormRadioOption>
           </FormRadioGroup>
 
           <FormField>
@@ -62,6 +62,7 @@ export const FormJoinRoomAs = (props: FormJoinRoomAsProps) => {
                 scale="sm"
                 placeholder="Your display name"
                 id="displayName"
+                className="w-full"
                 aria-describedby={`input-displayName-description input-displayName-helpblock`}
               />
             </FormField.InputField>
@@ -89,6 +90,7 @@ export const FormJoinRoomAs = (props: FormJoinRoomAsProps) => {
                 hasError={errors()?.avatarUrl !== null ? true : false}
                 name="avatarUrl"
                 scale="sm"
+                className="w-full"
                 placeholder="https://<some-url-to-a-valid-image-file>"
                 id="avatarUrl"
                 aria-describedby={`input-avatarUrl-description input-avatarUrl-helpblock`}

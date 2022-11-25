@@ -51,10 +51,13 @@ const Page: NextPage = () => {
           {queryAudioChatByIdRawData?.data?.audio_event_id ===
           '0x0000000000000000000000000000000000000000000000000000000000000000'
             ? 'Not found'
-            : queryAudioChatMetadata?.data?.name ?? 'Live audio chat'}{' '}
+            : queryAudioChatMetadata?.data?.name ?? 'Tune in !'}{' '}
           - Rally
         </title>
-        <meta name="description" content="Rally is the place to be." />
+        <meta
+          name="description"
+          content="Rally is an open-source alternative to Twitter Space/Clubhouse for web3 communities."
+        />
       </Head>
       <>
         <div className="overflow-hidden px-6 pb-8 pt-1 -mt-8 -mx-6">
@@ -92,7 +95,7 @@ const Page: NextPage = () => {
           </>
         ) : (
           <>
-            {['connecting', 'connected']?.includes(stateVoiceChat?.room?.state) && rally?.id === idRally ? (
+            {stateVoiceChat?.room?.state && rally?.id === idRally ? (
               <div className="animate-appear h-full">
                 <div className="pb-8 flex gap-4 flex-col 2xs:flex-row leading-loose -mis-8 -mie-6 pis-8 pie-6 border-neutral-4 border-b">
                   {queryAudioChatMetadata?.data?.image && (
@@ -115,7 +118,7 @@ const Page: NextPage = () => {
                     )}
                   </div>
                 </div>
-                <div className="px-8 h-full flex flex-col pt-6">
+                <div className="px-6 xs:px-8 h-full flex flex-col pt-6">
                   <StageLiveVoiceChat
                     roomStatus={stateVoiceChat?.room?.state}
                     participants={stateVoiceChat?.participants}
@@ -126,7 +129,7 @@ const Page: NextPage = () => {
             ) : (
               <>
                 <main className="h-full flex flex-col animate-appear items-center justify-center">
-                  <article className="w-full max-w-[22rem]">
+                  <article className="w-full max-w-[24rem]">
                     <header>
                       <h1 className="text-center text-lg flex flex-col-reverse pb-6 leading-relaxed items-center justify-center font-bold">
                         <span>{queryAudioChatMetadata?.data?.name}</span>
@@ -157,7 +160,7 @@ const Page: NextPage = () => {
                           </p>
                         )}
 
-                        <div className="px-8 text-2xs flex flex-col text-neutral-12 pt-6">
+                        <div className="px-6 xs:px-8 text-2xs flex flex-col text-neutral-12 pt-6">
                           <span className="font-medium text-center text-[0.75rem]">Hosted by</span>
                           <ul className="flex flex-wrap justify-center mt-4 gap-6">
                             <li>
@@ -174,7 +177,7 @@ const Page: NextPage = () => {
                         </div>
                       </section>
                       {queryAudioChatMetadata?.data?.tags?.length > 0 && (
-                        <section className="px-8 flex flex-col mt-6">
+                        <section className="px-6 xs:px-8 flex flex-col mt-6">
                           {queryAudioChatMetadata?.data?.tags?.length > 0 && (
                             <ul className="mx-auto text-2xs flex justify-center flex-wrap gap-2">
                               {queryAudioChatMetadata?.data?.tags.map((tag: string, key: number) => (
@@ -192,7 +195,7 @@ const Page: NextPage = () => {
                       <section className=" animate-appear border-t border-neutral-4 pt-4 mt-6">
                         {queryAudioChatMetadata?.data?.is_gated === true ||
                         queryAudioChatMetadata?.data?.access_control?.guilds?.length > 0 ? (
-                          <div className="px-8 animate-appear">
+                          <div className="px-6 xs:px-8 animate-appear">
                             <p className="pb-8 animate-appear font-semibold text-center text-xs">
                               This rally can only be joined by :{' '}
                             </p>
@@ -205,7 +208,7 @@ const Page: NextPage = () => {
                             </ul>
                           </div>
                         ) : (
-                          <p className="px-8 font-semibold text-center text-xs">Free to join</p>
+                          <p className="px-6 xs:px-8 font-semibold text-center text-xs">Free to join</p>
                         )}
                         {([
                           DICTIONARY_STATES_AUDIO_CHATS.READY.label,
@@ -213,7 +216,7 @@ const Page: NextPage = () => {
                         ].includes(queryAudioChatMetadata.data?.state) ||
                           (queryAudioChatMetadata?.data?.state === DICTIONARY_STATES_AUDIO_CHATS.LIVE.label &&
                             stateVoiceChat?.room?.state === 'disconnected')) && (
-                          <div className="mt-4 pt-6 border-t border-neutral-4 px-8 flex flex-col">
+                          <div className="mt-4 pt-6 border-t border-neutral-4 px-6 xs:px-8 flex flex-col">
                             {[
                               DICTIONARY_STATES_AUDIO_CHATS.READY.label,
                               DICTIONARY_STATES_AUDIO_CHATS.PLANNED.label,

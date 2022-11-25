@@ -88,7 +88,10 @@ const Page: NextPage = () => {
     <>
       <Head>
         <title>Upcoming rallies this week - Rally</title>
-        <meta name="description" content="Rally is the place to be." />
+        <meta
+          name="description"
+          content="Discover upcoming audio rooms on Rally, the open-source alternative to Clubhouse and Twitter Space for Web3 communities."
+        />
       </Head>
       <main>
         {queryAudioChatsByStateRawData.status === 'error' && <>Error</>}
@@ -113,6 +116,9 @@ const Page: NextPage = () => {
           </div>
         )}
       </main>
+      <p className="pt-8 text-center text-neutral-11">
+        This page is under construction and will be implemented in our 6th milestone.
+      </p>
     </>
   )
 }

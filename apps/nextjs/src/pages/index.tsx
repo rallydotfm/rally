@@ -19,7 +19,14 @@ const Home: NextPage = () => {
           content="Rally is an open-source alternative to Twitter Space/Clubhouse for web3 communities."
         />
       </Head>
-      <main>hello world !</main>
+      <main className="pt-8 max-w-screen-sm mx-auto">
+        <h1 className="text-center font-bold text-3xl">
+          Rally is an open-source alternative to Twitter Space/Clubhouse for web3 communities.
+        </h1>
+        <p className="pt-8 text-center text-neutral-11">
+          This page is under construction and will be implemented in our 6th milestone.
+        </p>
+      </main>
     </>
   )
 }

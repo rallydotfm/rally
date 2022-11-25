@@ -15,8 +15,10 @@ export const StageLiveVoiceChat = (props: StageLiveVoiceChatProps) => {
   const pickedParticipant = useStoreDisplayParticipant((state) => state.participant)
   return (
     <>
-      {roomStatus === 'connecting' && <p className="font-bold m-auto animate-pulse">Connecting, one moment...</p>}
-      {roomStatus === 'connected' && isCurrentRally && (
+      {roomStatus === 'connecting' && !participants && (
+        <p className="font-bold m-auto animate-pulse">Connecting, one moment...</p>
+      )}
+      {participants && isCurrentRally && (
         <>
           <div>
             <ListParticipantsVoiceChat

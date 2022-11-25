@@ -204,7 +204,8 @@ export const roomRouter = router({
         const user_metadata_base = JSON.parse(user_previous_metadata === '' ? '{}' : user_previous_metadata)
 
         const user_newest_metadata = JSON.stringify({
-          ...user_metadata_base,
+          display_name: user_metadata_base.display_name,
+          avatar_url: user_metadata_base.avatar_url,
           is_hand_raised: new_is_hand_raised_value,
         })
 
