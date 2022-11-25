@@ -1,7 +1,6 @@
-import { useQuery } from '@tanstack/react-query'
-import { getDefaultProfile } from '@services/lens/profile/getDefaultProfile'
 import { shortenEthereumAddress } from '@helpers/shortenEthereumAddress'
 import { chain, useEnsName } from 'wagmi'
+import useWalletAddressDefaultLensProfile from '@hooks/useWalletAddressDefaultLensProfile'
 
 interface EthereumAddressProps {
   address: string
@@ -10,24 +9,7 @@ interface EthereumAddressProps {
 }
 export const EthereumAddress = (props: EthereumAddressProps) => {
   const { address, displayLensProfile, shortenOnFallback } = props
-  const queryUserProfileLens = useQuery(
-    ['lens-profile', address],
-    async () => {
-      try {
-        const result = await getDefaultProfile({
-          ethereumAddress: address,
-        })
-        //@ts-ignore
-        if (result?.error) throw new Error(result?.error)
-        return result?.data?.defaultProfile
-      } catch (e) {
-        console.error(e)
-      }
-    },
-    {
-      enabled: displayLensProfile,
-    },
-  )
+  const queryUserProfileLens = useWalletAddressDefaultLensProfile(address, displayLensProfile)
 
   const queryEns = useEnsName({
     chainId: chain.mainnet.id,

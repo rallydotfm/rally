@@ -34,8 +34,13 @@ const OptionGuild = (props: OptionGuildProps) => {
   if (queryGuild?.isLoading)
     return (
       <div className="flex flex-col items-center justify-center relative">
-        <IconSpinner className="animate-spin" />
         <p className="mt-2 animate-pulse font-bold">Fetching guild {id}...</p>
+      </div>
+    )
+  if (queryGuild?.data?.errors?.length > 0)
+    return (
+      <div className="flex flex-col items-center justify-center relative">
+        <p className="mt-2 italic text-neutral-11">{queryGuild?.data?.errors?.[0]?.msg}</p>
       </div>
     )
   return (
@@ -62,7 +67,7 @@ const OptionGuild = (props: OptionGuildProps) => {
                 return (
                   <li className="relative flex p-5 space-i-4 overflow-hidden" key={`guild-${id}-role-${role.id}`}>
                     <input
-                      className="peer cursor-pointer peer absolute w-full h-full opacity-0"
+                      className="peer cursor-pointer pointer-events-auto peer absolute w-full h-full opacity-0"
                       type="checkbox"
                       defaultChecked={
                         data()?.rally_access_control_guilds?.[index].roles.includes(`${role.id}`) ? true : false
@@ -82,7 +87,7 @@ const OptionGuild = (props: OptionGuildProps) => {
                         }
                       }}
                     />
-                    <div className="w-5 mt-1 mb-auto shrink-0 aspect-square bg-neutral-1 border-2 border-neutral-7 rounded peer-checked:bg-interactive-1 relative flex items-center justify-center peer-checked:before:absolute peer-checked:before:z-10 peer-checked:before:w-2.5 peer-checked:rounded-md peer-checked:before:block peer-checked:before:bg-interactive-11 peer-checked:before:h-2.5 peer-checked:before:content-[' ']" />
+                    <div className="pointer-events-none w-5 mt-1 mb-auto shrink-0 aspect-square bg-neutral-1 border-2 border-neutral-7 rounded peer-checked:bg-interactive-1 relative flex items-center justify-center peer-checked:before:absolute peer-checked:before:z-10 peer-checked:before:w-2.5 peer-checked:rounded-md peer-checked:before:block peer-checked:before:bg-interactive-11 peer-checked:before:h-2.5 peer-checked:before:content-[' ']" />
                     <div className="w-max-content rounded-md overflow-hidden divide-x divide-neutral-4 grow shrink border border-neutral-6 peer-checked:ring-4 peer-checked:ring-interactive-11 grid grid-cols-1 xs:grid-cols-2">
                       <div className="bg-neutral-3 w-full col-span-1 text-xs px-4 py-3">
                         <label

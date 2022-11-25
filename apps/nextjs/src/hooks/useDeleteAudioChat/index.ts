@@ -3,6 +3,7 @@ import toast from 'react-hot-toast'
 import create from 'zustand'
 import { audioChatABI } from '@rally/abi'
 import { CONTRACT_AUDIO_CHATS } from '@config/contracts'
+import { chainId } from '@config/wagmi'
 
 export interface TxUiDeleteRally {
   isDialogVisible: boolean
@@ -32,21 +33,19 @@ export const useStoreTxUiDeleteRally = create<TxUiDeleteRally>((set) => ({
 }))
 
 export function useDeleteAudioChat(stateTxUiDeleteRally: TxUiDeleteRally, refetch: any) {
-  const { chain } = useNetwork()
-
   // Query to delete an audio chat
   const contractWriteDeleteAudioChat = useContractWrite({
     mode: 'recklesslyUnprepared',
     address: CONTRACT_AUDIO_CHATS,
     abi: audioChatABI,
     functionName: 'deleteAudioChat',
-    chainId: chain?.id,
+    chainId,
   })
 
   // Transaction receipt for `contractWriteDeleteAudioChat` (delete audiochat)
   const txDeleteAudioChat = useWaitForTransaction({
     hash: contractWriteDeleteAudioChat?.data?.hash,
-    chainId: chain?.id,
+    chainId,
     onError(e) {
       console.error(e)
       toast.error(e?.message)

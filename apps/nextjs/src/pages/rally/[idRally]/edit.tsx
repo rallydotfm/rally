@@ -14,7 +14,7 @@ const Page: NextPage = () => {
     isReady,
   } = useRouter()
   //@ts-ignore
-  const { queryAudioChatByIdRawData, queryAudioChatMetadata, queryDecryptCohostsAddress } =
+  const { queryAudioChatByIdRawData, queryAudioChatMetadata } =
     //@ts-ignore
     useGetAudioChatToEdit(idRally)
 
@@ -22,7 +22,10 @@ const Page: NextPage = () => {
     <>
       <Head>
         <title>Edit rally - Rally</title>
-        <meta name="description" content="Rally is the place to be." />
+        <meta
+          name="description"
+          content="Edit your upcoming audio room on Rally, the open-source alternative to Clubhouse and Twitter Space for Web3 communities."
+        />
       </Head>
       <main>
         <h1 className="font-bold text-2xl mb-3">Edit rally</h1>
@@ -41,19 +44,14 @@ const Page: NextPage = () => {
               </>
             ) : (
               <>
-                {queryAudioChatMetadata.isSuccess &&
-                  (queryAudioChatMetadata?.data?.cohosts_list?.length === 0 ||
-                    (queryAudioChatMetadata?.data?.cohosts_list?.length > 0 &&
-                      queryDecryptCohostsAddress?.isSuccess)) && (
-                    <FormEditAudioChat
-                      //@ts-ignore
-                      values={{
-                        ...queryAudioChatMetadata.data,
-                        cohosts_list:
-                          queryAudioChatMetadata?.data?.cohosts_list === 0 ? [] : queryDecryptCohostsAddress.data,
-                      }}
-                    />
-                  )}
+                {queryAudioChatMetadata.isSuccess && (
+                  <FormEditAudioChat
+                    //@ts-ignore
+                    values={{
+                      ...queryAudioChatMetadata.data,
+                    }}
+                  />
+                )}
               </>
             )}
           </>

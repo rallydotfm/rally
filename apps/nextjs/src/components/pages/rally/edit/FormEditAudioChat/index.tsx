@@ -29,6 +29,7 @@ export const FormEditAudioChat = (props: any) => {
       rally_is_recorded: values.will_be_recorded,
       rally_tags: values.tags,
       rally_cohosts: values.has_cohosts ? values.cohosts_list : [],
+      rally_guests: values.guests_list ?? [],
       rally_name: values.name,
       rally_description: values.description,
       rally_start_at: values.datetime_start_at.toISOString().substring(0, 16),
@@ -77,21 +78,6 @@ export const FormEditAudioChat = (props: any) => {
               </DeploymentStep>
             </li>
           )}
-          {formAudioChat.data()?.rally_has_cohosts === true && (
-            <li
-              className={`
-              flex items-center
-             ${stateEditAudioChat.uploadData.isIdle ? 'text-neutral-11' : 'text-white'}`}
-            >
-              <DeploymentStep
-                isLoading={stateEditAudioChat.signEncryption.isLoading}
-                isError={stateEditAudioChat.signEncryption.isError}
-                isSuccess={stateEditAudioChat.signEncryption.isSuccess}
-              >
-                Confirming co-hosts Etheurem address encryption
-              </DeploymentStep>
-            </li>
-          )}
           <li
             className={`
             flex items-center
@@ -133,7 +119,6 @@ export const FormEditAudioChat = (props: any) => {
           </li>
         </ol>
         {[
-          stateEditAudioChat.signEncryption,
           stateEditAudioChat.transaction,
           stateEditAudioChat.contract,
           stateEditAudioChat.uploadImage,
@@ -141,7 +126,6 @@ export const FormEditAudioChat = (props: any) => {
         ].filter((slice) => slice.isError)?.length > 0 && (
           <div className="mt-6 animate-appear">
             {[
-              stateEditAudioChat.signEncryption,
               stateEditAudioChat.transaction,
               stateEditAudioChat.contract,
               stateEditAudioChat.uploadImage,

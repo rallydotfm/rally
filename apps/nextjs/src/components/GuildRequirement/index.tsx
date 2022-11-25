@@ -1,4 +1,6 @@
 import shortenEthereumAddress from '@helpers/shortenEthereumAddress'
+import useGetGuildById from '@hooks/useGetGuildById'
+import { formatDuration } from 'date-fns'
 
 const RequirementNFT = (props: any) => {
   const { requirement } = props
@@ -39,6 +41,11 @@ const RequirementNFT = (props: any) => {
 }
 export const GuildRequirement = (props: any) => {
   const { requirement } = props
+  const queryGuild = useGetGuildById({
+    id: requirement?.data?.guildId,
+    options: { enabled: requirement?.data?.guildId ? true : false },
+  })
+
   switch (requirement.type) {
     case 'FREE': {
       return <>Connect your Ethereum wallet</>
@@ -133,6 +140,46 @@ export const GuildRequirement = (props: any) => {
         </>
       )
     }
+    case 'GUILD_ROLE': {
+      const role = queryGuild?.data?.roles?.find((r: any) => r.id === requirement.data.roleId)
+      return (
+        <>
+          Have the role {role?.name ?? 'unknown'} in the
+          <a
+            href={`https://guild.xyz/${queryGuild?.data?.urlName ?? requirement.data.guildId}`}
+            rel="noreferrer nofollow"
+            target="_blank"
+          >
+            {queryGuild?.data?.name ?? `#${requirement.data.guildId}`}
+          </a>
+          guild
+        </>
+      )
+    }
+
+    case 'GUILD_USER_SINCE': {
+      return <> Be a Guild.xyz user at least since {requirement.data.creationDate}</>
+    }
+
+    case 'GUILD_MINGUILDS': {
+      return (
+        <>
+          Be a member of at least {requirement.data.minAmount} guild{requirement.data.minAmount > 1 ? 's' : ''}
+        </>
+      )
+    }
+
+    case 'GUILD_ADMIN': {
+      return (
+        <>
+          Be an admin of a guild{' '}
+          {requirement.data.minAmount > 0
+            ? ` with at least ${requirement.data.minAmount} member${requirement.data.minAmount > 1 ? 's' : ''}`
+            : ''}
+        </>
+      )
+    }
+
     case 'JUICEBOX': {
       return (
         <>
@@ -152,7 +199,50 @@ export const GuildRequirement = (props: any) => {
     case 'DISCORD_ROLE': {
       return (
         <>
-          Have the "{requirement.data.roleName}" role in the "{requirement.data.serverName}" Discord server
+          {`Have the `}
+          {requirement.data.roleName}
+          {` role in the `}
+          {requirement.data.serverName}
+          {` server`}
+        </>
+      )
+    }
+
+    case 'DISCORD_JOIN': {
+      const formattedDate = new Date(requirement.data.memberSince).toLocaleDateString()
+
+      return requirement.type === 'DISCORD_MEMBER_SINCE' ? (
+        <>
+          {`Be member of the `}
+          {requirement.data.serverName}
+          {` server since at least `}
+          {formattedDate}
+        </>
+      ) : (
+        <>
+          {`Be a Discord user since at least `}
+          {formattedDate}
+        </>
+      )
+    }
+    case 'DISCORD_JOIN_FROM_NOW': {
+      const memberSince = requirement?.data.memberSince / 86400000
+      const memberSinceInYears = memberSince / 365
+      const format = ['months', 'weeks', 'hours', 'minutes']
+      return (
+        <>
+          Have a Discord account older than{' '}
+          {formatDuration(
+            {
+              days: memberSince,
+              months: memberSince / 30,
+              years: memberSince / 365,
+            },
+            {
+              format: memberSinceInYears > 1 ? ['years', ...format] : [...format],
+              zero: false,
+            },
+          )}
         </>
       )
     }

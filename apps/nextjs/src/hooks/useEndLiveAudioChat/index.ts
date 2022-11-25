@@ -1,4 +1,4 @@
-import { useContractWrite, useNetwork, useWaitForTransaction } from 'wagmi'
+import { useContractWrite, useWaitForTransaction } from 'wagmi'
 import toast from 'react-hot-toast'
 import create from 'zustand'
 import { audioChatABI } from '@rally/abi'
@@ -8,6 +8,9 @@ import queryClient from '@config/react-query'
 import { utils } from 'ethers'
 import { ROUTE_DASHBOARD_RALLIES } from '@config/routes'
 import { useRouter } from 'next/router'
+import { chainId } from '@config/wagmi'
+import { useStoreCurrentLiveRally } from '@hooks/useVoiceChat'
+import { trpc } from '@utils/trpc'
 
 export interface TxUiEndLiveRally {
   isDialogVisible: boolean
@@ -28,7 +31,14 @@ export const useStoreTxUiEndLiveRally = create<TxUiEndLiveRally>((set) => ({
 }))
 
 export function useEndLiveAudioChat(stateTxUiEndLiveRally: TxUiEndLiveRally) {
-  const { chain } = useNetwork()
+  const rally = useStoreCurrentLiveRally((currentLiveRallyState: any) => currentLiveRallyState.rally)
+  const resetState = useStoreCurrentLiveRally((currentLiveRallyState: any) => currentLiveRallyState.resetState)
+  const mutationEndRoom = trpc.room.end_room.useMutation({
+    onSuccess() {
+      resetState()
+    },
+  })
+
   const { push } = useRouter()
   // Query to create a new audio chat
   const contractWriteAudioChatEnd = useContractWrite({
@@ -36,13 +46,13 @@ export function useEndLiveAudioChat(stateTxUiEndLiveRally: TxUiEndLiveRally) {
     address: CONTRACT_AUDIO_CHATS,
     abi: audioChatABI,
     functionName: 'changeState',
-    chainId: chain?.id,
+    chainId,
   })
 
   // Transaction receipt for `contractWriteAudioChatEnd` (change audiochat state query)
   const txAudioChatEnd = useWaitForTransaction({
     hash: contractWriteAudioChatEnd?.data?.hash,
-    chainId: chain?.id,
+    chainId,
     onError(e) {
       console.error(e)
       toast.error(e?.message)
@@ -53,7 +63,9 @@ export function useEndLiveAudioChat(stateTxUiEndLiveRally: TxUiEndLiveRally) {
         const log = data.logs
         //@ts-ignore
         const { audio_event_id } = iface.parseLog(log[0]).args
-
+        await mutationEndRoom.mutateAsync({
+          id_rally: rally?.id ?? audio_event_id,
+        })
         await queryClient.invalidateQueries({
           queryKey: ['audio-chat-metadata', audio_event_id],
           type: 'active',

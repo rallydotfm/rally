@@ -4,6 +4,8 @@ import { httpBatchLink } from '@trpc/client'
 import type { AppRouter } from '@rally/api'
 import { transformer } from '@rally/api/transformer'
 
+export let roomService: any
+
 const getBaseUrl = () => {
   if (typeof window !== 'undefined') return '' // browser should use relative url
   if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}` // SSR should use vercel url
@@ -21,7 +23,9 @@ export const trpc = createTRPCNext<AppRouter>({
             'x-ssr': '1',
           }
         }
-        return {}
+        return {
+          Authorization: roomService,
+        }
       },
       transformer,
       links: [

@@ -10,12 +10,12 @@ interface MobileTopMenuProps {
 export const MobileTopMenu = (props: MobileTopMenuProps) => {
   const { address } = props
   return (
-    <div className="bg-black z-20 border-b-2 px-5 md:px-3 border-neutral-4 sticky w-full flex items-center inset-0 py-2 md:hidden">
+    <div className="bg-black z-20 border-b-2 px-3 border-neutral-4 sticky w-full flex items-center inset-0 py-2 md:hidden">
       <span aria-hidden="true" className="text-2xl mie-auto">
         📢
       </span>
       {address && address !== null && (
-        <div>
+        <div className="static">
           <MenuCurrentUser address={address} />
         </div>
       )}

@@ -10,7 +10,7 @@ export const notice = cva(['rounded-md'], {
       'negative-outline': ['bg-negative-1 text-negative-11', 'border-negative-4'],
     },
     scale: {
-      default: ['border', 'text-xs', 'py-2 px-4 sm:px-5', 'font-bold'],
+      default: ['border', 'text-xs', 'pt-8 pb-6 px-8', 'font-bold'],
     },
   },
   defaultVariants: {

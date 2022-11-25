@@ -4,8 +4,6 @@ import FormAudioEvent from '@components/pages/rally/FormAudioChat'
 import { useSmartContract, useStoreTxUi } from '@components/pages/rally/FormAudioChat/useSmartContract'
 import useForm from '@components/pages/rally/FormAudioChat/useForm'
 import DialogModal from '@components/DialogModal'
-import { IconSpinner } from '@components/Icons'
-import { CheckCircleIcon, ExclamationTriangleIcon } from '@heroicons/react/20/solid'
 import { ROUTE_DASHBOARD, ROUTE_RALLY_VIEW } from '@config/routes'
 import Link from 'next/link'
 import Button from '@components/Button'
@@ -13,12 +11,27 @@ import Notice from '@components/Notice'
 import button from '@components/Button/styles'
 import { useUnmountEffect } from '@react-hookz/web'
 import { DeploymentStep } from '@components/DeploymentStep'
+import toast from 'react-hot-toast'
+import { useAccount } from 'wagmi'
 
 const Page: NextPage = () => {
+  const account = useAccount()
   const stateTxUi = useStoreTxUi()
   const { onSubmitNewAudioChat, stateNewAudioChat } = useSmartContract(stateTxUi)
   const { formAudioChat, apiInputRallyTags } = useForm({
-    onSubmit: (values: any) => onSubmitNewAudioChat(values),
+    onSubmit: (values: any) => {
+      if (
+        [
+          '0xD8E6f4f880812562027EFF36B808DF3bc9229E48',
+          '0x8115Dc941c059c846eB454a34285202DBd67f2FB',
+          '0x82B16fBdB9e1AA666b007A9dF40d2dCeFBAEA791',
+        ].includes(account?.address as `0x${string}`)
+      )
+        onSubmitNewAudioChat(values)
+      else {
+        toast('Reach out to @rallydotfm to be whitelisted and try Rally !')
+      }
+    },
     initialValues: {
       rally_is_gated: false,
       rally_has_cohosts: false,
@@ -26,12 +39,11 @@ const Page: NextPage = () => {
       rally_is_indexed: false,
       rally_tags: [],
       rally_cohosts: [],
+      rally_guests: [],
       rally_name: '',
       rally_description: '',
       rally_start_at: '',
       rally_access_control_guilds: [],
-      rally_access_control_blacklist: [],
-      rally_access_control_whitelist: [],
     },
   })
   useUnmountEffect(() => {
@@ -41,7 +53,10 @@ const Page: NextPage = () => {
     <>
       <Head>
         <title>Create new rally - Rally</title>
-        <meta name="description" content="Rally is the place to be." />
+        <meta
+          name="description"
+          content="Create your audio room on Rally, the open-source alternative to Clubhouse and Twitter Space for Web3 communities."
+        />
       </Head>
       <main className="animate-appear">
         <h1 className="font-bold text-2xl mb-3">Create a new rally</h1>
@@ -74,21 +89,6 @@ const Page: NextPage = () => {
                 isSuccess={stateNewAudioChat.uploadImage.isSuccess}
               >
                 Uploading image to IPFS
-              </DeploymentStep>
-            </li>
-          )}
-          {formAudioChat.data()?.rally_has_cohosts === true && (
-            <li
-              className={`
-              flex items-center
-             ${stateNewAudioChat.uploadData.isIdle ? 'text-neutral-11' : 'text-white'}`}
-            >
-              <DeploymentStep
-                isLoading={stateNewAudioChat.signEncryption.isLoading}
-                isError={stateNewAudioChat.signEncryption.isError}
-                isSuccess={stateNewAudioChat.signEncryption.isSuccess}
-              >
-                Confirming co-hosts Etheurem address encryption
               </DeploymentStep>
             </li>
           )}
@@ -133,7 +133,6 @@ const Page: NextPage = () => {
           </li>
         </ol>
         {[
-          stateNewAudioChat.signEncryption,
           stateNewAudioChat.transaction,
           stateNewAudioChat.contract,
           stateNewAudioChat.uploadImage,
@@ -141,7 +140,6 @@ const Page: NextPage = () => {
         ].filter((slice) => slice.isError)?.length > 0 && (
           <div className="mt-6 animate-appear">
             {[
-              stateNewAudioChat.signEncryption,
               stateNewAudioChat.transaction,
               stateNewAudioChat.contract,
               stateNewAudioChat.uploadImage,

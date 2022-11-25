@@ -14,7 +14,7 @@ function defineNextConfig(config) {
   return config
 }
 
-export default withTM(['@rally/abi', '@rally/api', '@rally/db'])(
+export default withTM(['@rally/abi', '@rally/auth', '@rally/api', '@rally/db'])(
   defineNextConfig({
     reactStrictMode: true,
     swcMinify: true,

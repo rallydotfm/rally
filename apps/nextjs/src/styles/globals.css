@@ -1,3 +1,19 @@
+@font-face {
+  font-family: 'Satoshi';
+  font-style: italic;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('/Satoshi-VariableItalic.ttf') format('ttf');
+}
+
+@font-face {
+  font-family: 'Satoshi';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('/Satoshi-Variable.ttf') format('ttf');
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -5,6 +21,7 @@
 @layer base {
   html {
     --interactive: theme('colors.interactive.11');
+    @apply bg-black font-sans text-white overflow-x-hidden;
     scrollbar-color: var(--interactive) Canvas;
     color-scheme: dark;
   }
@@ -28,9 +45,7 @@
   :is(::-webkit-calendar-picker-indicator, ::-webkit-clear-button, ::-webkit-inner-spin-button, ::-webkit-outer-spin-button) {
     color: var(--interactive);
   }
-  html {
-    @apply bg-black text-white overflow-x-hidden;
-  }
+
   body {
     @apply text-base flex flex-col min-h-screen;
   }

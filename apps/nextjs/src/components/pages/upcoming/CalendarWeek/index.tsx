@@ -24,7 +24,7 @@ export default function CalendarWeek(props: any) {
           {weekDay.map((tab) => (
             <Tab
               key={`${tab.day}`}
-              className="col-span-1 bg-white py-1 px-0.5 xs:px-2 ui-not-selected:bg-opacity-5 ui-selected:bg-opacity-95 flex flex-col rounded-md ui-selected:font-medium ui-not-selected:text-white ui-selected:text-black"
+              className="col-span-1 items-center bg-white py-1 px-0.5 xs:px-2 ui-not-selected:bg-opacity-5 ui-selected:bg-opacity-95 flex flex-col rounded-md ui-selected:font-medium ui-not-selected:text-white ui-selected:text-black"
             >
               <span className="text-2xs">
                 <span className="sr-only">{format(new Date(tab.date), 'iiii')}</span>

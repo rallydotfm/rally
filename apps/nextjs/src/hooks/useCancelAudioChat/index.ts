@@ -1,10 +1,11 @@
-import { useContractWrite, useNetwork, useWaitForTransaction } from 'wagmi'
+import { useContractWrite, useWaitForTransaction } from 'wagmi'
 import toast from 'react-hot-toast'
 import create from 'zustand'
 import { audioChatABI } from '@rally/abi'
 import { CONTRACT_AUDIO_CHATS } from '@config/contracts'
 import { DICTIONARY_STATES_AUDIO_CHATS } from '@helpers/mappingAudioChatState'
 import { useQueryClient } from '@tanstack/react-query'
+import { chainId } from '@config/wagmi'
 
 export interface TxUiCancelRally {
   isDialogVisible: boolean
@@ -34,7 +35,6 @@ export const useStoreTxUiCancelRally = create<TxUiCancelRally>((set) => ({
 }))
 
 export function useCancelAudioChat(stateTxUiCancelRally: TxUiCancelRally) {
-  const { chain } = useNetwork()
   const queryClient = useQueryClient()
   // Query to create a new audio chat
   const contractWriteCancelAudioChat = useContractWrite({
@@ -42,13 +42,13 @@ export function useCancelAudioChat(stateTxUiCancelRally: TxUiCancelRally) {
     address: CONTRACT_AUDIO_CHATS,
     abi: audioChatABI,
     functionName: 'changeState',
-    chainId: chain?.id,
+    chainId,
   })
 
   // Transaction receipt for `contractWriteCancelAudioChat` (change audiochat state query)
   const txCancelAudioChat = useWaitForTransaction({
     hash: contractWriteCancelAudioChat?.data?.hash,
-    chainId: chain?.id,
+    chainId,
     onError(e) {
       console.error(e)
       toast.error(e?.message)

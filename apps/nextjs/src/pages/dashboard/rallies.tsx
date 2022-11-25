@@ -55,9 +55,12 @@ const Page: NextPage = () => {
     <>
       <Head>
         <title>Dashboard - Rally</title>
-        <meta name="description" content="Rally is the place to be." />
+        <meta
+          name="description"
+          content="Manage your audio rooms on Rally, the open-source alternative to Clubhouse and Twitter Space for Web3 communities."
+        />
       </Head>
-      <main className="pb-32">
+      <main className="pb-32 h-full">
         {(queryAudioChatsByAddressRawData.isLoading ||
           queriesAudioChatsByAddressMetadata.filter((query) => query?.isLoading)?.length > 0) && (
           <div className="mb-6 flex items-center justify-center space-i-1ex">
@@ -102,7 +105,7 @@ const Page: NextPage = () => {
                       key={audioChat.data.id}
                     >
                       <Link href={ROUTE_RALLY_VIEW.replace('[idRally]', audioChat.data.id)}>
-                        <a className="absolute inset-0 w-full h-full opacity-0">View page</a>
+                        <a className="absolute z-10 inset-0 w-full h-full opacity-0">View page</a>
                       </Link>
                       <div className="xs:pt-2 xs:pis-2 xs:pie-4">
                         <article
@@ -111,7 +114,7 @@ const Page: NextPage = () => {
                           } flex flex-col space-y-4 xs:flex-row xs:space-y-0 xs:space-i-6`}
                         >
                           {audioChat?.data?.image && (
-                            <div className="relative w-full overflow-hidden xs:w-32 md:aspect-square lg:w-32 aspect-twitter-card rounded-t-md xs:rounded-b-md">
+                            <div className="relative pointer-events-none w-full overflow-hidden xs:w-32 md:aspect-square lg:w-32 aspect-twitter-card rounded-t-md xs:rounded-b-md">
                               <div className="bg-neutral-5 absolute w-full h-full inset-0 animate-pulse" />
                               <img
                                 alt=""

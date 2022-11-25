@@ -3,14 +3,14 @@ import { contractConfigAudioChat } from '@config/contracts'
 import { useQueries } from '@tanstack/react-query'
 import getAudioChatMetadata from '@services/rally/audioChat/getAudioChatMetadata'
 import toast from 'react-hot-toast'
+import { chainId } from '@config/wagmi'
 
 export function useGetAudioChatByState(states: Array<number>) {
-  const { chain } = useNetwork()
   const queryAudioChatsByStateRawData = useContractRead({
     ...contractConfigAudioChat,
-    chainId: chain?.id,
+    chainId,
     functionName: 'getAudioChatsByState',
-    enabled: chain?.unsupported === false ? true : false,
+    enabled: true,
     args: [states],
     cacheOnBlock: true,
     onError(e) {
