@@ -15,15 +15,18 @@ export type Scalars = {
   BroadcastId: any
   ChainId: any
   CollectModuleData: any
+  ContentEncryptionKey: any
   ContractAddress: any
   CreateHandle: any
   Cursor: any
   DateTime: any
+  EncryptedValueScalar: any
   Ens: any
   EthereumAddress: any
   FollowModuleData: any
   Handle: any
   HandleClaimIdScalar: any
+  IfpsCid: any
   InternalPublicationId: any
   Jwt: any
   LimitScalar: any
@@ -34,6 +37,7 @@ export type Scalars = {
   Nonce: any
   NotificationId: any
   ProfileId: any
+  ProfileInterest: any
   ProxyActionId: any
   PublicationId: any
   PublicationTag: any
@@ -44,11 +48,53 @@ export type Scalars = {
   Signature: any
   Sources: any
   TimestampScalar: any
+  TokenId: any
   TxHash: any
   TxId: any
   UnixTimestamp: any
   Url: any
   Void: any
+}
+
+/** The access conditions for the publication */
+export type AccessConditionInput = {
+  /** AND condition */
+  and?: InputMaybe<AndConditionInput>
+  /** Profile follow condition */
+  collect?: InputMaybe<CollectConditionInput>
+  /** EOA ownership condition */
+  eoa?: InputMaybe<EoaOwnershipInput>
+  /** Profile follow condition */
+  follow?: InputMaybe<FollowConditionInput>
+  /** NFT ownership condition */
+  nft?: InputMaybe<NftOwnershipInput>
+  /** OR condition */
+  or?: InputMaybe<OrConditionInput>
+  /** Profile ownership condition */
+  profile?: InputMaybe<ProfileOwnershipInput>
+  /** ERC20 token ownership condition */
+  token?: InputMaybe<Erc20OwnershipInput>
+}
+
+/** The access conditions for the publication */
+export type AccessConditionOutput = {
+  __typename?: 'AccessConditionOutput'
+  /** AND condition */
+  and?: Maybe<AndConditionOutput>
+  /** Profile follow condition */
+  collect?: Maybe<CollectConditionOutput>
+  /** EOA ownership condition */
+  eoa?: Maybe<EoaOwnershipOutput>
+  /** Profile follow condition */
+  follow?: Maybe<FollowConditionOutput>
+  /** NFT ownership condition */
+  nft?: Maybe<NftOwnershipOutput>
+  /** OR condition */
+  or?: Maybe<OrConditionOutput>
+  /** Profile ownership condition */
+  profile?: Maybe<ProfileOwnershipOutput>
+  /** ERC20 token ownership condition */
+  token?: Maybe<Erc20OwnershipOutput>
 }
 
 export type AchRequest = {
@@ -60,12 +106,31 @@ export type AchRequest = {
   secret: Scalars['String']
 }
 
+/** The request object to add interests to a profile */
+export type AddProfileInterestsRequest = {
+  /** The profile interest to add */
+  interests: Array<Scalars['ProfileInterest']>
+  /** The profileId to add interests to */
+  profileId: Scalars['ProfileId']
+}
+
 export type AllPublicationsTagsRequest = {
   cursor?: InputMaybe<Scalars['Cursor']>
   limit?: InputMaybe<Scalars['LimitScalar']>
   sort: TagSortCriteria
   /** The App Id */
   source?: InputMaybe<Scalars['Sources']>
+}
+
+export type AndConditionInput = {
+  /** The list of conditions to apply AND to. You can only use nested boolean conditions at the root level. */
+  criteria: Array<AccessConditionInput>
+}
+
+export type AndConditionOutput = {
+  __typename?: 'AndConditionOutput'
+  /** The list of conditions to apply AND to. You can only use nested boolean conditions at the root level. */
+  criteria: Array<AccessConditionOutput>
 }
 
 export type ApprovedAllowanceAmount = {
@@ -130,6 +195,12 @@ export type CanCommentResponse = {
   result: Scalars['Boolean']
 }
 
+export type CanDecryptResponse = {
+  __typename?: 'CanDecryptResponse'
+  reasons?: Maybe<DecryptFailReason>
+  result: Scalars['Boolean']
+}
+
 export type CanMirrorResponse = {
   __typename?: 'CanMirrorResponse'
   result: Scalars['Boolean']
@@ -159,6 +230,23 @@ export type ClaimableHandles = {
   __typename?: 'ClaimableHandles'
   canClaimFreeTextHandle: Scalars['Boolean']
   reservedHandles: Array<ReservedClaimableHandle>
+}
+
+/** Condition that signifies if address or profile has collected a publication */
+export type CollectConditionInput = {
+  /** The publication id that has to be collected to unlock content */
+  publicationId?: InputMaybe<Scalars['ProfileId']>
+  /** True if the content will be unlocked for this specific publication */
+  thisPublication?: InputMaybe<Scalars['Boolean']>
+}
+
+/** Condition that signifies if address or profile has collected a publication */
+export type CollectConditionOutput = {
+  __typename?: 'CollectConditionOutput'
+  /** The publication id that has to be collected to unlock content */
+  publicationId?: Maybe<Scalars['ProfileId']>
+  /** True if the content will be unlocked for this specific publication */
+  thisPublication?: Maybe<Scalars['Boolean']>
 }
 
 export type CollectModule =
@@ -214,6 +302,7 @@ export type Comment = {
   /** ID of the source */
   appId?: Maybe<Scalars['Sources']>
   canComment: CanCommentResponse
+  canDecrypt: CanDecryptResponse
   canMirror: CanMirrorResponse
   /** The collect module */
   collectModule: CollectModule
@@ -232,6 +321,8 @@ export type Comment = {
   hidden: Scalars['Boolean']
   /** The internal publication id */
   id: Scalars['InternalPublicationId']
+  /** Indicates if the publication is gated behind some access criteria */
+  isGated: Scalars['Boolean']
   /** The top level post/mirror this comment lives on */
   mainPost: MainPostReference
   /** The metadata for the post */
@@ -254,8 +345,19 @@ export type CommentCanCommentArgs = {
 }
 
 /** The social comment */
+export type CommentCanDecryptArgs = {
+  address?: InputMaybe<Scalars['EthereumAddress']>
+  profileId?: InputMaybe<Scalars['ProfileId']>
+}
+
+/** The social comment */
 export type CommentCanMirrorArgs = {
   profileId?: InputMaybe<Scalars['ProfileId']>
+}
+
+/** The social comment */
+export type CommentHasCollectedByMeArgs = {
+  isFinalisedOnChain?: InputMaybe<Scalars['Boolean']>
 }
 
 /** The social comment */
@@ -266,6 +368,13 @@ export type CommentMirrorsArgs = {
 /** The social comment */
 export type CommentReactionArgs = {
   request?: InputMaybe<ReactionFieldResolverRequest>
+}
+
+/** The gated publication access criteria contract types */
+export enum ContractType {
+  Erc20 = 'ERC20',
+  Erc721 = 'ERC721',
+  Erc1155 = 'ERC1155',
 }
 
 /** The create burn eip 712 typed data */
@@ -525,6 +634,8 @@ export type CreatePublicCommentRequest = {
   collectModule: CollectModuleParams
   /** The metadata uploaded somewhere passing in the url to reach it */
   contentURI: Scalars['Url']
+  /** The criteria to access the publication data */
+  gated?: InputMaybe<GatedPublicationParamsInput>
   /** Profile id */
   profileId: Scalars['ProfileId']
   /** Publication id of what your comments on remember if this is a comment you commented on it will be that as the id */
@@ -538,6 +649,8 @@ export type CreatePublicPostRequest = {
   collectModule: CollectModuleParams
   /** The metadata uploaded somewhere passing in the url to reach it */
   contentURI: Scalars['Url']
+  /** The criteria to access the publication data */
+  gated?: InputMaybe<GatedPublicationParamsInput>
   /** Profile id */
   profileId: Scalars['ProfileId']
   /** The reference module */
@@ -812,6 +925,20 @@ export enum CustomFiltersTypes {
   Gardeners = 'GARDENERS',
 }
 
+/** The reason why a profile cannot decrypt a publication */
+export enum DecryptFailReason {
+  CollectNotFinalisedOnChain = 'COLLECT_NOT_FINALISED_ON_CHAIN',
+  DoesNotFollowProfile = 'DOES_NOT_FOLLOW_PROFILE',
+  DoesNotOwnNft = 'DOES_NOT_OWN_NFT',
+  DoesNotOwnProfile = 'DOES_NOT_OWN_PROFILE',
+  FollowNotFinalisedOnChain = 'FOLLOW_NOT_FINALISED_ON_CHAIN',
+  HasNotCollectedPublication = 'HAS_NOT_COLLECTED_PUBLICATION',
+  MissingEncryptionParams = 'MISSING_ENCRYPTION_PARAMS',
+  ProfileDoesNotExist = 'PROFILE_DOES_NOT_EXIST',
+  UnauthorizedAddress = 'UNAUTHORIZED_ADDRESS',
+  UnauthorizedBalance = 'UNAUTHORIZED_BALANCE',
+}
+
 export type DefaultProfileRequest = {
   ethereumAddress: Scalars['EthereumAddress']
 }
@@ -866,6 +993,8 @@ export type DoesFollowResponse = {
   followerAddress: Scalars['EthereumAddress']
   /** If the user does follow */
   follows: Scalars['Boolean']
+  /** Is finalised on-chain */
+  isFinalisedOnChain: Scalars['Boolean']
   /** The profile id */
   profileId: Scalars['ProfileId']
 }
@@ -916,10 +1045,90 @@ export type EnabledModules = {
   referenceModules: Array<EnabledModule>
 }
 
+/** The encrypted fields */
+export type EncryptedFieldsOutput = {
+  __typename?: 'EncryptedFieldsOutput'
+  /** The encrypted animation_url field */
+  animation_url?: Maybe<Scalars['EncryptedValueScalar']>
+  /** The encrypted content field */
+  content?: Maybe<Scalars['EncryptedValueScalar']>
+  /** The encrypted external_url field */
+  external_url?: Maybe<Scalars['EncryptedValueScalar']>
+  /** The encrypted image field */
+  image?: Maybe<Scalars['EncryptedValueScalar']>
+  /** The encrypted media field */
+  media?: Maybe<Array<EncryptedMediaSet>>
+}
+
+/** The Encrypted Media url and metadata */
+export type EncryptedMedia = {
+  __typename?: 'EncryptedMedia'
+  /** The encrypted alt tags for accessibility */
+  altTag?: Maybe<Scalars['EncryptedValueScalar']>
+  /** The encrypted cover for any video or audio you attached */
+  cover?: Maybe<Scalars['EncryptedValueScalar']>
+  /** Height - will always be null on the public API */
+  height?: Maybe<Scalars['Int']>
+  /** The image/audio/video mime type for the publication */
+  mimeType?: Maybe<Scalars['MimeType']>
+  /** Size - will always be null on the public API */
+  size?: Maybe<Scalars['Int']>
+  /** The encrypted value for the URL */
+  url: Scalars['Url']
+  /** Width - will always be null on the public API */
+  width?: Maybe<Scalars['Int']>
+}
+
+/** The encrypted media set */
+export type EncryptedMediaSet = {
+  __typename?: 'EncryptedMediaSet'
+  /**
+   * Medium media - will always be null on the public API
+   * @deprecated should not be used will always be null
+   */
+  medium?: Maybe<EncryptedMedia>
+  /** Original media */
+  original: EncryptedMedia
+  /**
+   * Small media - will always be null on the public API
+   * @deprecated should not be used will always be null
+   */
+  small?: Maybe<EncryptedMedia>
+}
+
+/** The metadata encryption params */
+export type EncryptionParamsOutput = {
+  __typename?: 'EncryptionParamsOutput'
+  /** The access conditions */
+  accessCondition: AccessConditionOutput
+  /** The encrypted fields */
+  encryptedFields: EncryptedFieldsOutput
+  /** The encryption provider */
+  encryptionProvider: EncryptionProvider
+  /** The provider-specific encryption params */
+  providerSpecificParams: ProviderSpecificParamsOutput
+}
+
+/** The gated publication encryption provider */
+export enum EncryptionProvider {
+  LitProtocol = 'LIT_PROTOCOL',
+}
+
 export type EnsOnChainIdentity = {
   __typename?: 'EnsOnChainIdentity'
   /** The default ens mapped to this address */
   name?: Maybe<Scalars['Ens']>
+}
+
+export type EoaOwnershipInput = {
+  /** The address that will have access to the content */
+  address: Scalars['EthereumAddress']
+}
+
+export type EoaOwnershipOutput = {
+  __typename?: 'EoaOwnershipOutput'
+  /** The address that will have access to the content */
+  address: Scalars['EthereumAddress']
 }
 
 /** The erc20 type */
@@ -941,6 +1150,33 @@ export type Erc20Amount = {
   asset: Erc20
   /** Floating point number as string (e.g. 42.009837). It could have the entire precision of the Asset or be truncated to the last significant decimal. */
   value: Scalars['String']
+}
+
+export type Erc20OwnershipInput = {
+  /** The amount of tokens required to access the content */
+  amount: Scalars['String']
+  /** The amount of tokens required to access the content */
+  chainID: Scalars['ChainId']
+  /** The operator to use when comparing the amount of tokens */
+  condition: ScalarOperator
+  /** The ERC20 token's ethereum address */
+  contractAddress: Scalars['ContractAddress']
+  /** The amount of decimals of the ERC20 contract */
+  decimals: Scalars['Float']
+}
+
+export type Erc20OwnershipOutput = {
+  __typename?: 'Erc20OwnershipOutput'
+  /** The amount of tokens required to access the content */
+  amount: Scalars['String']
+  /** The amount of tokens required to access the content */
+  chainID: Scalars['ChainId']
+  /** The operator to use when comparing the amount of tokens */
+  condition: ScalarOperator
+  /** The ERC20 token's ethereum address */
+  contractAddress: Scalars['ContractAddress']
+  /** The amount of decimals of the ERC20 contract */
+  decimals: Scalars['Float']
 }
 
 /** The paginated publication result */
@@ -1086,6 +1322,17 @@ export type Follow = {
   profile: Scalars['ProfileId']
 }
 
+export type FollowConditionInput = {
+  /** The profile id of the gated profile */
+  profileId: Scalars['ProfileId']
+}
+
+export type FollowConditionOutput = {
+  __typename?: 'FollowConditionOutput'
+  /** The profile id of the gated profile */
+  profileId: Scalars['ProfileId']
+}
+
 export type FollowModule =
   | FeeFollowModuleSettings
   | ProfileFollowModuleSettings
@@ -1202,6 +1449,28 @@ export type FreeCollectProxyAction = {
 
 export type FreeFollowProxyAction = {
   profileId: Scalars['ProfileId']
+}
+
+/** The access conditions for the publication */
+export type GatedPublicationParamsInput = {
+  /** AND condition */
+  and?: InputMaybe<AndConditionInput>
+  /** Profile follow condition */
+  collect?: InputMaybe<CollectConditionInput>
+  /** The LIT Protocol encrypted symmetric key */
+  encryptedSymmetricKey: Scalars['ContentEncryptionKey']
+  /** EOA ownership condition */
+  eoa?: InputMaybe<EoaOwnershipInput>
+  /** Profile follow condition */
+  follow?: InputMaybe<FollowConditionInput>
+  /** NFT ownership condition */
+  nft?: InputMaybe<NftOwnershipInput>
+  /** OR condition */
+  or?: InputMaybe<OrConditionInput>
+  /** Profile ownership condition */
+  profile?: InputMaybe<ProfileOwnershipInput>
+  /** ERC20 token ownership condition */
+  token?: InputMaybe<Erc20OwnershipInput>
 }
 
 export type GenerateModuleCurrencyApproval = {
@@ -1363,7 +1632,7 @@ export type Media = {
   /** The alt tags for accessibility */
   altTag?: Maybe<Scalars['String']>
   /** The cover for any video or audio you attached */
-  cover?: Maybe<Scalars['String']>
+  cover?: Maybe<Scalars['Url']>
   /** Height - will always be null on the public API */
   height?: Maybe<Scalars['Int']>
   /** The image/audio/video mime type for the publication */
@@ -1374,6 +1643,19 @@ export type Media = {
   url: Scalars['Url']
   /** Width - will always be null on the public API */
   width?: Maybe<Scalars['Int']>
+}
+
+/** Media object output */
+export type MediaOutput = {
+  __typename?: 'MediaOutput'
+  /** The alt tags for accessibility */
+  altTag?: Maybe<Scalars['String']>
+  /** The cover for any video or audio you attached */
+  cover?: Maybe<Scalars['Url']>
+  item: Scalars['Url']
+  source?: Maybe<PublicationMediaSource>
+  /** This is the mime type of media */
+  type?: Maybe<Scalars['MimeType']>
 }
 
 /** The Media Set */
@@ -1431,6 +1713,8 @@ export type MetadataOutput = {
   cover?: Maybe<MediaSet>
   /** This is the metadata description */
   description?: Maybe<Scalars['Markdown']>
+  /** The publication's encryption params in case it's encrypted */
+  encryptionParams?: Maybe<EncryptionParamsOutput>
   /** This is the image attached to the metadata and the property used to show the NFT! */
   image?: Maybe<Scalars['Url']>
   /** The locale of the publication,  */
@@ -1451,6 +1735,7 @@ export type Mirror = {
   /** ID of the source */
   appId?: Maybe<Scalars['Sources']>
   canComment: CanCommentResponse
+  canDecrypt: CanDecryptResponse
   canMirror: CanMirrorResponse
   /** The collect module */
   collectModule: CollectModule
@@ -1463,6 +1748,8 @@ export type Mirror = {
   hidden: Scalars['Boolean']
   /** The internal publication id */
   id: Scalars['InternalPublicationId']
+  /** Indicates if the publication is gated behind some access criteria */
+  isGated: Scalars['Boolean']
   /** The metadata for the post */
   metadata: MetadataOutput
   /** The mirror publication */
@@ -1484,8 +1771,19 @@ export type MirrorCanCommentArgs = {
 }
 
 /** The social mirror */
+export type MirrorCanDecryptArgs = {
+  address?: InputMaybe<Scalars['EthereumAddress']>
+  profileId?: InputMaybe<Scalars['ProfileId']>
+}
+
+/** The social mirror */
 export type MirrorCanMirrorArgs = {
   profileId?: InputMaybe<Scalars['ProfileId']>
+}
+
+/** The social mirror */
+export type MirrorHasCollectedByMeArgs = {
+  isFinalisedOnChain?: InputMaybe<Scalars['Boolean']>
 }
 
 /** The social mirror */
@@ -1525,10 +1823,13 @@ export type ModuleInfo = {
 export type Mutation = {
   __typename?: 'Mutation'
   ach?: Maybe<Scalars['Void']>
+  /** Adds profile interests to the given profile */
+  addProfileInterests?: Maybe<Scalars['Void']>
   addReaction?: Maybe<Scalars['Void']>
   authenticate: AuthenticationResult
   broadcast: RelayResult
   claim: RelayResult
+  createAttachMediaData: PublicMediaResults
   createBurnProfileTypedData: CreateBurnProfileBroadcastItemResult
   createCollectTypedData: CreateCollectBroadcastItemResult
   createCommentTypedData: CreateCommentBroadcastItemResult
@@ -1551,12 +1852,18 @@ export type Mutation = {
   hidePublication?: Maybe<Scalars['Void']>
   proxyAction: Scalars['ProxyActionId']
   refresh: AuthenticationResult
+  /** Removes profile interests from the given profile */
+  removeProfileInterests?: Maybe<Scalars['Void']>
   removeReaction?: Maybe<Scalars['Void']>
   reportPublication?: Maybe<Scalars['Void']>
 }
 
 export type MutationAchArgs = {
   request: AchRequest
+}
+
+export type MutationAddProfileInterestsArgs = {
+  request: AddProfileInterestsRequest
 }
 
 export type MutationAddReactionArgs = {
@@ -1573,6 +1880,10 @@ export type MutationBroadcastArgs = {
 
 export type MutationClaimArgs = {
   request: ClaimHandleRequest
+}
+
+export type MutationCreateAttachMediaDataArgs = {
+  request: PublicMediaRequest
 }
 
 export type MutationCreateBurnProfileTypedDataArgs = {
@@ -1675,6 +1986,10 @@ export type MutationProxyActionArgs = {
 
 export type MutationRefreshArgs = {
   request: RefreshRequest
+}
+
+export type MutationRemoveProfileInterestsArgs = {
+  request: RemoveProfileInterestsRequest
 }
 
 export type MutationRemoveReactionArgs = {
@@ -1850,6 +2165,29 @@ export type NftOwnershipChallengeResult = {
   timeout: Scalars['TimestampScalar']
 }
 
+export type NftOwnershipInput = {
+  /** The NFT chain id */
+  chainID: Scalars['ChainId']
+  /** The NFT collection's ethereum address */
+  contractAddress: Scalars['ContractAddress']
+  /** The unlocker contract type */
+  contractType: ContractType
+  /** The optional token ID(s) to check for ownership */
+  tokenIds?: InputMaybe<Scalars['TokenId']>
+}
+
+export type NftOwnershipOutput = {
+  __typename?: 'NftOwnershipOutput'
+  /** The NFT chain id */
+  chainID: Scalars['ChainId']
+  /** The NFT collection's ethereum address */
+  contractAddress: Scalars['ContractAddress']
+  /** The unlocker contract type */
+  contractType: ContractType
+  /** The optional token ID(s) to check for ownership */
+  tokenIds?: Maybe<Scalars['TokenId']>
+}
+
 export type Notification =
   | NewCollectNotification
   | NewCommentNotification
@@ -1896,6 +2234,17 @@ export type OnChainIdentity = {
   sybilDotOrg: SybilDotOrgIdentity
   /** The worldcoin identity */
   worldcoin: WorldcoinIdentity
+}
+
+export type OrConditionInput = {
+  /** The list of conditions to apply OR to. You can only use nested boolean conditions at the root level. */
+  criteria: Array<AccessConditionInput>
+}
+
+export type OrConditionOutput = {
+  __typename?: 'OrConditionOutput'
+  /** The list of conditions to apply OR to. You can only use nested boolean conditions at the root level. */
+  criteria: Array<AccessConditionOutput>
 }
 
 /** The nft type */
@@ -2011,6 +2360,7 @@ export type Post = {
   /** ID of the source */
   appId?: Maybe<Scalars['Sources']>
   canComment: CanCommentResponse
+  canDecrypt: CanDecryptResponse
   canMirror: CanMirrorResponse
   /** The collect module */
   collectModule: CollectModule
@@ -2028,6 +2378,8 @@ export type Post = {
   hidden: Scalars['Boolean']
   /** The internal publication id */
   id: Scalars['InternalPublicationId']
+  /** Indicates if the publication is gated behind some access criteria */
+  isGated: Scalars['Boolean']
   /** The metadata for the post */
   metadata: MetadataOutput
   mirrors: Array<Scalars['InternalPublicationId']>
@@ -2048,8 +2400,19 @@ export type PostCanCommentArgs = {
 }
 
 /** The social post */
+export type PostCanDecryptArgs = {
+  address?: InputMaybe<Scalars['EthereumAddress']>
+  profileId?: InputMaybe<Scalars['ProfileId']>
+}
+
+/** The social post */
 export type PostCanMirrorArgs = {
   profileId?: InputMaybe<Scalars['ProfileId']>
+}
+
+/** The social post */
+export type PostHasCollectedByMeArgs = {
+  isFinalisedOnChain?: InputMaybe<Scalars['Boolean']>
 }
 
 /** The social post */
@@ -2081,6 +2444,8 @@ export type Profile = {
   handle: Scalars['Handle']
   /** The profile id */
   id: Scalars['ProfileId']
+  /** The profile interests */
+  interests?: Maybe<Array<Scalars['ProfileInterest']>>
   /** Is the profile default */
   isDefault: Scalars['Boolean']
   isFollowedByMe: Scalars['Boolean']
@@ -2097,6 +2462,11 @@ export type Profile = {
   picture?: Maybe<ProfileMedia>
   /** Profile stats */
   stats: ProfileStats
+}
+
+/** The Profile */
+export type ProfileIsFollowedByMeArgs = {
+  isFinalisedOnChain?: InputMaybe<Scalars['Boolean']>
 }
 
 /** The Profile */
@@ -2130,6 +2500,19 @@ export type ProfileMedia = MediaSet | NftImage
 
 export type ProfileOnChainIdentityRequest = {
   profileIds: Array<Scalars['ProfileId']>
+}
+
+/** Condition that signifies if address has access to profile */
+export type ProfileOwnershipInput = {
+  /** The profile id */
+  profileId: Scalars['ProfileId']
+}
+
+/** Condition that signifies if address has access to profile */
+export type ProfileOwnershipOutput = {
+  __typename?: 'ProfileOwnershipOutput'
+  /** The profile id */
+  profileId: Scalars['ProfileId']
 }
 
 export type ProfilePublicationRevenueQueryRequest = {
@@ -2238,6 +2621,13 @@ export type ProfileStatsPublicationsTotalArgs = {
   forSources: Array<Scalars['Sources']>
 }
 
+/** The provider-specific encryption params */
+export type ProviderSpecificParamsOutput = {
+  __typename?: 'ProviderSpecificParamsOutput'
+  /** The encryption key */
+  encryptionKey: Scalars['ContentEncryptionKey']
+}
+
 export type ProxyActionError = {
   __typename?: 'ProxyActionError'
   lastKnownTxId?: Maybe<Scalars['TxId']>
@@ -2270,6 +2660,26 @@ export enum ProxyActionStatusTypes {
   Transferring = 'TRANSFERRING',
 }
 
+export type PublicMediaRequest = {
+  /** The alt tags for accessibility */
+  altTag?: InputMaybe<Scalars['String']>
+  /** The cover for any video or audio you attached */
+  cover?: InputMaybe<Scalars['Url']>
+  /** Pre calculated cid of the file to push */
+  itemCid: Scalars['IfpsCid']
+  /** This is the mime type of media */
+  type?: InputMaybe<Scalars['MimeType']>
+}
+
+/** The response to upload the attached file */
+export type PublicMediaResults = {
+  __typename?: 'PublicMediaResults'
+  /** ipfs uri to add on the metadata */
+  media: MediaOutput
+  /** Signed url to push the file */
+  signedUrl: Scalars['String']
+}
+
 export type Publication = Comment | Mirror | Post
 
 /** The publication content warning */
@@ -2290,6 +2700,11 @@ export enum PublicationMainFocus {
   Link = 'LINK',
   TextOnly = 'TEXT_ONLY',
   Video = 'VIDEO',
+}
+
+/** The source of the media */
+export enum PublicationMediaSource {
+  Lens = 'LENS',
 }
 
 /** Publication metadata content waring filters */
@@ -2314,13 +2729,14 @@ export type PublicationMetadataFilters = {
   tags?: InputMaybe<PublicationMetadataTagsFilter>
 }
 
-/** The metadata attribute output */
+/** The metadata attribute input */
 export type PublicationMetadataMediaInput = {
   /** The alt tags for accessibility */
   altTag?: InputMaybe<Scalars['String']>
   /** The cover for any video or audio you attached */
-  cover?: InputMaybe<Scalars['String']>
+  cover?: InputMaybe<Scalars['Url']>
   item: Scalars['Url']
+  source?: InputMaybe<PublicationMediaSource>
   /** This is the mime type of media */
   type?: InputMaybe<Scalars['MimeType']>
 }
@@ -2601,6 +3017,8 @@ export type Query = {
   profile?: Maybe<Profile>
   profileFollowModuleBeenRedeemed: Scalars['Boolean']
   profileFollowRevenue: FollowRevenueResult
+  /** Get the list of profile interests */
+  profileInterests: Array<Scalars['ProfileInterest']>
   profileOnChainIdentity: Array<OnChainIdentity>
   profilePublicationRevenue: ProfilePublicationRevenueResult
   profilePublicationsForSale: PaginatedProfilePublicationsForSaleResult
@@ -2822,6 +3240,8 @@ export enum ReactionTypes {
 export type RecommendedProfileOptions = {
   /** If you wish to turn ML off */
   disableML?: InputMaybe<Scalars['Boolean']>
+  /** If you wish to shuffle the results */
+  shuffle?: InputMaybe<Scalars['Boolean']>
 }
 
 export type ReferenceModule =
@@ -2881,6 +3301,14 @@ export type RelayerResult = {
   txId: Scalars['TxId']
 }
 
+/** The request object to remove interests from a profile */
+export type RemoveProfileInterestsRequest = {
+  /** The profile interest to add */
+  interests: Array<Scalars['ProfileInterest']>
+  /** The profileId to add interests to */
+  profileId: Scalars['ProfileId']
+}
+
 export type ReportPublicationRequest = {
   additionalComments?: InputMaybe<Scalars['String']>
   publicationId: Scalars['InternalPublicationId']
@@ -2919,6 +3347,16 @@ export type RevertFollowModuleSettings = {
   contractAddress: Scalars['ContractAddress']
   /** The follow module enum */
   type: FollowModules
+}
+
+/** The gated publication access criteria scalar operators */
+export enum ScalarOperator {
+  Equal = 'EQUAL',
+  GreaterThan = 'GREATER_THAN',
+  GreaterThanOrEqual = 'GREATER_THAN_OR_EQUAL',
+  LessThan = 'LESS_THAN',
+  LessThanOrEqual = 'LESS_THAN_OR_EQUAL',
+  NotEqual = 'NOT_EQUAL',
 }
 
 export type SearchQueryRequest = {
@@ -3258,6 +3696,32 @@ export type WorldcoinIdentity = {
   isHuman: Scalars['Boolean']
 }
 
+export type AuthenticateMutationVariables = Exact<{
+  request: SignedAuthChallenge
+}>
+
+export type AuthenticateMutation = {
+  __typename?: 'Mutation'
+  authenticate: { __typename?: 'AuthenticationResult'; accessToken: any; refreshToken: any }
+}
+
+export type BroadcastMutationVariables = Exact<{
+  request: BroadcastRequest
+}>
+
+export type BroadcastMutation = {
+  __typename?: 'Mutation'
+  broadcast:
+    | { __typename?: 'RelayError'; reason: RelayErrorReasons }
+    | { __typename?: 'RelayerResult'; txHash: any; txId: any }
+}
+
+export type ChallengeQueryVariables = Exact<{
+  request: ChallengeRequest
+}>
+
+export type ChallengeQuery = { __typename?: 'Query'; challenge: { __typename?: 'AuthChallengeResult'; text: string } }
+
 export type MediaFieldsFragment = {
   __typename?: 'Media'
   url: any
@@ -3405,13 +3869,7 @@ export type MetadataOutputFieldsFragment = {
   }>
 }
 
-export type Erc20FieldsFragment = {
-  __typename?: 'Erc20'
-  name: string
-  symbol: string
-  decimals: number
-  address: any
-}
+export type Erc20FieldsFragment = { __typename?: 'Erc20'; name: string; symbol: string; decimals: number; address: any }
 
 type CollectModuleFields_FeeCollectModuleSettings_Fragment = {
   __typename: 'FeeCollectModuleSettings'
@@ -3610,13 +4068,7 @@ export type PostFieldsFragment = {
     content?: any | null
     media: Array<{
       __typename?: 'MediaSet'
-      original: {
-        __typename?: 'Media'
-        url: any
-        width?: number | null
-        height?: number | null
-        mimeType?: any | null
-      }
+      original: { __typename?: 'Media'; url: any; width?: number | null; height?: number | null; mimeType?: any | null }
       small?: {
         __typename?: 'Media'
         url: any
@@ -3819,13 +4271,7 @@ export type MirrorBaseFieldsFragment = {
     content?: any | null
     media: Array<{
       __typename?: 'MediaSet'
-      original: {
-        __typename?: 'Media'
-        url: any
-        width?: number | null
-        height?: number | null
-        mimeType?: any | null
-      }
+      original: { __typename?: 'Media'; url: any; width?: number | null; height?: number | null; mimeType?: any | null }
       small?: {
         __typename?: 'Media'
         url: any
@@ -5910,13 +6356,7 @@ export type MirrorFieldsFragment = {
     content?: any | null
     media: Array<{
       __typename?: 'MediaSet'
-      original: {
-        __typename?: 'Media'
-        url: any
-        width?: number | null
-        height?: number | null
-        mimeType?: any | null
-      }
+      original: { __typename?: 'Media'; url: any; width?: number | null; height?: number | null; mimeType?: any | null }
       small?: {
         __typename?: 'Media'
         url: any
@@ -6120,13 +6560,7 @@ export type CommentBaseFieldsFragment = {
     content?: any | null
     media: Array<{
       __typename?: 'MediaSet'
-      original: {
-        __typename?: 'Media'
-        url: any
-        width?: number | null
-        height?: number | null
-        mimeType?: any | null
-      }
+      original: { __typename?: 'Media'; url: any; width?: number | null; height?: number | null; mimeType?: any | null }
       small?: {
         __typename?: 'Media'
         url: any
@@ -7699,13 +8133,7 @@ export type CommentFieldsFragment = {
     content?: any | null
     media: Array<{
       __typename?: 'MediaSet'
-      original: {
-        __typename?: 'Media'
-        url: any
-        width?: number | null
-        height?: number | null
-        mimeType?: any | null
-      }
+      original: { __typename?: 'Media'; url: any; width?: number | null; height?: number | null; mimeType?: any | null }
       small?: {
         __typename?: 'Media'
         url: any
@@ -8337,13 +8765,7 @@ export type CommentMirrorOfFieldsFragment = {
     content?: any | null
     media: Array<{
       __typename?: 'MediaSet'
-      original: {
-        __typename?: 'Media'
-        url: any
-        width?: number | null
-        height?: number | null
-        mimeType?: any | null
-      }
+      original: { __typename?: 'Media'; url: any; width?: number | null; height?: number | null; mimeType?: any | null }
       small?: {
         __typename?: 'Media'
         url: any
@@ -8569,6 +8991,40 @@ export type CommonPaginatedResultFieldsFragment = {
   totalCount?: number | null
 }
 
+export type CreateFollowTypedDataMutationVariables = Exact<{
+  request: FollowRequest
+}>
+
+export type CreateFollowTypedDataMutation = {
+  __typename?: 'Mutation'
+  createFollowTypedData: {
+    __typename?: 'CreateFollowBroadcastItemResult'
+    id: any
+    expiresAt: any
+    typedData: {
+      __typename?: 'CreateFollowEIP712TypedData'
+      domain: {
+        __typename?: 'EIP712TypedDataDomain'
+        name: string
+        chainId: any
+        version: string
+        verifyingContract: any
+      }
+      types: {
+        __typename?: 'CreateFollowEIP712TypedDataTypes'
+        FollowWithSig: Array<{ __typename?: 'EIP712TypedDataField'; name: string; type: string }>
+      }
+      value: {
+        __typename?: 'CreateFollowEIP712TypedDataValue'
+        nonce: any
+        deadline: any
+        profileIds: Array<any>
+        datas: Array<any>
+      }
+    }
+  }
+}
+
 export type DefaultProfileQueryVariables = Exact<{
   request: DefaultProfileRequest
 }>
@@ -8677,6 +9133,10 @@ export type DefaultProfileQuery = {
   } | null
 }
 
+export type ProfileInterestsQueryVariables = Exact<{ [key: string]: never }>
+
+export type ProfileInterestsQuery = { __typename?: 'Query'; profileInterests: Array<any> }
+
 export type ProfileQueryVariables = Exact<{
   request: SingleProfileQueryRequest
 }>
@@ -8685,6 +9145,7 @@ export type ProfileQuery = {
   __typename?: 'Query'
   profile?: {
     __typename?: 'Profile'
+    interests?: Array<any> | null
     id: any
     name?: string | null
     bio?: string | null
@@ -8784,6 +9245,12 @@ export type ProfileQuery = {
       | null
   } | null
 }
+
+export type VerifyQueryVariables = Exact<{
+  request: VerifyRequest
+}>
+
+export type VerifyQuery = { __typename?: 'Query'; verify: boolean }
 
 export const MediaFieldsFragmentDoc = {
   kind: 'Document',
@@ -9783,6 +10250,238 @@ export const CommonPaginatedResultFieldsFragmentDoc = {
     },
   ],
 } as unknown as DocumentNode<CommonPaginatedResultFieldsFragment, unknown>
+export const AuthenticateDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'mutation',
+      name: { kind: 'Name', value: 'authenticate' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'request' } },
+          type: {
+            kind: 'NonNullType',
+            type: { kind: 'NamedType', name: { kind: 'Name', value: 'SignedAuthChallenge' } },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'authenticate' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'request' },
+                value: { kind: 'Variable', name: { kind: 'Name', value: 'request' } },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'accessToken' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'refreshToken' } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<AuthenticateMutation, AuthenticateMutationVariables>
+export const BroadcastDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'mutation',
+      name: { kind: 'Name', value: 'Broadcast' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'request' } },
+          type: { kind: 'NonNullType', type: { kind: 'NamedType', name: { kind: 'Name', value: 'BroadcastRequest' } } },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'broadcast' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'request' },
+                value: { kind: 'Variable', name: { kind: 'Name', value: 'request' } },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                {
+                  kind: 'InlineFragment',
+                  typeCondition: { kind: 'NamedType', name: { kind: 'Name', value: 'RelayerResult' } },
+                  selectionSet: {
+                    kind: 'SelectionSet',
+                    selections: [
+                      { kind: 'Field', name: { kind: 'Name', value: 'txHash' } },
+                      { kind: 'Field', name: { kind: 'Name', value: 'txId' } },
+                    ],
+                  },
+                },
+                {
+                  kind: 'InlineFragment',
+                  typeCondition: { kind: 'NamedType', name: { kind: 'Name', value: 'RelayError' } },
+                  selectionSet: {
+                    kind: 'SelectionSet',
+                    selections: [{ kind: 'Field', name: { kind: 'Name', value: 'reason' } }],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<BroadcastMutation, BroadcastMutationVariables>
+export const ChallengeDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'query',
+      name: { kind: 'Name', value: 'Challenge' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'request' } },
+          type: { kind: 'NonNullType', type: { kind: 'NamedType', name: { kind: 'Name', value: 'ChallengeRequest' } } },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'challenge' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'request' },
+                value: { kind: 'Variable', name: { kind: 'Name', value: 'request' } },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [{ kind: 'Field', name: { kind: 'Name', value: 'text' } }],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<ChallengeQuery, ChallengeQueryVariables>
+export const CreateFollowTypedDataDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'mutation',
+      name: { kind: 'Name', value: 'createFollowTypedData' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'request' } },
+          type: { kind: 'NonNullType', type: { kind: 'NamedType', name: { kind: 'Name', value: 'FollowRequest' } } },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'createFollowTypedData' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'request' },
+                value: { kind: 'Variable', name: { kind: 'Name', value: 'request' } },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'expiresAt' } },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'typedData' },
+                  selectionSet: {
+                    kind: 'SelectionSet',
+                    selections: [
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'domain' },
+                        selectionSet: {
+                          kind: 'SelectionSet',
+                          selections: [
+                            { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+                            { kind: 'Field', name: { kind: 'Name', value: 'chainId' } },
+                            { kind: 'Field', name: { kind: 'Name', value: 'version' } },
+                            { kind: 'Field', name: { kind: 'Name', value: 'verifyingContract' } },
+                          ],
+                        },
+                      },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'types' },
+                        selectionSet: {
+                          kind: 'SelectionSet',
+                          selections: [
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'FollowWithSig' },
+                              selectionSet: {
+                                kind: 'SelectionSet',
+                                selections: [
+                                  { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+                                  { kind: 'Field', name: { kind: 'Name', value: 'type' } },
+                                ],
+                              },
+                            },
+                          ],
+                        },
+                      },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'value' },
+                        selectionSet: {
+                          kind: 'SelectionSet',
+                          selections: [
+                            { kind: 'Field', name: { kind: 'Name', value: 'nonce' } },
+                            { kind: 'Field', name: { kind: 'Name', value: 'deadline' } },
+                            { kind: 'Field', name: { kind: 'Name', value: 'profileIds' } },
+                            { kind: 'Field', name: { kind: 'Name', value: 'datas' } },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<CreateFollowTypedDataMutation, CreateFollowTypedDataMutationVariables>
 export const DefaultProfileDocument = {
   kind: 'Document',
   definitions: [
@@ -9825,6 +10524,20 @@ export const DefaultProfileDocument = {
     ...MediaFieldsFragmentDoc.definitions,
   ],
 } as unknown as DocumentNode<DefaultProfileQuery, DefaultProfileQueryVariables>
+export const ProfileInterestsDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'query',
+      name: { kind: 'Name', value: 'ProfileInterests' },
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [{ kind: 'Field', name: { kind: 'Name', value: 'profileInterests' } }],
+      },
+    },
+  ],
+} as unknown as DocumentNode<ProfileInterestsQuery, ProfileInterestsQueryVariables>
 export const ProfileDocument = {
   kind: 'Document',
   definitions: [
@@ -9857,7 +10570,10 @@ export const ProfileDocument = {
             ],
             selectionSet: {
               kind: 'SelectionSet',
-              selections: [{ kind: 'FragmentSpread', name: { kind: 'Name', value: 'ProfileFields' } }],
+              selections: [
+                { kind: 'FragmentSpread', name: { kind: 'Name', value: 'ProfileFields' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'interests' } },
+              ],
             },
           },
         ],
@@ -9867,6 +10583,39 @@ export const ProfileDocument = {
     ...MediaFieldsFragmentDoc.definitions,
   ],
 } as unknown as DocumentNode<ProfileQuery, ProfileQueryVariables>
+export const VerifyDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'query',
+      name: { kind: 'Name', value: 'verify' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'request' } },
+          type: { kind: 'NonNullType', type: { kind: 'NamedType', name: { kind: 'Name', value: 'VerifyRequest' } } },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'verify' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'request' },
+                value: { kind: 'Variable', name: { kind: 'Name', value: 'request' } },
+              },
+            ],
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<VerifyQuery, VerifyQueryVariables>
 
 export interface PossibleTypesResultData {
   possibleTypes: {

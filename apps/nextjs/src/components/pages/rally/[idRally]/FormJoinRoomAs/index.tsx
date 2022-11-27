@@ -32,7 +32,13 @@ export const FormJoinRoomAs = (props: FormJoinRoomAsProps) => {
               setData('useLensProfile', value === 'lens' ? true : false)
               if (value === 'lens') {
                 setFields('displayName', queryLensProfile?.data?.name)
-                setFields('avatarUrl', queryLensProfile?.data?.picture?.original?.url)
+                setFields(
+                  'avatarUrl',
+                  queryLensProfile?.data?.picture?.original?.url?.replace(
+                    'ipfs://',
+                    'https://lens.infura-ipfs.io/ipfs/',
+                  ),
+                )
               }
             }}
           >

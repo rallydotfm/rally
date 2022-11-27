@@ -3,7 +3,7 @@ import { getDefaultProfile } from '@services/lens/profile/getDefaultProfile'
 
 export function useWalletAddressDefaultLensProfile(address: string, enabled?: boolean) {
   const queryLensProfile = useQuery(
-    ['lens-profile', address],
+    ['lens-profile-by-wallet-address', address],
     async () => {
       try {
         const result = await getDefaultProfile({

@@ -1,0 +1,23 @@
+query profile($request: SingleProfileQueryRequest!) {
+  profile(request: $request) {
+    ...ProfileFields
+    interests
+    onChainIdentity {
+      ens {
+        name
+      }
+      proofOfHumanity
+      sybilDotOrg {
+        verified
+        source {
+          twitter {
+            handle
+          }
+        }
+      }
+      worldcoin {
+        isHuman
+      }
+    }
+  }
+}
