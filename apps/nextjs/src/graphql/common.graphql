@@ -62,6 +62,7 @@ fragment ProfileFields on Profile {
   ownedBy
   dispatcher {
     address
+    canUseRelay
   }
   stats {
     totalFollowers
@@ -73,24 +74,23 @@ fragment ProfileFields on Profile {
     totalCollects
   }
   followModule {
-    ... on FeeFollowModuleSettings {
-      type
-      amount {
-        asset {
-          name
-          symbol
-          decimals
-          address
+    ...FollowModuleFields
+  }
+  onChainIdentity {
+    ens {
+      name
+    }
+    proofOfHumanity
+    sybilDotOrg {
+      verified
+      source {
+        twitter {
+          handle
         }
-        value
       }
-      recipient
     }
-    ... on ProfileFollowModuleSettings {
-      type
-    }
-    ... on RevertFollowModuleSettings {
-      type
+    worldcoin {
+      isHuman
     }
   }
 }
@@ -121,6 +121,23 @@ fragment MetadataOutputFields on MetadataOutput {
     traitType
     value
   }
+  encryptionParams {
+    providerSpecificParams {
+      encryptionKey
+    }
+    accessCondition {
+        ...AccessConditionFields
+    }
+    encryptedFields {
+        animation_url
+        content
+        external_url
+        image
+        media {
+            ...EncryptedMediaSetFields
+        }
+    }
+  }
 }
 
 fragment Erc20Fields on Erc20 {
@@ -128,66 +145,6 @@ fragment Erc20Fields on Erc20 {
   symbol
   decimals
   address
-}
-
-fragment CollectModuleFields on CollectModule {
-  __typename
-  ... on FreeCollectModuleSettings {
-    type
-    followerOnly
-    contractAddress
-  }
-  ... on FeeCollectModuleSettings {
-    type
-    amount {
-      asset {
-        ...Erc20Fields
-      }
-      value
-    }
-    recipient
-    referralFee
-  }
-  ... on LimitedFeeCollectModuleSettings {
-    type
-    collectLimit
-    amount {
-      asset {
-        ...Erc20Fields
-      }
-      value
-    }
-    recipient
-    referralFee
-  }
-  ... on LimitedTimedFeeCollectModuleSettings {
-    type
-    collectLimit
-    amount {
-      asset {
-        ...Erc20Fields
-      }
-      value
-    }
-    recipient
-    referralFee
-    endTimestamp
-  }
-  ... on RevertCollectModuleSettings {
-    type
-  }
-  ... on TimedFeeCollectModuleSettings {
-    type
-    amount {
-      asset {
-        ...Erc20Fields
-      }
-      value
-    }
-    recipient
-    referralFee
-    endTimestamp
-  }
 }
 
 fragment PostFields on Post {
@@ -206,15 +163,14 @@ fragment PostFields on Post {
     ...CollectModuleFields
   }
   referenceModule {
-    ... on FollowOnlyReferenceModuleSettings {
-      type
-    }
+    ...ReferenceModuleFields
   }
   appId
   hidden
   reaction(request: null)
   mirrors(by: null)
   hasCollectedByMe
+  isGated
 }
 
 fragment MirrorBaseFields on Mirror {
@@ -233,14 +189,13 @@ fragment MirrorBaseFields on Mirror {
     ...CollectModuleFields
   }
   referenceModule {
-    ... on FollowOnlyReferenceModuleSettings {
-      type
-    }
+    ...ReferenceModuleFields
   }
   appId
   hidden
   reaction(request: null)
   hasCollectedByMe
+  isGated
 }
 
 fragment MirrorFields on Mirror {
@@ -271,15 +226,14 @@ fragment CommentBaseFields on Comment {
     ...CollectModuleFields
   }
   referenceModule {
-    ... on FollowOnlyReferenceModuleSettings {
-      type
-    }
+    ...ReferenceModuleFields
   }
   appId
   hidden
   reaction(request: null)
   mirrors(by: null)
   hasCollectedByMe
+  isGated
 }
 
 fragment CommentFields on Comment {
@@ -351,8 +305,254 @@ fragment WalletFields on Wallet {
   }
 }
 
-fragment CommonPaginatedResultFields on PaginatedResultInfo {
+fragment CommonPaginatedResultInfoFields on PaginatedResultInfo {
   prev
   next
   totalCount
+}
+
+fragment FollowModuleFields on FollowModule {
+  ... on FeeFollowModuleSettings {
+    type
+    amount {
+      asset {
+        name
+        symbol
+        decimals
+        address
+      }
+      value
+    }
+    recipient
+  }
+  ... on ProfileFollowModuleSettings {
+    type
+    contractAddress
+  }
+  ... on RevertFollowModuleSettings {
+    type
+    contractAddress
+  }
+  ... on UnknownFollowModuleSettings {
+    type
+    contractAddress
+    followModuleReturnData
+  }
+}
+
+fragment CollectModuleFields on CollectModule {
+  __typename
+  ... on FreeCollectModuleSettings {
+    type
+    followerOnly
+    contractAddress
+  }
+  ... on FeeCollectModuleSettings {
+    type
+    amount {
+      asset {
+        ...Erc20Fields
+      }
+      value
+    }
+    recipient
+    referralFee
+  }
+  ... on LimitedFeeCollectModuleSettings {
+    type
+    collectLimit
+    amount {
+      asset {
+        ...Erc20Fields
+      }
+      value
+    }
+    recipient
+    referralFee
+  }
+  ... on LimitedTimedFeeCollectModuleSettings {
+    type
+    collectLimit
+    amount {
+      asset {
+        ...Erc20Fields
+      }
+      value
+    }
+    recipient
+    referralFee
+    endTimestamp
+  }
+  ... on RevertCollectModuleSettings {
+    type
+  }
+  ... on TimedFeeCollectModuleSettings {
+    type
+    amount {
+      asset {
+        ...Erc20Fields
+      }
+      value
+    }
+    recipient
+    referralFee
+    endTimestamp
+  }
+  ... on UnknownCollectModuleSettings {
+    type
+    contractAddress
+    collectModuleReturnData
+  }
+}
+
+fragment ReferenceModuleFields on ReferenceModule {
+  ... on FollowOnlyReferenceModuleSettings {
+    type
+    contractAddress
+  }
+  ... on UnknownReferenceModuleSettings {
+    type
+    contractAddress
+    referenceModuleReturnData
+  }
+  ... on DegreesOfSeparationReferenceModuleSettings {
+    type
+    contractAddress
+    commentsRestricted
+    mirrorsRestricted
+    degreesOfSeparation
+  }
+}
+
+fragment Erc20OwnershipFields on Erc20OwnershipOutput {
+  contractAddress
+  amount
+  chainID
+  condition
+  decimals
+}
+
+fragment EoaOwnershipFields on EoaOwnershipOutput {
+  address
+}
+
+fragment NftOwnershipFields on NftOwnershipOutput {
+  contractAddress
+  chainID
+  contractType
+  tokenIds
+}
+
+fragment ProfileOwnershipFields on ProfileOwnershipOutput {
+  profileId
+}
+
+fragment FollowConditionFields on FollowConditionOutput {
+  profileId
+}
+
+fragment CollectConditionFields on CollectConditionOutput {
+  publicationId
+  thisPublication
+}
+
+fragment AndConditionFields on AndConditionOutput {
+  criteria {
+    ...AccessConditionFields
+  }
+}
+
+fragment OrConditionFields on OrConditionOutput {
+  criteria {
+    ...AccessConditionFields
+  }
+}
+fragment AndConditionFieldsNoRecursive on AndConditionOutput {
+  criteria {
+    ...SimpleConditionFields
+  }
+}
+
+fragment OrConditionFieldsNoRecursive on OrConditionOutput {
+  criteria {
+    ...SimpleConditionFields
+  }
+}
+
+fragment SimpleConditionFields on AccessConditionOutput {
+  nft {
+    ...NftOwnershipFields
+  }
+  eoa {
+    ...EoaOwnershipFields
+  }
+  token {
+    ...Erc20OwnershipFields
+  }
+  profile {
+    ...ProfileOwnershipFields
+  }
+  follow {
+    ...FollowConditionFields
+  }
+  collect {
+    ...CollectConditionFields
+  }
+}
+
+fragment BooleanConditionFieldsRecursive on AccessConditionOutput {
+  and {
+     criteria {
+         ...SimpleConditionFields
+         and {
+             criteria {
+                 ...SimpleConditionFields
+             }
+         }
+         or {
+             criteria {
+                 ...SimpleConditionFields
+             }
+         }
+     }
+  }
+  or {
+     criteria {
+         ...SimpleConditionFields
+         and {
+             criteria {
+                 ...SimpleConditionFields
+             }
+         }
+         or {
+             criteria {
+                 ...SimpleConditionFields
+             }
+         }
+     }
+  }
+}
+
+fragment AccessConditionFields on AccessConditionOutput {
+    ...SimpleConditionFields
+    ...BooleanConditionFieldsRecursive
+}
+
+fragment EncryptedMediaFields on EncryptedMedia {
+  url
+  width
+  height
+  mimeType
+}
+
+fragment EncryptedMediaSetFields on EncryptedMediaSet {
+   original {
+       ...EncryptedMediaFields
+   }
+   small {
+       ...EncryptedMediaFields
+   }
+   medium {
+       ...EncryptedMediaFields
+   }
 }

@@ -1,14 +1,13 @@
-import { client } from '@config/urql'
 import { ProfileInterestsDocument } from '@graphql/generated'
+import { client } from '@config/graphql-request'
 
 /**
- * Get Lens profile by handle
- * @param request: `{ handle: string }`
- * @returns Lens profile Profile or `undefined`
+ * Get list of interests available on Lens
+ * @returns Array<string>
  */
 export async function getListProfileInterests() {
-  const profile = await client.query(ProfileInterestsDocument).toPromise()
-  return profile
+  const result = await client.request(ProfileInterestsDocument)
+  return result
 }
 
 export default getListProfileInterests

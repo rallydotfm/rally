@@ -1,3 +1,20 @@
+export const DICTIONARY_PROFILE_INTERESTS_CATEGORIES = {
+  ART_ENTERTAINMENT: 'Art & Entertainment',
+  BUSINESS: 'Business',
+  TECHNOLOGY: 'Technology',
+  CAREER: 'Career',
+  EDUCATION: 'Education',
+  FAMILY_PARENTING: 'Family & Parenting',
+  HEALTH_FITNESS: 'Health & Fitness',
+  FOOD_DRINK: 'Food & Drink',
+  HOBBIES_INTERESTS: 'Hobbies & Interests',
+  HOME_GARDEN: 'Home & Garden',
+  LAW_GOVERNMENT_POLITICS: 'Law, Government & Politics',
+  NEWS: 'News',
+  LENS: 'Lens',
+  CRYPTO: 'Crypto',
+  NSFW: 'NSFW',
+}
 export const DICTIONARY_PROFILE_INTERESTS = {
   ART_ENTERTAINMENT__BOOKS: {
     label: 'Book',

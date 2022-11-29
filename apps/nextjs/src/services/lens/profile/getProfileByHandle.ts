@@ -1,4 +1,4 @@
-import { client } from '@config/urql'
+import { client } from '@config/graphql-request'
 import { ProfileDocument } from '@graphql/generated'
 import type { SingleProfileQueryRequest } from '@graphql/generated'
 
@@ -7,13 +7,14 @@ import type { SingleProfileQueryRequest } from '@graphql/generated'
  * @param request: `{ handle: string }`
  * @returns Lens profile Profile or `undefined`
  */
-export async function getProfileByHandleRequest(request: SingleProfileQueryRequest) {
-  const profile = await client
-    .query(ProfileDocument, {
-      request,
-    })
-    .toPromise()
-  return profile
+export async function getProfileByHandleRequest(profileRequest: SingleProfileQueryRequest) {
+  const result = await client.request(ProfileDocument, {
+    request: {
+      ...profileRequest,
+    },
+  })
+
+  return result
 }
 
 export default getProfileByHandleRequest

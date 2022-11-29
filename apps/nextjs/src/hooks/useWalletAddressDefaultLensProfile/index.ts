@@ -11,7 +11,7 @@ export function useWalletAddressDefaultLensProfile(address: string, enabled?: bo
         })
         //@ts-ignore
         if (result?.error) throw new Error(result?.error)
-        return result?.data?.defaultProfile
+        return result?.defaultProfile
       } catch (e) {
         console.error(e)
       }

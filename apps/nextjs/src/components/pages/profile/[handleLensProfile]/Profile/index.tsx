@@ -1,9 +1,13 @@
 import Button from '@components/Button'
 import { IconInstagram, IconTwitter, IconWebsite } from '@components/Icons'
-import useGetListProfilesInterests from '@hooks/useGetProfileInterests'
 import type { Profile as LensProfile } from '@graphql/generated'
 import { DICTIONARY_PROFILE_INTERESTS } from '@helpers/mappingProfileInterests'
 import useGetGuildMembershipsByWalletAddress from '@hooks/useGetGuildMembershipsByWalletAddress'
+import CardGuildMembership from './CardGuildMembership'
+import type { GetMembershipsResponse } from '@guildxyz/sdk'
+import { useAccount } from 'wagmi'
+import Link from 'next/link'
+import { ROUTE_ACCOUNT } from '@config/routes'
 
 interface ProfileProps {
   data: LensProfile
@@ -17,8 +21,10 @@ const attributeKeyToIcon = {
 
 export const Profile = (props: ProfileProps) => {
   const { data } = props
-  const queryListProfileInterests = useGetListProfilesInterests()
-  const queryListProfileGuilds = useGetGuildMembershipsByWalletAddress(data?.ownedBy)
+  const account = useAccount()
+  const queryListProfileGuilds = useGetGuildMembershipsByWalletAddress(data?.ownedBy as `0x${string}`, {
+    enabled: true,
+  })
   return (
     <article>
       <div>
@@ -67,7 +73,17 @@ export const Profile = (props: ProfileProps) => {
             </section>
           </div>
           <div className="col-span-1 pt-6 justify-self-end">
-            <Button scale="sm">Follow</Button>
+            {account?.address === data?.ownedBy ? (
+              <>
+                <Link href={ROUTE_ACCOUNT}>
+                  <a>Edit your profile</a>
+                </Link>
+              </>
+            ) : (
+              <>
+                <Button scale="sm">Follow</Button>
+              </>
+            )}
           </div>
         </div>
       </div>
@@ -98,18 +114,40 @@ export const Profile = (props: ProfileProps) => {
         </ul>
       </section>
       <section className="pt-6 mt-8 border-t border-neutral-1">
-        <h2 className="font-semibold text-sm text-neutral-12">Interests</h2>
-        <ul className="mt-2 flex flex-wrap gap-1 text-2xs">
-          {data.interests?.map((interest) => (
-            <li className="px-2 py-0.5 bg-neutral-1 rounded-md font-medium" key={interest}>
-              {DICTIONARY_PROFILE_INTERESTS[interest]?.emoji} {DICTIONARY_PROFILE_INTERESTS[interest]?.label}
-            </li>
-          ))}
-        </ul>
+        <h2 className="animate-appear font-semibold text-sm text-neutral-12">Interests</h2>
+
+        <div className="mt-2">
+          {(data?.interests?.length as number) > 0 ? (
+            <ul className="flex flex-wrap gap-1 text-2xs">
+              {data.interests?.map((interest) => (
+                <li className="animate-appear px-2 py-0.5 bg-neutral-1 rounded-md font-medium" key={interest}>
+                  {DICTIONARY_PROFILE_INTERESTS[interest]?.emoji} {DICTIONARY_PROFILE_INTERESTS[interest]?.label}
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <>
+              <p className="animate-appear italic text-neutral-9 text-sm">
+                {account?.address === data?.ownedBy
+                  ? "You didn't set your profile interests yet."
+                  : `${data?.name} didn't set their interests yet.`}
+              </p>
+            </>
+          )}
+        </div>
       </section>
 
-      <section className="-mx-6 px-6 pt-6 mt-8 border-t border-neutral-1">
-        <h2 className="font-semibold text-sm text-neutral-12">Guilds</h2>
+      <section className="animate-appear -mx-6 px-6 pt-6 mt-8 border-t border-neutral-1">
+        <h2 className="font-semibold text-sm text-neutral-12 mb-3">Guilds</h2>
+        <ul className="grid grid-cols-1 2xs:grid-cols-2 gap-3 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
+          {queryListProfileGuilds?.data?.guilds.map((guild: GetMembershipsResponse) => {
+            return (
+              <li className="animate-appear col-span-1" key={guild.guildId}>
+                <CardGuildMembership id={guild.guildId} />
+              </li>
+            )
+          })}
+        </ul>
       </section>
     </article>
   )

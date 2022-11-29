@@ -1,10 +1,7 @@
-import { IconSpinner } from '@components/Icons'
 import { useDebouncedEffect } from '@react-hookz/web'
 import { useState } from 'react'
 import useGetGuildById from '@hooks/useGetGuildById'
 import GuildRequirement from '@components/GuildRequirement'
-import { role } from '@guildxyz/sdk'
-
 interface OptionGuildProps {
   id: string
   index: number

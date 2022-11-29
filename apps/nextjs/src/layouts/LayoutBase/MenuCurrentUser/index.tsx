@@ -4,13 +4,14 @@ import { useDisconnect, useEnsName, useNetwork } from 'wagmi'
 import { EllipsisHorizontalIcon } from '@heroicons/react/24/outline'
 import { shortenEthereumAddress } from '@helpers/shortenEthereumAddress'
 import useWalletAddressDefaultLensProfile from '@hooks/useWalletAddressDefaultLensProfile'
-import { ROUTE_PROFILE, ROUTE_ACCOUNT_PREFERENCES } from '@config/routes'
+import { ROUTE_PROFILE, ROUTE_ACCOUNT } from '@config/routes'
 import { useChainModal } from '@rainbow-me/rainbowkit'
 
 import Profile from './Profile'
 import { ExclamationTriangleIcon, ShieldExclamationIcon } from '@heroicons/react/20/solid'
 import Button from '@components/Button'
-import { useSession } from 'next-auth/react'
+import { signOut, useSession } from 'next-auth/react'
+import { useStoreHasSignedInWithLens } from '@hooks/useSignInWithLens'
 
 interface MenuCurrentUserProps {
   address: string
@@ -26,6 +27,7 @@ export const MenuCurrentUser = (props: MenuCurrentUserProps) => {
     address: address as `0x${string}`,
   })
   const { status } = useSession()
+  const setIsSignedIn = useStoreHasSignedInWithLens((state) => state.setIsSignedIn)
 
   return (
     <div className="flex items-center md:flex-col md:justify-center">
@@ -91,17 +93,23 @@ export const MenuCurrentUser = (props: MenuCurrentUserProps) => {
             <Profile queryEns={queryEns} queryLens={queryUserProfileLens} address={address} />
           </Menu.Item>
           {queryUserProfileLens?.data?.id && (
-            <Menu.Item as={Link} href={ROUTE_PROFILE.replace('[idLensProfile]', queryUserProfileLens?.data?.id)}>
+            <Menu.Item
+              as={Link}
+              href={ROUTE_PROFILE.replace('[handleLensProfile]', queryUserProfileLens?.data?.handle)}
+            >
               <a className="hover:bg-interactive-10 ui-active:bg-interactive-10 px-3 py-2">My profile</a>
             </Menu.Item>
           )}
-          <Menu.Item as={Link} href={ROUTE_ACCOUNT_PREFERENCES}>
-            <a className="hover:bg-interactive-10 ui-active:bg-interactive-10 px-3 py-2">Preferences</a>
+          <Menu.Item as={Link} href={ROUTE_ACCOUNT}>
+            <a className="hover:bg-interactive-10 ui-active:bg-interactive-10 px-3 py-2">Account</a>
           </Menu.Item>
           <Menu.Item
             as="button"
             className="text-start ui-active:bg-interactive-10 px-3 py-2"
-            onClick={() => disconnect()}
+            onClick={async () => {
+              setIsSignedIn(false)
+              await disconnect()
+            }}
           >
             Sign out
           </Menu.Item>

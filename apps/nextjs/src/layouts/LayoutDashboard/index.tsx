@@ -3,6 +3,7 @@ import { cva } from 'class-variance-authority'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { getLayout as getProtectedLayout } from '../LayoutWalletRequired'
+import { getLayout as getBaseLayout } from '../LayoutBase'
 
 interface LayoutProps {
   children: React.ReactNode
@@ -43,6 +44,7 @@ export const LayoutDashboard = (props: LayoutProps) => {
 }
 
 export const getLayout = (page: any) => {
-  return getProtectedLayout(<LayoutDashboard>{page}</LayoutDashboard>)
+  return getBaseLayout(<LayoutDashboard>{getProtectedLayout(page)}</LayoutDashboard>)
 }
+
 export default LayoutDashboard

@@ -11,7 +11,7 @@ export function useGetLensProfileByHandle(handle: string, options: any) {
         })
         //@ts-ignore
         if (result?.error) throw new Error(result?.error)
-        return result?.data?.profile
+        return result?.profile
       } catch (e) {
         console.error(e)
       }

@@ -9,7 +9,7 @@ export function useGetProfilesInterests() {
         const result = await getListProfileInterests()
         //@ts-ignore
         if (result?.error) throw new Error(result?.error)
-        return result?.data?.profileInterests
+        return result?.profileInterests
       } catch (e) {
         console.error(e)
       }

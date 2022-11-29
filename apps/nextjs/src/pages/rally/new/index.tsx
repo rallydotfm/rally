@@ -13,6 +13,8 @@ import { useUnmountEffect } from '@react-hookz/web'
 import { DeploymentStep } from '@components/DeploymentStep'
 import toast from 'react-hot-toast'
 import { useAccount } from 'wagmi'
+import { getLayout as getProtectedLayout } from '@layouts/LayoutWalletRequired'
+import { getLayout as getBaseLayout } from '@layouts/LayoutBase'
 
 const Page: NextPage = () => {
   const account = useAccount()
@@ -178,6 +180,11 @@ const Page: NextPage = () => {
       </DialogModal>
     </>
   )
+}
+
+//@ts-ignore
+Page.getLayout = (page: any) => {
+  return getBaseLayout(getProtectedLayout(page))
 }
 
 export default Page
