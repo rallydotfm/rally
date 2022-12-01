@@ -20,7 +20,7 @@ export const DICTIONARY_PROFILE_INTERESTS = {
     label: 'Book',
     emoji: '📚',
   },
-  ART_ENTERTAINMENT__ARTS: {
+  ART_ENTERTAINMENT__ART: {
     label: 'Art',
     emoji: '🎨',
   },
@@ -57,7 +57,7 @@ export const DICTIONARY_PROFILE_INTERESTS = {
     emoji: '💳',
   },
   BUSINESS__FINANCE: {
-    label: 'FINANCE',
+    label: 'Finance',
     emoji: '💱',
   },
   BUSINESS__MARKETING: {
@@ -220,7 +220,14 @@ export const DICTIONARY_PROFILE_INTERESTS = {
     label: 'L1',
     emoji: '🇱1️⃣',
   },
-
+  CRYPTO__ETHEREUM: {
+    label: 'Ethereum',
+    emoji: '🔹',
+  },
+  CRYPTO__GM: {
+    label: 'gm',
+    emoji: '👋',
+  },
   CRYPTO__L2: {
     label: 'L2',
     emoji: '🇱2️⃣',

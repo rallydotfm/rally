@@ -16,9 +16,9 @@ NEXT_PUBLIC_LENS_API_URL=https://api-mumbai.lens.dev
 # Lens App ID
 NEXT_PUBLIC_LENS_PUBLICATIONS_APP_ID=
 # Lens Hub Proxy contract address. This is the contract address on Mumbai testnet.
-NEXT_PUBLIC_LENS_HUB_PROXY=0x60Ae865ee4C725cd04353b5AAb364553f56ceF82
+NEXT_PUBLIC_CONTRACT_LENS_HUB_PROXY=0x60Ae865ee4C725cd04353b5AAb364553f56ceF82
 # Lens Periphery contract address. This is the contract address on Mumbai testnet.
-NEXT_PUBLIC_LENS_PERIPHERY=0xD5037d72877808cdE7F669563e9389930AF404E8
+NEXT_PUBLIC_CONTRACT_LENS_PERIPHERY=0xD5037d72877808cdE7F669563e9389930AF404E8
 # Web3 Storage key. Replace with yours !
 NEXT_PUBLIC_WEB3_STORAGE=
 # Audio chat management smart contract. This is the contract address on Mumbai testnet

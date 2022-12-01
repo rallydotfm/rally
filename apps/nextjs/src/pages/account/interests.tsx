@@ -9,8 +9,10 @@ import ListInterests from '@components/pages/account/interests/ListInterests'
 const Page: NextPage = () => {
   const account = useAccount()
   const queryListInterests = useGetProfilesInterests()
-  const queryLensProfile = useWalletAddressDefaultLensProfile(account?.address, account?.address ? true : false)
-  console.log(queryLensProfile?.data?.interests, queryListInterests?.data)
+  const queryLensProfile = useWalletAddressDefaultLensProfile(
+    account?.address as `0x${string}`,
+    account?.address ? true : false,
+  )
   return (
     <>
       <Head>
@@ -26,12 +28,13 @@ const Page: NextPage = () => {
           Select the topics you're interested by. Rally will use those to display curated rooms and recordings for you.
         </p>
         <p className="font-bold mt-1 mb-6 text-xs">You can select up to 12 interests.</p>
-        {queryLensProfile?.data && queryListInterests?.data && (
-          <ListInterests userProfileInterests={queryLensProfile?.data?.interests} list={queryListInterests?.data} />
+        {queryLensProfile?.data && queryListInterests?.data?.length && (
+          <ListInterests profile={queryLensProfile?.data} list={queryListInterests?.data} />
         )}
       </main>
     </>
   )
 }
+//@ts-ignore
 Page.getLayout = getLayout
 export default Page

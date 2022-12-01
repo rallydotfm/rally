@@ -1,4 +1,3 @@
-import Button from '@components/Button'
 import { IconInstagram, IconTwitter, IconWebsite } from '@components/Icons'
 import type { Profile as LensProfile } from '@graphql/generated'
 import { DICTIONARY_PROFILE_INTERESTS } from '@helpers/mappingProfileInterests'
@@ -8,6 +7,9 @@ import type { GetMembershipsResponse } from '@guildxyz/sdk'
 import { useAccount } from 'wagmi'
 import Link from 'next/link'
 import { ROUTE_ACCOUNT } from '@config/routes'
+import ButtonFollowOnLens from '@components/ButtonFollowOnLens'
+import ButtonUnfollowOnLens from '@components/ButtonUnfollowOnLens'
+import button from '@components/Button/styles'
 
 interface ProfileProps {
   data: LensProfile
@@ -76,12 +78,21 @@ export const Profile = (props: ProfileProps) => {
             {account?.address === data?.ownedBy ? (
               <>
                 <Link href={ROUTE_ACCOUNT}>
-                  <a>Edit your profile</a>
+                  <a className={button({ intent: 'neutral-outline', scale: 'sm' })}>Edit your profile</a>
                 </Link>
+              </>
+            ) : data?.isFollowedByMe ? (
+              <>
+                <ButtonUnfollowOnLens
+                  disabled={!account?.address}
+                  scale="sm"
+                  intent="negative-outline"
+                  profile={data}
+                />
               </>
             ) : (
               <>
-                <Button scale="sm">Follow</Button>
+                <ButtonFollowOnLens disabled={!account?.address} scale="sm" intent="primary-outline" profile={data} />
               </>
             )}
           </div>

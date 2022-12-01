@@ -1,4 +1,4 @@
-import { useContractWrite, useNetwork, useWaitForTransaction } from 'wagmi'
+import { useContractWrite, useWaitForTransaction } from 'wagmi'
 import toast from 'react-hot-toast'
 import create from 'zustand'
 import { audioChatABI } from '@rally/abi'

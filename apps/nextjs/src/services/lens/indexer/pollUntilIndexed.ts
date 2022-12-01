@@ -3,19 +3,18 @@ import hasTxBeenIndexed from './hasTxBeenIndexed'
 export async function pollUntilIndexed(input: { txHash: string } | { txId: string }) {
   while (true) {
     const response = await hasTxBeenIndexed(input)
-
-    if (response.__typename === 'TransactionIndexedResult') {
-      if (response.metadataStatus) {
-        if (response.metadataStatus.status === 'SUCCESS') {
-          return response
+    if (response?.hasTxHashBeenIndexed?.__typename === 'TransactionIndexedResult') {
+      if (response?.hasTxHashBeenIndexed?.metadataStatus) {
+        if (response?.hasTxHashBeenIndexed?.metadataStatus.status === 'SUCCESS') {
+          return response?.hasTxHashBeenIndexed
         }
 
-        if (response.metadataStatus.status === 'METADATA_VALIDATION_FAILED') {
-          throw new Error(response.metadataStatus.status)
+        if (response?.hasTxHashBeenIndexed?.metadataStatus.status === 'METADATA_VALIDATION_FAILED') {
+          throw new Error(response?.hasTxHashBeenIndexed?.metadataStatus.status)
         }
       } else {
-        if (response.indexed) {
-          return response
+        if (response?.hasTxHashBeenIndexed?.indexed) {
+          return response?.hasTxHashBeenIndexed
         }
       }
 
@@ -23,7 +22,7 @@ export async function pollUntilIndexed(input: { txHash: string } | { txId: strin
       await new Promise((resolve) => setTimeout(resolve, 1500))
     } else {
       // it got reverted and failed!
-      throw new Error(response.reason)
+      throw new Error(response?.hasTxHashBeenIndexed?.reason)
     }
   }
 }
