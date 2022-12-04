@@ -11,6 +11,7 @@ import button from '@components/Button/styles'
 import type { Key } from 'react'
 import type { Profile as LensProfile } from '@graphql/generated'
 import { useStoreHasSignedInWithLens } from '@hooks/useSignInWithLens'
+import useDoesFollow from '@hooks/useDoesFollow'
 
 interface ProfileProps {
   data: LensProfile
@@ -29,6 +30,8 @@ export const Profile = (props: ProfileProps) => {
   const queryListProfileGuilds = useGetGuildMembershipsByWalletAddress(data?.ownedBy as `0x${string}`, {
     enabled: true,
   })
+  const doesFollow = useDoesFollow(data.id)
+
   return (
     <article className="animate-appear">
       <div>
@@ -92,23 +95,27 @@ export const Profile = (props: ProfileProps) => {
               </>
             ) : (
               <>
-                {data?.isFollowedByMe ? (
+                {account?.address && doesFollow?.data?.doesFollow?.[0] && (
                   <>
-                    <ButtonUnfollowOnLens
-                      disabled={!account?.address || !isSignedIn}
-                      scale="sm"
-                      intent="negative-outline"
-                      profile={data}
-                    />
-                  </>
-                ) : (
-                  <>
-                    <ButtonFollowOnLens
-                      disabled={!account?.address || !isSignedIn}
-                      scale="sm"
-                      intent="primary-outline"
-                      profile={data}
-                    />
+                    {doesFollow?.data?.doesFollow?.[0]?.follows === true ? (
+                      <>
+                        <ButtonUnfollowOnLens
+                          disabled={!account?.address || !isSignedIn}
+                          scale="sm"
+                          intent="negative-outline"
+                          profile={data}
+                        />
+                      </>
+                    ) : (
+                      <>
+                        <ButtonFollowOnLens
+                          disabled={!account?.address || !isSignedIn}
+                          scale="sm"
+                          intent="primary-outline"
+                          profile={data}
+                        />
+                      </>
+                    )}
                   </>
                 )}
               </>

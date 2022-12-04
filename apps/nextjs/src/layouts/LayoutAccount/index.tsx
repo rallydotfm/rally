@@ -55,10 +55,10 @@ export const LayoutAccount = (props: LayoutProps) => {
             href: ROUTE_ACCOUNT,
             label: 'Profile',
           },
-          {
+          /*{
             href: ROUTE_ACCOUNT_MEMBERSHIP,
             label: 'Membership',
-          },
+          },*/
           {
             href: ROUTE_ACCOUNT_PERMISSIONS,
             label: 'Permissions',

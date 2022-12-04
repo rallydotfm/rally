@@ -3,13 +3,18 @@ import Head from 'next/head'
 import { useRouter } from 'next/router'
 import useGetLensProfileByHandle from '@hooks/useGetLensProfileByHandle'
 import Profile from '@components/pages/profile/[handleLensProfile]/Profile'
+import { useAccount } from 'wagmi'
+import { useStoreHasSignedInWithLens } from '@hooks/useSignInWithLens'
 
 const Page: NextPage = () => {
   const {
     query: { handleLensProfile },
   } = useRouter()
+  const account = useAccount()
+  const isSignedIn = useStoreHasSignedInWithLens((state: any) => state.isSignedIn)
+
   const queryLensProfile = useGetLensProfileByHandle(handleLensProfile as string, {
-    enabled: handleLensProfile ? true : false,
+    enabled: handleLensProfile || isSignedIn || account?.address ? true : false,
   })
 
   return (

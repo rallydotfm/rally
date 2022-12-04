@@ -115,6 +115,12 @@ export function useFollowTypedData() {
           exact: true,
         })
 
+        await queryClient.cancelQueries({
+          queryKey: ['does-follow', profileToFollow.id, account?.address],
+          type: 'active',
+          exact: true,
+        })
+
         //@ts-ignore
         await mutationPollTransaction.mutateAsync(tx.hash)
         await queryClient.invalidateQueries({
@@ -137,6 +143,13 @@ export function useFollowTypedData() {
           type: 'active',
           exact: true,
         })
+
+        await queryClient.invalidateQueries({
+          queryKey: ['does-follow', profileToFollow.id, account?.address],
+          type: 'active',
+          exact: true,
+        })
+
         queryClient.setQueryData(
           ['lens-profile-by-wallet-address', profileToFollow.ownedBy],
           (profileOldData: any) => ({

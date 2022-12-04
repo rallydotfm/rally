@@ -275,7 +275,6 @@ const Page: NextPage = () => {
                                     <Button
                                       onClick={async () => {
                                         setIsSignedIn(false)
-                                        await signOut()
                                         await disconnect()
                                         //@ts-ignore
                                         openConnectModal()

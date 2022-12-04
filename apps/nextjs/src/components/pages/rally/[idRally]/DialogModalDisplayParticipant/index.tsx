@@ -14,6 +14,7 @@ import { ROUTE_PROFILE } from '@config/routes'
 import { useStoreHasSignedInWithLens } from '@hooks/useSignInWithLens'
 import useGetFollowing from '@hooks/useGetFollowing'
 import { useAccount } from 'wagmi'
+import useDoesFollow from '@hooks/useDoesFollow'
 
 export interface ParticipantToDisplay {
   isDialogVisible: boolean
@@ -57,6 +58,7 @@ export const DialogModalDisplayParticipant = (props: any) => {
   const queryLensProfile = useWalletAddressDefaultLensProfile(pickedParticipant?.identity as `0x${string}`, true)
   const queryUserAddressFollowers = useGetFollowing(pickedParticipant?.identity as `0x${string}`, {})
   const isSignedIn = useStoreHasSignedInWithLens((state) => state.isSignedIn)
+  const doesFollow = useDoesFollow(queryLensProfile?.data?.id)
 
   const { publications } = useParticipant(pickedParticipant as Participant)
   return (
@@ -135,20 +137,24 @@ export const DialogModalDisplayParticipant = (props: any) => {
           )}
           {!pickedParticipant?.isLocal && queryLensProfile?.data?.id && (
             <div className="mt-4">
-              {queryLensProfile?.data?.isFollowedByMe ? (
-                <ButtonUnfollowOnLens
-                  disabled={!isSignedIn}
-                  profile={queryLensProfile?.data}
-                  scale="xs"
-                  intent="negative-outline"
-                />
-              ) : (
-                <ButtonFollowOnLens
-                  disabled={!isSignedIn}
-                  profile={queryLensProfile?.data}
-                  scale="xs"
-                  intent="primary-outline"
-                />
+              {doesFollow?.data?.doesFollow?.[0] && (
+                <>
+                  {doesFollow?.data?.doesFollow?.[0]?.follows === true ? (
+                    <ButtonUnfollowOnLens
+                      disabled={!isSignedIn}
+                      profile={queryLensProfile?.data}
+                      scale="xs"
+                      intent="negative-outline"
+                    />
+                  ) : (
+                    <ButtonFollowOnLens
+                      disabled={!isSignedIn}
+                      profile={queryLensProfile?.data}
+                      scale="xs"
+                      intent="primary-outline"
+                    />
+                  )}
+                </>
               )}
             </div>
           )}

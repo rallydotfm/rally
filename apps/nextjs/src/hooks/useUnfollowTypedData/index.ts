@@ -1,4 +1,4 @@
-import { useSigner, useSignTypedData } from 'wagmi'
+import { useAccount, useSigner, useSignTypedData } from 'wagmi'
 import { useQueryClient } from '@tanstack/react-query'
 import omit from '@helpers/omit'
 import splitSignature from '@helpers/splitSignature'
@@ -8,10 +8,10 @@ import createUnfollowTypedData from '@services/lens/follow/unfollow'
 import { usePollTransaction } from '@hooks/usePollTransaction'
 import { useState } from 'react'
 import { Contract } from 'ethers'
-
 import type { Signer } from 'ethers'
 
 export function useUnfollowTypedData() {
+  const account = useAccount()
   const queryClient = useQueryClient()
   const { data: signer } = useSigner()
   const signTypedDataUnfollow = useSignTypedData()
@@ -25,6 +25,8 @@ export function useUnfollowTypedData() {
 
   async function unfollowProfile(profile: any) {
     setIsErrorContractUnfollow(false)
+    signTypedDataUnfollow.reset()
+    mutationPollTransaction.reset()
     try {
       const result = await createUnfollowTypedData({ profile: profile.id })
 
@@ -46,7 +48,6 @@ export function useUnfollowTypedData() {
           s,
           deadline: typedData.value.deadline,
         }
-
         const followNftContract = new Contract(
           typedData.domain.verifyingContract,
           lensFollowNFTContractABI,
@@ -54,8 +55,8 @@ export function useUnfollowTypedData() {
         )
 
         setIsWritingContractUnfollow(true)
-        const tx = await followNftContract.burnWithSig(typedData.value.tokenId, sig)
-        const newFollowersCount = (profile.stats.totalFollowers += 1)
+        const tx = await followNftContract.burn(typedData.value.tokenId)
+        const newFollowersCount = (profile.stats.totalFollowers -= 1)
 
         //@ts-ignore
         await queryClient.cancelQueries({
@@ -63,6 +64,13 @@ export function useUnfollowTypedData() {
           type: 'active',
           exact: true,
         })
+
+        await queryClient.cancelQueries({
+          queryKey: ['does-follow', profile.id, account?.address],
+          type: 'active',
+          exact: true,
+        })
+
         await queryClient.cancelQueries({
           queryKey: ['lens-profile-by-wallet-address', profile.ownedBy],
           type: 'active',
@@ -80,6 +88,13 @@ export function useUnfollowTypedData() {
           type: 'active',
           exact: true,
         })
+
+        await queryClient.invalidateQueries({
+          queryKey: ['does-follow', profile.id, account?.address],
+          type: 'active',
+          exact: true,
+        })
+
         queryClient.setQueryData(['lens-profile-by-handle', profile.handle], (profileOldData: any) => ({
           //@ts-ignore
           ...profile,
@@ -106,11 +121,13 @@ export function useUnfollowTypedData() {
         //@ts-ignore
         toast.error(`Something went wrong: ${result?.error}`)
         setIsErrorContractUnfollow(true)
+        setIsWritingContractUnfollow(false)
       }
     } catch (e) {
       console.error(e)
       //@ts-ignore
       toast.error(`Something went wrong: ${e?.cause ?? e}`)
+      setIsWritingContractUnfollow(false)
     }
   }
 
