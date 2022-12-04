@@ -103,6 +103,7 @@ export const Profile = (props: ProfileProps) => {
                           disabled={!account?.address || !isSignedIn}
                           scale="sm"
                           intent="negative-outline"
+                          className="animate-appear"
                           profile={data}
                         />
                       </>
@@ -112,6 +113,7 @@ export const Profile = (props: ProfileProps) => {
                           disabled={!account?.address || !isSignedIn}
                           scale="sm"
                           intent="primary-outline"
+                          className="animate-appear"
                           profile={data}
                         />
                       </>
