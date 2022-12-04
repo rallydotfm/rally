@@ -43,4 +43,5 @@ async function middleware(request: RequestInit) {
     headers: { ...request.headers },
   }
 }
+//@ts-ignore
 export const client = new GraphQLClient(API_URL as string, { requestMiddleware: middleware })

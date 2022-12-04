@@ -9,18 +9,16 @@ export const LayoutWalletRequired = (props: LayoutProps) => {
   const { children } = props
   const session = useSession()
   const account = useAccount()
-  return (
-    <>
-      {!session?.data?.address || !account?.address ? (
-        <Notice intent="primary-outline" className="mt-9 text-center">
-          <h2 className="text-md font-bold">Connect your wallet</h2>
-          <p>Please connect your Ethereum wallet and use Polygon Mumbai network to access this page.</p>
-        </Notice>
-      ) : (
-        <>{children}</>
-      )}
-    </>
-  )
+  if (!session?.data?.address || !account?.address)
+    return (
+      <Notice intent="primary-outline" className="mt-9 max-w-screen-xs mx-auto text-center">
+        <h2 className="text-md font-bold">Connect your wallet</h2>
+        <p className="!font-[500] text-neutral-12 mt-2">
+          Please connect and verify your Ethereum wallet to Polygon Mumbai network to access this page.
+        </p>
+      </Notice>
+    )
+  return <>{children}</>
 }
 
 export const getLayout = (page: any) => {

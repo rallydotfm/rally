@@ -1,4 +1,3 @@
-import Button from '@components/Button'
 import button from '@components/Button/styles'
 import useGetGuildById from '@hooks/useGetGuildById'
 import useGetGuildMembershipsByWalletAddress from '@hooks/useGetGuildMembershipsByWalletAddress'
@@ -22,7 +21,7 @@ export const CardGuildMembership = (props: CardGuildMembershipProps) => {
 
         {queryGuild?.data?.imageUrl && (
           <img
-            className="w-full h-full overflow-hidden absolute inset-0 z-10"
+            className="w-full h-full object-cover overflow-hidden absolute inset-0 z-10"
             src={queryGuild.data.imageUrl}
             alt={queryGuild?.data?.name}
           />

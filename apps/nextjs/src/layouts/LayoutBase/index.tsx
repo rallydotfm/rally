@@ -31,11 +31,10 @@ export const LayoutBase = (props: LayoutProps) => {
     address ? true : false,
   )
   const isSignedIn = useStoreHasSignedInWithLens((state) => state.isSignedIn)
-
   return (
     <div className="relative flex-grow flex flex-col">
       {!isConnecting && !address && <BannerConnectWallet />}
-      {address && queryCurrentUserLensProfile?.data?.handle && !isSignedIn && <BannerSignInWithLens />}
+      {address && !isSignedIn && <BannerSignInWithLens />}
       <div className="flex-grow pb-12 md:pb-0 flex flex-col md:grid md:grid-cols-12">
         <MainNavBar address={address} />
         <MobileTopMenu address={address} />
@@ -66,7 +65,7 @@ export const LayoutBase = (props: LayoutProps) => {
               </div>
             </div>
           )}
-          {stateVoiceChat?.room.state === 'connected' && stateVoiceChat?.room?.localParticipant && (
+          {stateVoiceChat?.room.state === 'connected' && stateVoiceChat?.room?.sid !== '' && (
             <div
               className={`transition-all pointer-events-auto border-transparent flex py-1 bg-neutral-1 md:bg-black border-y-neutral-4 border`}
             >

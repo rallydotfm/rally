@@ -1,23 +1,42 @@
 import Button from '@components/Button'
 import useUnfollowTypedData from '@hooks/useUnfollowTypedData'
+import type { ButtonProps } from '@components/Button'
 
-export const ButtonUnfollowOnLens = (props) => {
+interface ButtonUnfollowOnLensProps extends ButtonProps {
+  profile: any
+}
+
+export const ButtonUnfollowOnLens = (props: ButtonUnfollowOnLensProps) => {
   const { profile, disabled, ...rest } = props
-  const { unfollowProfile, isWritingContractUnfollow, isErrorContractUnfollow, signTypedDataUnfollow } =
-    useUnfollowTypedData()
+  const {
+    unfollowProfile,
+    mutationPollTransaction,
+    isWritingContractUnfollow,
+    isErrorContractUnfollow,
+    signTypedDataUnfollow,
+  } = useUnfollowTypedData()
 
   return (
     <Button
       {...rest}
-      disabled={disabled || [signTypedDataUnfollow?.isLoading, isWritingContractUnfollow].includes(true)}
-      isLoading={[signTypedDataUnfollow?.isLoading, isWritingContractUnfollow].includes(true)}
+      disabled={
+        disabled ||
+        [mutationPollTransaction.isLoading, signTypedDataUnfollow?.isLoading, isWritingContractUnfollow].includes(true)
+      }
+      isLoading={[
+        signTypedDataUnfollow?.isLoading,
+        mutationPollTransaction.isLoading,
+        isWritingContractUnfollow,
+      ].includes(true)}
       onClick={() => unfollowProfile(profile)}
     >
       {signTypedDataUnfollow?.isLoading
         ? 'Sign message...'
         : isWritingContractUnfollow
         ? 'Sign transaction...'
-        : [signTypedDataUnfollow.isError || isErrorContractUnfollow].includes(true)
+        : mutationPollTransaction.isLoading
+        ? 'Indexing...'
+        : [mutationPollTransaction.isError || signTypedDataUnfollow.isError || isErrorContractUnfollow].includes(true)
         ? 'Try again'
         : 'Unfollow'}
     </Button>

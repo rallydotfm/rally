@@ -98,7 +98,7 @@ const Page: NextPage = () => {
           </>
         ) : (
           <>
-            {stateVoiceChat?.room?.state && rally?.id === idRally ? (
+            {stateVoiceChat?.room?.state && rally?.id === idRally && stateVoiceChat?.room?.state === 'connected' ? (
               <div className="animate-appear h-full">
                 <div className="pb-8 flex gap-4 flex-col 2xs:flex-row leading-loose -mis-8 -mie-6 pis-8 pie-6 border-neutral-4 border-b">
                   {queryAudioChatMetadata?.data?.image && (

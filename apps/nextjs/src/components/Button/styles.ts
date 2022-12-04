@@ -36,7 +36,7 @@ export const button = cva(
           'border-transparent bg-black text-white hover:bg-neutral-12 hover:border-black focus:border-black hover:border-opacity-50 focus:border-opacity-50 focus:bg-white hover:text-black focus:text-black',
         ],
         'neutral-on-dark-layer': [
-          'border-transparent bg-white text-black hover:bg-neutral-2 hover:border-white focus:border-white  focus:bg-neutral1 hover:text-neutral-12 focus:text-neutral-12',
+          'border-transparent bg-white text-black hover:bg-neutral-2 hover:border-white focus:border-white  focus:bg-neutral1 hover:text-neutral-12 focus:text-neutral-1 focus:hover:text-neutral-12',
         ],
 
         'neutral-outline': [

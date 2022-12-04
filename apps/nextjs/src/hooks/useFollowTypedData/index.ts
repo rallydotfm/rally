@@ -1,4 +1,4 @@
-import { chain, useAccount, useContractWrite, useSignTypedData, useWaitForTransaction } from 'wagmi'
+import { chain, useAccount, useContractWrite, useSignTypedData } from 'wagmi'
 import omit from '@helpers/omit'
 import splitSignature from '@helpers/splitSignature'
 import { CONTRACT_LENS_HUB_PROXY } from '@config/contracts'
@@ -8,13 +8,12 @@ import useWalletAddressDefaultLensProfile from '@hooks/useWalletAddressDefaultLe
 import toast from 'react-hot-toast'
 import createFollowTypedData from '@services/lens/follow/follow'
 import { useQueryClient } from '@tanstack/react-query'
-import { useStoreLensIndexer } from '@hooks/useStoreLensIndexer'
+import { usePollTransaction } from '@hooks/usePollTransaction'
 
 export function useFollowTypedData() {
   const account = useAccount()
-  const poll = useStoreLensIndexer((state: any) => state.poll)
   const queryClient = useQueryClient()
-  const queryLensProfile = useWalletAddressDefaultLensProfile(account?.address as `0x${string}`, true)
+  const queryLensProfile: any = useWalletAddressDefaultLensProfile(account?.address as `0x${string}`, true)
   const signTypedDataFollow = useSignTypedData()
   const contractWriteFollow = useContractWrite({
     mode: 'recklesslyUnprepared',
@@ -24,17 +23,14 @@ export function useFollowTypedData() {
     //@ts-ignore
     chainId: API_URL.includes('mumbai') ? chain.polygonMumbai.id : chain.polygon.id,
     onError(err) {
-      console.log('some error here', err.message)
+      console.error(err.message)
     },
   })
 
-  const txWriteFollow = useWaitForTransaction({
-    //@ts-ignore
-    chainId: API_URL.includes('mumbai') ? chain.polygonMumbai.id : chain.polygon.id,
-    hash: contractWriteFollow?.data?.hash,
-    onError(err) {
-      toast.error(`Transaction failed with error: ${err.cause}`)
-    },
+  const mutationPollTransaction = usePollTransaction({
+    messageSuccess: `Profile followed successfully!`,
+    messageError: 'Something went wrong, please try again.',
+    options: {},
   })
 
   async function followProfile(profileToFollow: any) {
@@ -85,7 +81,9 @@ export function useFollowTypedData() {
         const typedData = result.createFollowTypedData.typedData
         const signature = await signTypedDataFollow.signTypedDataAsync({
           domain: omit(typedData?.domain, '__typename'),
+          //@ts-ignore
           types: omit(typedData?.types, '__typename'),
+          //@ts-ignore
           value: omit(typedData?.value, '__typename'),
         })
 
@@ -106,26 +104,51 @@ export function useFollowTypedData() {
             },
           ],
         })
-        poll({
-          hash: tx.hash,
-          messageSuccess: `You now follow ${profileToFollow?.name}`,
-          messageError: 'Something went wrong, please try again.',
+        await queryClient.cancelQueries({
+          queryKey: ['lens-profile-by-handle', profileToFollow.handle],
+          type: 'active',
+          exact: true,
+        })
+        await queryClient.cancelQueries({
+          queryKey: ['lens-profile-by-wallet-address', profileToFollow.ownedBy],
+          type: 'active',
+          exact: true,
         })
 
+        //@ts-ignore
+        await mutationPollTransaction.mutateAsync(tx.hash)
         await queryClient.invalidateQueries({
           queryKey: ['lens-profile-by-handle', profileToFollow.handle],
           type: 'active',
           exact: true,
         })
+        const newFollowersCount = (profileToFollow.stats.totalFollowers += 1)
         queryClient.setQueryData(['lens-profile-by-handle', profileToFollow.handle], (profileOldData: any) => ({
           //@ts-ignore
-          ...profileOldData,
+          ...profileToFollow,
           isFollowedByMe: true,
           stats: {
-            ...profileOldData.stats,
-            totalFollowers: (profileOldData.stats.totalFollowers += 1),
+            ...profileToFollow.stats,
+            totalFollowers: newFollowersCount,
           },
         }))
+        await queryClient.invalidateQueries({
+          queryKey: ['lens-profile-by-wallet-address', profileToFollow.ownedBy],
+          type: 'active',
+          exact: true,
+        })
+        queryClient.setQueryData(
+          ['lens-profile-by-wallet-address', profileToFollow.ownedBy],
+          (profileOldData: any) => ({
+            //@ts-ignore
+            ...profileToFollow,
+            isFollowedByMe: true,
+            stats: {
+              ...profileToFollow.stats,
+              totalFollowers: newFollowersCount,
+            },
+          }),
+        )
       } else {
         //@ts-ignore
         toast.error(`Something went wrong: ${result?.error}`)
@@ -139,7 +162,7 @@ export function useFollowTypedData() {
 
   return {
     followProfile,
-    txWriteFollow,
+    mutationPollTransaction,
     contractWriteFollow,
     signTypedDataFollow,
   }

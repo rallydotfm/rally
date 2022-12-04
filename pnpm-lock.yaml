@@ -44,8 +44,10 @@ importers:
       '@trpc/server': 10.0.0-proxy-beta.13
       '@types/js-cookie': ^3.0.2
       '@types/node': ^18.11.4
+      '@types/omit-deep': ^0.3.0
       '@types/react': ^18.0.21
       '@types/react-dom': ^18.0.6
+      '@types/uuid': ^9.0.0
       '@typescript-eslint/eslint-plugin': ^5.40.1
       '@typescript-eslint/parser': ^5.40.1
       '@vercel/og': ^0.0.21
@@ -134,8 +136,10 @@ importers:
       '@tailwindcss/typography': 0.5.7_tailwindcss@3.2.1
       '@types/js-cookie': 3.0.2
       '@types/node': 18.11.4
+      '@types/omit-deep': 0.3.0
       '@types/react': 18.0.21
       '@types/react-dom': 18.0.6
+      '@types/uuid': 9.0.0
       '@typescript-eslint/eslint-plugin': 5.40.1_c4zyna56jjjrggqkyejnaxjxfu
       '@typescript-eslint/parser': 5.40.1_wyqvi574yv7oiwfeinomdzmc3m
       autoprefixer: 10.4.12_postcss@8.4.18
@@ -2819,6 +2823,10 @@ packages:
     resolution: {integrity: sha512-Gj7cI7z+98M282Tqmp2K5EIsoouUEzbBJhQQzDE3jSIRk6r9gsz0oUokqIUR4u1R3dMHo0pDHM7sNOHyhulypw==}
     dev: false
 
+  /@types/omit-deep/0.3.0:
+    resolution: {integrity: sha512-jwMkEElSsK+1VwtaYjb4aYYGMkVHfXWcJj2Zb7i3aEecaVLbIJvJNjpXYX1JVnIm4V4fcrUobhOjl9cXnfLXkA==}
+    dev: true
+
   /@types/parse-json/4.0.0:
     resolution: {integrity: sha512-//oorEZjL6sbPcKUaCdIGlIUeH26mgzimjBB77G6XRgnDl/L5wOnpyBGRe/Mmf5CVW3PwEBE1NjiMZ/ssFh4wA==}
     dev: true
@@ -2870,6 +2878,10 @@ packages:
 
   /@types/semver/7.3.12:
     resolution: {integrity: sha512-WwA1MW0++RfXmCr12xeYOOC5baSC9mSb0ZqCquFzKhcoF4TvHu5MKOuXsncgZcpVFhB1pXd5hZmM0ryAoCp12A==}
+    dev: true
+
+  /@types/uuid/9.0.0:
+    resolution: {integrity: sha512-kr90f+ERiQtKWMz5rP32ltJ/BtULDI5RVO0uavn1HQUOwjx0R1h0rnDYNL0CepF1zL5bSY6FISAfd9tOdDhU5Q==}
     dev: true
 
   /@types/uuid4/2.0.0:

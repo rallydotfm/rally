@@ -3,8 +3,7 @@ import Head from 'next/head'
 import { getLayout } from '@layouts/LayoutAccount'
 import useWalletAddressDefaultLensProfile from '@hooks/useWalletAddressDefaultLensProfile'
 import { useAccount } from 'wagmi'
-import FormEditProfile from '@components/pages/account/edit-profile/FormEditProfile'
-import useForm from '@components/pages/account/edit-profile/FormEditProfile/useForm'
+import EditProfile from '@components/pages/account/edit-profile/EditProfile'
 
 const Page: NextPage = () => {
   const account = useAccount()
@@ -12,13 +11,6 @@ const Page: NextPage = () => {
     account?.address as `0x${string}`,
     account?.address ? true : false,
   )
-
-  const storeForm = useForm({
-    onSubmit: () => {
-      console.log('yo')
-    },
-  })
-
   return (
     <>
       <Head>
@@ -29,8 +21,9 @@ const Page: NextPage = () => {
         />
       </Head>
       <main>
-        <h1 className="font-bold text-md pb-8">Edit your profile</h1>
-        <FormEditProfile storeForm={storeForm} />
+        <h1 className="font-bold text-md pb-8 animate-appear">Edit your profile</h1>
+        {queryLensProfile?.isLoading && <p className="animate-pulse">Loading profile data...</p>}
+        {queryLensProfile?.data?.handle && <EditProfile profile={queryLensProfile?.data} />}
       </main>
     </>
   )
