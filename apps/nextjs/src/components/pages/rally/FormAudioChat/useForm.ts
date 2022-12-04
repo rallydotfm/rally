@@ -12,6 +12,7 @@ export const schema = object({
   rally_max_attendees: number().positive().optional(),
   rally_image_file: any(),
   rally_image_src: string().optional(),
+  rally_category: string(),
   rally_start_at: string().refine((value) => value !== '' && !isPast(new Date(value))),
   rally_tags: array(string()),
   rally_has_cohosts: boolean(),

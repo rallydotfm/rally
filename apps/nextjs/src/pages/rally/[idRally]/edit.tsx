@@ -6,6 +6,8 @@ import FormEditAudioChat from '@components/pages/rally/edit/FormEditAudioChat'
 import { useRouter } from 'next/router'
 import { useAccount } from 'wagmi'
 import useGetAudioChatToEdit from '@components/pages/rally/edit/useGetAudioChatToEdit'
+import { getLayout as getProtectedLayout } from '@layouts/LayoutWalletRequired'
+import { getLayout as getBaseLayout } from '@layouts/LayoutBase'
 
 const Page: NextPage = () => {
   const { address } = useAccount()
@@ -59,6 +61,11 @@ const Page: NextPage = () => {
       </main>
     </>
   )
+}
+
+//@ts-ignore
+Page.getLayout = (page: any) => {
+  return getBaseLayout(getProtectedLayout(page))
 }
 
 export default Page

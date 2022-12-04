@@ -20,9 +20,15 @@ export const MobileTopMenu = (props: MobileTopMenuProps) => {
         </div>
       )}
       <Link href={ROUTE_RALLY_NEW}>
-        <a className={button({ scale: 'xs', intent: 'primary-outline', class: 'mis-6 aspect-square xs:aspect-auto' })}>
-          <PlusIcon className="w-5 xs:mie-2" />
-          <span className="sr-only xs:not-sr-only xs:pie-1">New rally</span>
+        <a
+          className={button({
+            scale: 'sm',
+            intent: 'primary-outline',
+            class: 'mis-6 mt-1.5 2xs:mt-0 w-12 2xs:w-auto aspect-square 2xs:aspect-auto',
+          })}
+        >
+          <PlusIcon className="w-5 shrink-0 2xs:mie-2" />
+          <span className="whitespace-nowrap sr-only 2xs:not-sr-only 2xs:pie-1">New rally</span>
         </a>
       </Link>
     </div>

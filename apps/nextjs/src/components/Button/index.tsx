@@ -3,7 +3,7 @@ import { IconSpinner } from '@components/Icons'
 import type { ButtonProps as HtmlButtonProps } from 'react-html-props'
 import type { SystemUiButtonProps } from './styles'
 
-interface ButtonProps extends HtmlButtonProps, SystemUiButtonProps {
+export interface ButtonProps extends HtmlButtonProps, SystemUiButtonProps {
   isLoading?: boolean
 }
 

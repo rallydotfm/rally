@@ -5,7 +5,7 @@ import { useGetAudioChatById } from '@hooks/useGetAudioChatById'
 import { IconSpinner } from '@components/Icons'
 import { ROUTE_HOME } from '@config/routes'
 import { useConnectModal, useChainModal } from '@rainbow-me/rainbowkit'
-import { useSession } from 'next-auth/react'
+import { signOut, useSession } from 'next-auth/react'
 import Link from 'next/link'
 import button from '@components/Button/styles'
 import { ArrowLeftIcon } from '@heroicons/react/20/solid'
@@ -22,6 +22,7 @@ import StageLiveVoiceChat from '@components/pages/rally/[idRally]/StageLiveVoice
 import CardGuild from '@components/pages/rally/[idRally]/CardGuild'
 import HostProfile from '@components/pages/rally/[idRally]/HostProfile'
 import FormJoinRoomAs from '@components/pages/rally/[idRally]/FormJoinRoomAs'
+import { useStoreHasSignedInWithLens } from '@hooks/useSignInWithLens'
 
 const Page: NextPage = () => {
   const {
@@ -42,7 +43,9 @@ const Page: NextPage = () => {
 
   const stateVoiceChat: any = useStoreLiveVoiceChat()
   const rally = useStoreCurrentLiveRally((state: any) => state.rally)
+  const setIsSignedIn = useStoreHasSignedInWithLens((state) => state.setIsSignedIn)
   const { disconnect } = useDisconnect()
+
   return (
     <>
       <Head>
@@ -95,7 +98,7 @@ const Page: NextPage = () => {
           </>
         ) : (
           <>
-            {stateVoiceChat?.room?.state && rally?.id === idRally ? (
+            {stateVoiceChat?.room?.state && rally?.id === idRally && stateVoiceChat?.room?.state === 'connected' ? (
               <div className="animate-appear h-full">
                 <div className="pb-8 flex gap-4 flex-col 2xs:flex-row leading-loose -mis-8 -mie-6 pis-8 pie-6 border-neutral-4 border-b">
                   {queryAudioChatMetadata?.data?.image && (
@@ -271,6 +274,7 @@ const Page: NextPage = () => {
                                   <>
                                     <Button
                                       onClick={async () => {
+                                        setIsSignedIn(false)
                                         await disconnect()
                                         //@ts-ignore
                                         openConnectModal()

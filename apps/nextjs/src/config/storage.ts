@@ -1,2 +1,2 @@
-export const COOKIE_ACCESS_TOKENS = 'lens.rallydotfm.accessTokens'
-export const COOKIE_REFRESH_TOKENS = 'lens.rallydotfm.refreshTokens'
+export const COOKIE_LENS_ACCESS_TOKEN = 'lens.rallydotfm.accessTokens'
+export const COOKIE_LENS_REFRESH_TOKEN = 'lens.rallydotfm.refreshTokens'

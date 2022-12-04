@@ -1,4 +1,4 @@
-import { useContractRead, useNetwork } from 'wagmi'
+import { useContractRead } from 'wagmi'
 import { contractConfigAudioChat } from '@config/contracts'
 import { useQueries } from '@tanstack/react-query'
 import getAudioChatMetadata from '@services/rally/audioChat/getAudioChatMetadata'

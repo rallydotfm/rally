@@ -1,15 +1,26 @@
+import button from '@components/Button/styles'
+import { ROUTE_PREFERENCES_INTERESTS } from '@config/routes'
 import { DICTIONARY_STATES_AUDIO_CHATS } from '@helpers/mappingAudioChatState'
 import useGetAudioChatByState from '@hooks/useGetAudioChatByStatus'
-import { trpc } from '@utils/trpc'
+import { useStorePersistedInterests } from '@hooks/usePersistedInterests'
+import useWalletAddressDefaultLensProfile from '@hooks/useWalletAddressDefaultLensProfile'
 import type { NextPage } from 'next'
-import { useSession } from 'next-auth/react'
 import Head from 'next/head'
-const Home: NextPage = () => {
+import Link from 'next/link'
+import { useAccount } from 'wagmi'
+const Page: NextPage = () => {
+  const account = useAccount()
+  const interests = useStorePersistedInterests((state: any) => state.interests)
+  const queryLensProfile = useWalletAddressDefaultLensProfile(
+    account?.address as `0x${string}`,
+    account?.address ? true : false,
+  )
   const { queriesAudioChatsByStateMetadata, queryAudioChatsByStateRawData } = useGetAudioChatByState([
     DICTIONARY_STATES_AUDIO_CHATS.LIVE.value,
     DICTIONARY_STATES_AUDIO_CHATS.READY.value,
     DICTIONARY_STATES_AUDIO_CHATS.PLANNED.value,
   ])
+
   return (
     <>
       <Head>
@@ -20,6 +31,29 @@ const Home: NextPage = () => {
         />
       </Head>
       <main className="pt-8 max-w-screen-sm mx-auto">
+        {queryLensProfile?.isSuccess && (
+          <>
+            {queryLensProfile?.data?.interests?.length === 0 ||
+              (queryLensProfile?.data === null &&
+                (interests?.[account?.address as `0x${string}`]?.length === 0 ||
+                  !interests?.[account?.address as `0x${string}`]) && (
+                  <aside className="border flex flex-wrap gap-3 items-center justify-between border-neutral-4 p-4 text-2xs text-white font-semibold rounded-md animate-appear mb-12">
+                    <p>Want to see more accurate rooms ?</p>
+                    <Link href={ROUTE_PREFERENCES_INTERESTS}>
+                      <a
+                        className={button({
+                          intent: 'primary-outline',
+                          scale: 'xs',
+                        })}
+                      >
+                        Pick interests
+                      </a>
+                    </Link>
+                  </aside>
+                ))}
+          </>
+        )}
+
         <h1 className="text-center font-bold text-3xl">
           Rally is an open-source alternative to Twitter Space/Clubhouse for web3 communities.
         </h1>
@@ -31,4 +65,4 @@ const Home: NextPage = () => {
   )
 }
 
-export default Home
+export default Page

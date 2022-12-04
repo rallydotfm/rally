@@ -209,6 +209,8 @@ export function useSmartContract(stateTxUi: TxUi) {
           has_cohosts: rally_cohosts?.length > 0,
           cohosts_list: rally_cohosts,
           guests_list: rally_guests,
+          category: values?.rally_category,
+          is_nsfw: values?.rally_is_nsfw,
           will_be_recorded: values.rally_is_recorded,
           is_gated: values.rally_is_gated,
           max_attendees: values.rally_max_attendees,

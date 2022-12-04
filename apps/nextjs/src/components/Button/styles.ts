@@ -32,6 +32,13 @@ export const button = cva(
           'text-white focus:text-negative-3',
           'border-negative-9 focus:border-negative-11',
         ],
+        'neutral-on-light-layer': [
+          'border-transparent bg-black text-white hover:bg-neutral-12 hover:border-black focus:border-black hover:border-opacity-50 focus:border-opacity-50 focus:bg-white hover:text-black focus:text-black',
+        ],
+        'neutral-on-dark-layer': [
+          'border-transparent bg-white text-black hover:bg-neutral-2 hover:border-white focus:border-white  focus:bg-neutral1 hover:text-neutral-12 focus:text-neutral-1 focus:hover:text-neutral-12',
+        ],
+
         'neutral-outline': [
           'border-neutral-9 hover:border-neutral-10 focus:border-white bg-white bg-opacity-0 text-white hover:bg-opacity-10 focus:border-transparent focus:bg-opacity-100 focus:text-black',
         ],
@@ -46,10 +53,10 @@ export const button = cva(
         ],
       },
       scale: {
-        default: ['text-xs', 'py-2 px-4 sm:px-5', 'font-bold', 'border'],
-        lg: ['text-md', 'py-1.5 px-4 sm:px-5', 'font-bold', 'border'],
-        sm: ['text-2xs', 'py-2 px-2.5', 'font-bold', 'border'],
-        xs: ['text-2xs', 'py-0.5 px-3', 'font-bold', 'border'],
+        default: ['text-xs', 'py-2 px-[3ex]', 'font-bold', 'border'],
+        lg: ['text-md', 'py-1.5 px-[3ex]', 'font-bold', 'border'],
+        sm: ['text-2xs', 'py-2 px-[3ex]', 'font-bold', 'border'],
+        xs: ['text-2xs', 'py-0.5 px-[3ex]', 'font-bold', 'border'],
       },
     },
     defaultVariants: {

@@ -11,6 +11,9 @@ import { CameraIcon, InformationCircleIcon, PlusIcon } from '@heroicons/react/20
 import EthereumAddress from '@components/EthereumAddress'
 import OptionGuild from '@components/pages/rally/FormAudioChat/OptionGuild'
 import { useAccount, useNetwork } from 'wagmi'
+import FormSelect from '@components/FormSelect'
+import useGetProfilesInterests from '@hooks/useGetProfileInterests'
+import { DICTIONARY_PROFILE_INTERESTS, DICTIONARY_PROFILE_INTERESTS_CATEGORIES } from '@helpers/mappingProfileInterests'
 
 interface FormAudioChatProps {
   state: any
@@ -29,6 +32,7 @@ export const FormAudioChat = (props: FormAudioChatProps) => {
   } = props
   const { chain } = useNetwork()
   const account = useAccount()
+  const queryProfileInterests = useGetProfilesInterests()
   return (
     <>
       <form ref={form}>
@@ -38,13 +42,13 @@ export const FormAudioChat = (props: FormAudioChatProps) => {
 
             <FormField className="!mt-0">
               <FormField.InputField>
-                <FormField.Label hasError={errors()?.rally_name ? true : false} htmlFor="rally_name">
+                <FormField.Label hasError={errors()?.rally_name?.length ? true : false} htmlFor="rally_name">
                   Name
                 </FormField.Label>
                 <FormField.Description id="input-rally_name-description">The name of your rally.</FormField.Description>
                 <FormInput
                   disabled={!account?.address || chain?.unsupported === true}
-                  hasError={errors()?.rally_name ? true : false}
+                  hasError={errors()?.rally_name?.length ? true : false}
                   placeholder="Eg: RallyDAO meeting #5"
                   name="rally_name"
                   id="rally_name"
@@ -61,7 +65,7 @@ export const FormAudioChat = (props: FormAudioChatProps) => {
             </FormField>
             <FormField>
               <FormField.InputField>
-                <FormField.Label hasError={errors()?.rally_start_at ? true : false} htmlFor="rally_start_at">
+                <FormField.Label hasError={errors()?.rally_start_at?.length ? true : false} htmlFor="rally_start_at">
                   Date and time
                 </FormField.Label>
                 <FormField.Description id="input-rally_start_at-description">
@@ -69,7 +73,7 @@ export const FormAudioChat = (props: FormAudioChatProps) => {
                 </FormField.Description>
                 <FormInput
                   disabled={!account?.address || chain?.unsupported === true}
-                  hasError={errors()?.rally_start_at ? true : false}
+                  hasError={errors()?.rally_start_at?.length ? true : false}
                   name="rally_start_at"
                   id="rally_start_at"
                   type="datetime-local"
@@ -80,22 +84,71 @@ export const FormAudioChat = (props: FormAudioChatProps) => {
                 />
               </FormField.InputField>
               <FormField.HelpBlock
-                hasError={errors()?.rally_start_at ? true : false}
+                hasError={errors()?.rally_start_at?.length ? true : false}
                 id="input-start-at-timezone-helpblock"
                 className="not-sr-only pt-2 text-neutral-11 text-2xs"
               >
                 Timezone: ({Intl.DateTimeFormat().resolvedOptions().timeZone})
               </FormField.HelpBlock>
               <FormField.HelpBlock
-                hasError={errors()?.rally_start_at ? true : false}
+                hasError={errors()?.rally_start_at?.length ? true : false}
                 id="input-rally_start_at-helpblock"
               >
                 Please pick a valid date.
               </FormField.HelpBlock>
             </FormField>
+
             <FormField>
               <FormField.InputField>
-                <FormField.Label hasError={errors()?.rally_description ? true : false} htmlFor="rally_description">
+                <FormField.Label hasError={errors()?.rally_category?.length ? true : false} htmlFor="rally_category">
+                  Category
+                </FormField.Label>
+                <FormField.Description id="input-rally_category-description">Pick a category</FormField.Description>
+                <FormSelect
+                  name="rally_category"
+                  id="rally_category"
+                  disabled={queryProfileInterests?.isLoading || queryProfileInterests?.isError}
+                  required={true}
+                  hasError={errors()?.rally_category?.length ? true : false}
+                >
+                  <option value="" disabled>
+                    Select a category
+                  </option>
+                  {queryProfileInterests?.data?.map((interest) => (
+                    <option value={interest}>
+                      {/* @ts-ignore */}
+                      {DICTIONARY_PROFILE_INTERESTS?.[interest]?.label ??
+                        /* @ts-ignore */
+                        DICTIONARY_PROFILE_INTERESTS_CATEGORIES?.[interest]}
+                    </option>
+                  ))}
+                </FormSelect>
+              </FormField.InputField>
+              <FormField.HelpBlock
+                hasError={errors()?.rally_category?.length ? true : false}
+                id="input-rally_category-helpblock"
+              >
+                Please select a category.
+              </FormField.HelpBlock>
+            </FormField>
+
+            <FormField>
+              <InputCheckboxToggle
+                label="This rally is NSFW (not safe for work)"
+                checked={data().rally_is_nsfw}
+                disabled={!account?.address || chain?.unsupported === true}
+                onChange={(value: any) => {
+                  setFields('rally_is_nsfw', value)
+                }}
+              />
+            </FormField>
+
+            <FormField>
+              <FormField.InputField>
+                <FormField.Label
+                  hasError={errors()?.rally_description?.length ? true : false}
+                  htmlFor="rally_description"
+                >
                   Description
                 </FormField.Label>
                 <FormField.Description id="input-rally_description-description">
@@ -104,7 +157,7 @@ export const FormAudioChat = (props: FormAudioChatProps) => {
                 <FormTextarea
                   disabled={!account?.address || chain?.unsupported === true}
                   rows={7}
-                  hasError={errors()?.rally_description ? true : false}
+                  hasError={errors()?.rally_description?.length ? true : false}
                   placeholder="Eg: Community discussion about the future of Rally. Members only !"
                   name="rally_description"
                   id="rally_description"
@@ -112,7 +165,7 @@ export const FormAudioChat = (props: FormAudioChatProps) => {
                 />
               </FormField.InputField>
               <FormField.HelpBlock
-                hasError={errors()?.rally_description ? true : false}
+                hasError={errors()?.rally_description?.length ? true : false}
                 id="input-rally_description-helpblock"
               >
                 Please type a description.
@@ -120,9 +173,12 @@ export const FormAudioChat = (props: FormAudioChatProps) => {
             </FormField>
             <FormField>
               <FormField.InputField>
-                <div className="flex flex-col lg:justify-between lg:flex-row lg:space-x-6">
+                <div className="flex flex-col lg:justify-between lg:flex-row lg:space-i-6">
                   <div>
-                    <FormField.Label hasError={errors()?.rally_image_file ? true : false} htmlFor="rally_image_file">
+                    <FormField.Label
+                      hasError={errors()?.rally_image_file?.length ? true : false}
+                      htmlFor="rally_image_file"
+                    >
                       Your rally image
                     </FormField.Label>
                     <FormField.Description id="input-rally_image_file-description">
@@ -133,11 +189,11 @@ export const FormAudioChat = (props: FormAudioChatProps) => {
                       className="not-sr-only text-neutral-11 text-2xs"
                       id="input-rally_image_file-helpblock"
                     >
-                      Your image should have a 2:1 ratio and not be larger than 1MB.
+                      Your image should have a 1:1 ratio and not be larger than 1MB.
                     </FormField.HelpBlock>
                   </div>
                   <div className="mt-3 relative lg:mt-0">
-                    <div className="w-full lg:w-96 aspect-twitter-card rounded-md overflow-hidden relative bg-neutral-1">
+                    <div className="w-full lg:w-56 aspect-square rounded-md overflow-hidden relative bg-neutral-1">
                       <input
                         disabled={!account?.address || chain?.unsupported === true}
                         onChange={(e) => {
@@ -195,14 +251,17 @@ export const FormAudioChat = (props: FormAudioChatProps) => {
 
             <FormField>
               <FormField.InputField>
-                <FormField.Label hasError={errors()?.rally_max_attendees ? true : false} htmlFor="rally_max_attendees">
+                <FormField.Label
+                  hasError={errors()?.rally_max_attendees?.length ? true : false}
+                  htmlFor="rally_max_attendees"
+                >
                   Maximum number of participants
                 </FormField.Label>
                 <FormField.Description id="input-rally_max_attendees-description">
                   The maximum amount of people that can attend your rally (you, co-hosts, guests and listeners).
                 </FormField.Description>
                 <FormInput
-                  hasError={errors()?.rally_max_attendees ? true : false}
+                  hasError={errors()?.rally_max_attendees?.length ? true : false}
                   name="rally_max_attendees"
                   id="rally_max_attendees"
                   disabled={!account?.address || chain?.unsupported === true}
@@ -214,15 +273,16 @@ export const FormAudioChat = (props: FormAudioChatProps) => {
               </FormField.InputField>
 
               <FormField.HelpBlock
-                hasError={errors()?.rally_max_attendees ? true : false}
+                hasError={errors()?.rally_max_attendees?.length ? true : false}
                 id="input-rally_max_attendees-helpblock"
               >
                 The maximum amount of participants must be a positive number.
               </FormField.HelpBlock>
             </FormField>
+
             <FormField>
               <FormField.InputField>
-                <FormField.Label hasError={errors()?.rally_tags ? true : false} htmlFor="rally_tags">
+                <FormField.Label hasError={errors()?.rally_tags?.length ? true : false} htmlFor="rally_tags">
                   Tags
                 </FormField.Label>
                 <FormField.Description id="input-rally_tags-description">Add some tags</FormField.Description>
@@ -232,10 +292,14 @@ export const FormAudioChat = (props: FormAudioChatProps) => {
                   api={apiInputRallyTags}
                 />
               </FormField.InputField>
-              <FormField.HelpBlock hasError={errors()?.rally_tags ? true : false} id="input-rally_tags-helpblock">
+              <FormField.HelpBlock
+                hasError={errors()?.rally_tags?.length ? true : false}
+                id="input-rally_tags-helpblock"
+              >
                 Please add at least 1 tag.
               </FormField.HelpBlock>
             </FormField>
+
             <FormField>
               <InputCheckboxToggle
                 label="This rally will be recorded"
@@ -283,7 +347,7 @@ export const FormAudioChat = (props: FormAudioChatProps) => {
                           <FormField.InputField>
                             <FormField.Label
                               className="text-xs !pb-1"
-                              hasError={errors()?.[`rally_cohosts.${index}.eth_address`] ? true : false}
+                              hasError={errors()?.[`rally_cohosts.${index}.eth_address`]?.length ? true : false}
                               htmlFor={`rally_cohosts.${index}.eth_address`}
                             >
                               Ethereum address
@@ -295,7 +359,7 @@ export const FormAudioChat = (props: FormAudioChatProps) => {
                               scale="sm"
                               required
                               disabled={!account?.address || chain?.unsupported === true}
-                              hasError={errors()?.[`rally_cohosts.${index}.eth_address`] ? true : false}
+                              hasError={errors()?.[`rally_cohosts.${index}.eth_address`]?.length ? true : false}
                               placeholder="A valid Ethereum address"
                               name={`rally_cohosts.${index}.eth_address`}
                               id={`rally_cohosts.${index}.eth_address`}
@@ -303,7 +367,7 @@ export const FormAudioChat = (props: FormAudioChatProps) => {
                             />
                           </FormField.InputField>
                           <FormField.HelpBlock
-                            hasError={errors()?.[`rally_cohosts.${index}.eth_address`] ? true : false}
+                            hasError={errors()?.[`rally_cohosts.${index}.eth_address`]?.length ? true : false}
                             id={`input-rally_cohosts.${index}.eth_address-helpblock`}
                           >
                             The address of your co-host must be a valid Ethereum address.
@@ -372,7 +436,7 @@ export const FormAudioChat = (props: FormAudioChatProps) => {
                         <FormField.InputField>
                           <FormField.Label
                             className="text-xs !pb-1"
-                            hasError={errors()?.[`rally_guests.${index}.eth_address`] ? true : false}
+                            hasError={errors()?.[`rally_guests.${index}.eth_address`]?.length ? true : false}
                             htmlFor={`rally_guests.${index}.eth_address`}
                           >
                             Ethereum address
@@ -384,7 +448,7 @@ export const FormAudioChat = (props: FormAudioChatProps) => {
                             scale="sm"
                             required
                             disabled={!account?.address || chain?.unsupported === true}
-                            hasError={errors()?.[`rally_guests.${index}.eth_address`] ? true : false}
+                            hasError={errors()?.[`rally_guests.${index}.eth_address`]?.length ? true : false}
                             placeholder="A valid Ethereum address"
                             name={`rally_guests.${index}.eth_address`}
                             id={`rally_guests.${index}.eth_address`}
@@ -392,7 +456,7 @@ export const FormAudioChat = (props: FormAudioChatProps) => {
                           />
                         </FormField.InputField>
                         <FormField.HelpBlock
-                          hasError={errors()?.[`rally_guests.${index}.eth_address`] ? true : false}
+                          hasError={errors()?.[`rally_guests.${index}.eth_address`]?.length ? true : false}
                           id={`input-rally_guests.${index}.eth_address-helpblock`}
                         >
                           The address of your co-host must be a valid Ethereum address.
@@ -481,7 +545,9 @@ export const FormAudioChat = (props: FormAudioChatProps) => {
                             <FormField.InputField>
                               <FormField.Label
                                 className="text-xs"
-                                hasError={errors()?.[`rally_access_control_guilds.${index}.guild_id`] ? true : false}
+                                hasError={
+                                  errors()?.[`rally_access_control_guilds.${index}.guild_id`]?.length ? true : false
+                                }
                                 htmlFor={`rally_access_control_guilds.${index}.guild_id`}
                               >
                                 Guild ID
@@ -495,7 +561,9 @@ export const FormAudioChat = (props: FormAudioChatProps) => {
                               <FormInput
                                 scale="sm"
                                 disabled={!account?.address || chain?.unsupported === true}
-                                hasError={errors()?.[`rally_access_control_guilds.${index}.guild_id`] ? true : false}
+                                hasError={
+                                  errors()?.[`rally_access_control_guilds.${index}.guild_id`]?.length ? true : false
+                                }
                                 placeholder="Eg: our-guild, layer3, lens-protocol..."
                                 name={`rally_access_control_guilds.${index}.guild_id`}
                                 id={`rally_access_control_guilds.${index}.guild_id`}
@@ -503,7 +571,9 @@ export const FormAudioChat = (props: FormAudioChatProps) => {
                               />
                             </FormField.InputField>
                             <FormField.HelpBlock
-                              hasError={errors()?.[`rally_access_control_guilds.${index}.guild_id`] ? true : false}
+                              hasError={
+                                errors()?.[`rally_access_control_guilds.${index}.guild_id`]?.length ? true : false
+                              }
                               id={`input-rally_access_control_guilds.${index}.guild_id-helpblock`}
                             >
                               The name that will be displayed for this co-host.

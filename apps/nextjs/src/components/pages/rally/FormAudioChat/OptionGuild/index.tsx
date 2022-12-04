@@ -1,10 +1,7 @@
-import { IconSpinner } from '@components/Icons'
 import { useDebouncedEffect } from '@react-hookz/web'
 import { useState } from 'react'
 import useGetGuildById from '@hooks/useGetGuildById'
 import GuildRequirement from '@components/GuildRequirement'
-import { role } from '@guildxyz/sdk'
-
 interface OptionGuildProps {
   id: string
   index: number
@@ -48,8 +45,6 @@ const OptionGuild = (props: OptionGuildProps) => {
       <div className="overflow-hidden">
         <div className="flex items-center">
           <div className="shrink-0 w-10 h-10 mie-2 bg-neutral-5 rounded-full overflow-hidden">
-            {/* @ts-ignore */}
-            {data()?.rally_access_control_guilds?.[index].roles.includes[role.id] && <CheckIcon />}
             <img className="w-full h-full object-cover" src={`${queryGuild?.data?.imageUrl}`} alt="" />
           </div>
           <span className="font-bold text-xs w-full">{queryGuild?.data?.name}</span>

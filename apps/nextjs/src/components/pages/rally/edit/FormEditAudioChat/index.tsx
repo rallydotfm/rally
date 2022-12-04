@@ -31,6 +31,8 @@ export const FormEditAudioChat = (props: any) => {
       rally_cohosts: values.has_cohosts ? values.cohosts_list : [],
       rally_guests: values.guests_list ?? [],
       rally_name: values.name,
+      rally_category: values?.category ?? '',
+      rally_is_nsfw: values?.is_nsfw ?? false,
       rally_description: values.description,
       rally_start_at: values.datetime_start_at.toISOString().substring(0, 16),
       rally_image_src: values?.image,

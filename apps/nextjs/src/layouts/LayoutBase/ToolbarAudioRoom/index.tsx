@@ -5,6 +5,7 @@ import {
   Cog6ToothIcon,
   ArrowRightOnRectangleIcon,
   SignalSlashIcon,
+  UsersIcon,
 } from '@heroicons/react/20/solid'
 
 import { HandRaisedIcon, HeartIcon, MicrophoneIcon } from '@heroicons/react/24/outline'
@@ -92,12 +93,21 @@ export const ToolbarAudioRoom = () => {
                     src={`https://ipfs.io/ipfs/${rally?.image}`}
                   />
                 )}
-                <span className="whitespace-nowrap block overflow-hidden text-ellipsis xs:-translate-y-2.5">
+                <span
+                  className={`whitespace-nowrap block overflow-hidden text-ellipsis ${
+                    rally?.image ? 'xs:-translate-y-2.5' : ''
+                  }`}
+                >
                   {rally?.name}
                 </span>
               </a>
             </Link>
           )}
+          <mark className="text-[0.75rem] flex items-center mis-4 font-bold my-auto text-interactive-12 bg-interactive-3 px-1ex py-1 rounded">
+            <UsersIcon className="mie-1ex w-3" />
+
+            {new Intl.NumberFormat('en-US', { maximumSignificantDigits: 3 }).format(state.participants.length)}
+          </mark>
         </div>
 
         <div
@@ -126,7 +136,7 @@ export const ToolbarAudioRoom = () => {
               {!microphonePublication ? (
                 <>
                   <MicrophoneIcon className="w-7" />
-                  <Cog6ToothIcon className="absolute animate-bounce bottom-1 inline-end-1 pointer-events-none text-neutral-9 w-3" />
+                  <Cog6ToothIcon className="absolute animate-bounce bottom-2.5 inline-end-2.5 pointer-events-none text-neutral-9 w-4" />
                 </>
               ) : (
                 <>

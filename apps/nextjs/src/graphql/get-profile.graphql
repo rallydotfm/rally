@@ -1,0 +1,6 @@
+query profile($request: SingleProfileQueryRequest!) {
+  profile(request: $request) {
+    ...ProfileFields
+    interests
+  }
+}
