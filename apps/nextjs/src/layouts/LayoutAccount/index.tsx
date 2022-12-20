@@ -19,10 +19,9 @@ export const LayoutAccount = (props: LayoutProps) => {
   const session = useSession()
   const account = useAccount()
   const [isDialogEditProfilePictureOpen, setIsDialogEditProfilePictureOpen] = useState(false)
-  const queryLensProfile = useWalletAddressDefaultLensProfile(
-    account?.address as `0x${string}`,
-    account?.address ? true : false,
-  )
+  const queryLensProfile = useWalletAddressDefaultLensProfile(account?.address as `0x${string}`, {
+    enabled: account?.address ? true : false,
+  })
   return (
     <>
       <div className="flex text-center xs:text-start flex-col-reverse xs:flex-row items-center xs:space-i-7">
@@ -55,10 +54,10 @@ export const LayoutAccount = (props: LayoutProps) => {
             href: ROUTE_ACCOUNT,
             label: 'Profile',
           },
-          /*{
+          {
             href: ROUTE_ACCOUNT_MEMBERSHIP,
             label: 'Membership',
-          },*/
+          },
           {
             href: ROUTE_ACCOUNT_PERMISSIONS,
             label: 'Permissions',

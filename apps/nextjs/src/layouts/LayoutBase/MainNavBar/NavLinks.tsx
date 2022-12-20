@@ -1,12 +1,13 @@
-import { HomeIcon, CalendarIcon, Squares2X2Icon } from '@heroicons/react/24/outline'
+import { HomeIcon, CalendarIcon, WalletIcon } from '@heroicons/react/24/outline'
 import {
   HomeIcon as SolidHomeIcon,
   CalendarIcon as SolidCalendarIcon,
-  Squares2X2Icon as SolidSquares2X2Icon,
+  WalletIcon as SolidWalletIcon,
 } from '@heroicons/react/24/solid'
-import { PATHNAME_DASHBOARD, ROUTE_DASHBOARD, ROUTE_HOME, ROUTE_UPCOMING } from '@config/routes'
+import { PATHNAME_DASHBOARD, ROUTE_DASHBOARD, ROUTE_HOME, ROUTE_SEARCH, ROUTE_UPCOMING } from '@config/routes'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
+import { MagnifyingGlassIcon } from '@heroicons/react/20/solid'
 
 const routes = [
   {
@@ -23,11 +24,20 @@ const routes = [
     defaultIcon: CalendarIcon,
     label: 'Upcoming',
   },
+
+  {
+    href: ROUTE_SEARCH,
+    key: 'search',
+    activeIcon: MagnifyingGlassIcon,
+    defaultIcon: MagnifyingGlassIcon,
+    label: 'Search',
+  },
+
   {
     href: ROUTE_DASHBOARD,
     key: 'dashboard',
-    activeIcon: SolidSquares2X2Icon,
-    defaultIcon: Squares2X2Icon,
+    activeIcon: SolidWalletIcon,
+    defaultIcon: WalletIcon,
     label: 'Dashboard',
     subpath: PATHNAME_DASHBOARD,
   },
@@ -47,9 +57,9 @@ export const NavLinks = () => {
               }`}
             >
               {isActive ? (
-                <route.activeIcon className="w-6 md:w-8 lg:w-7" />
+                <route.activeIcon className="w-6 text-white md:w-8 lg:w-7" />
               ) : (
-                <route.defaultIcon className="w-6 md:w-8 lg:w-7" />
+                <route.defaultIcon className="w-6 text-white text-opacity-40 md:w-8 lg:w-7" />
               )}
               <span className="sr-only lg:inline-flex lg:pis-3 lg:not-sr-only">{route.label}</span>
             </a>

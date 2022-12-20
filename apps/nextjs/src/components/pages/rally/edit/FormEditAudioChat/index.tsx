@@ -1,14 +1,13 @@
 import FormAudioChat from '../../FormAudioChat'
 import { useSmartContract, useStoreTxUi } from '@components/pages/rally/FormAudioChat/useSmartContract'
 import useForm from '@components/pages/rally/FormAudioChat/useForm'
-import { useUnmountEffect } from '@react-hookz/web'
+import { useMountEffect, useUnmountEffect } from '@react-hookz/web'
 import DialogModal from '@components/DialogModal'
 import { ROUTE_DASHBOARD, ROUTE_RALLY_VIEW } from '@config/routes'
 import Link from 'next/link'
 import Button from '@components/Button'
 import Notice from '@components/Notice'
 import button from '@components/Button/styles'
-import { useEffect } from 'react'
 import DeploymentStep from '@components/DeploymentStep'
 
 export const FormEditAudioChat = (props: any) => {
@@ -22,6 +21,7 @@ export const FormEditAudioChat = (props: any) => {
         values: formValues,
       }),
     initialValues: {
+      rally_clips_allowed: values?.clips_allowed ?? false,
       rally_is_gated: values.is_gated,
       rally_max_attendees: values.max_attendees,
       rally_is_indexed: values.is_indexed,
@@ -32,6 +32,7 @@ export const FormEditAudioChat = (props: any) => {
       rally_guests: values.guests_list ?? [],
       rally_name: values.name,
       rally_category: values?.category ?? '',
+      rally_language: values?.language ?? 'en',
       rally_is_nsfw: values?.is_nsfw ?? false,
       rally_description: values.description,
       rally_start_at: values.datetime_start_at.toISOString().substring(0, 16),
@@ -44,11 +45,11 @@ export const FormEditAudioChat = (props: any) => {
       rally_access_control_whitelist: values.access_control.whitelist,
     },
   })
-  useEffect(() => {
+  useMountEffect(() => {
     stateTxUi.setRallyId(values.id)
     stateTxUi.setFileRallyCID(values.cid)
     stateTxUi.setImageRallyCID(values.image)
-  }, [])
+  })
   useUnmountEffect(() => {
     stateTxUi.resetState()
   })

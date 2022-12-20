@@ -1,7 +1,7 @@
 import { useContractRead } from 'wagmi'
 import { contractConfigAudioChat } from '@config/contracts'
 import { useQuery } from '@tanstack/react-query'
-import getAudioChatMetadata from '@services/rally/audioChat/getAudioChatMetadata'
+import getAudioChatMetadata from '@services/rally/ipfs/audioChat/getAudioChatMetadata'
 import toast from 'react-hot-toast'
 import { chainId } from '@config/wagmi'
 
@@ -27,6 +27,7 @@ export function useGetAudioChatById(idAudioChat?: `0x${string}`) {
       return metadata
     },
     {
+      refetchOnWindowFocus: false,
       enabled:
         queryAudioChatByIdRawData.status === 'success' &&
         queryAudioChatByIdRawData?.data?.audio_event_id !==

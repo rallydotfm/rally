@@ -1,9 +1,9 @@
-import { client } from '@config/graphql-request'
-import { CreateSetProfileMetadataTypedDataDocument } from '@graphql/generated'
-import type { CreatePublicSetProfileMetadataUriRequest } from '@graphql/generated'
+import { clientLens } from '@config/graphql-request'
+import { CreateSetProfileMetadataTypedDataDocument } from '@graphql/lens/generated'
+import type { CreatePublicSetProfileMetadataUriRequest } from '@graphql/lens/generated'
 
 export async function createSetProfileMetadataTypedData(request: CreatePublicSetProfileMetadataUriRequest) {
-  const result = await client.request(CreateSetProfileMetadataTypedDataDocument, {
+  const result = await clientLens.request(CreateSetProfileMetadataTypedDataDocument, {
     request,
   })
 

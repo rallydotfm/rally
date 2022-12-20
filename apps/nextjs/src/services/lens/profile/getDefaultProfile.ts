@@ -1,6 +1,6 @@
-import { client } from '@config/graphql-request'
-import { DefaultProfileDocument } from '@graphql/generated'
-import type { DefaultProfileRequest } from '@graphql/generated'
+import { clientLens } from '@config/graphql-request'
+import { DefaultProfileDocument } from '@graphql/lens/generated'
+import type { DefaultProfileRequest } from '@graphql/lens/generated'
 
 /**
  * Get the default Lens profile associated to an Ethereum address
@@ -8,7 +8,7 @@ import type { DefaultProfileRequest } from '@graphql/generated'
  * @returns associated Lens profile or `undefined`
  */
 export async function getDefaultProfile(profileRequest: DefaultProfileRequest) {
-  const result = await client.request(DefaultProfileDocument, {
+  const result = await clientLens.request(DefaultProfileDocument, {
     request: {
       ...profileRequest,
     },

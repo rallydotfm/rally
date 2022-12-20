@@ -16,7 +16,7 @@ import { toastOptions } from '@config/react-hot-toast'
 import { SessionProvider } from 'next-auth/react'
 import { RainbowKitSiweNextAuthProvider } from '@rainbow-me/rainbowkit-siwe-next-auth'
 import { getSiweMessageOptions } from '@config/siwe'
-
+import '@vidstack/player/hydrate.js'
 function MyApp({ Component, pageProps }: AppProps) {
   //@ts-ignore
   const getLayout = Component.getLayout ?? getBaseLayout

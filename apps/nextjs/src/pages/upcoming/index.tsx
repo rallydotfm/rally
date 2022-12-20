@@ -1,88 +1,95 @@
-import { IconSpinner } from '@components/Icons'
-import { DICTIONARY_STATES_AUDIO_CHATS } from '@helpers/mappingAudioChatState'
-import { isThisWeek } from 'date-fns'
+import { endOfWeek, getUnixTime, startOfWeek } from 'date-fns'
 import type { NextPage } from 'next'
 import Head from 'next/head'
-
-import { useContractRead } from 'wagmi'
-import { contractConfigAudioChat } from '@config/contracts'
-import { useQueries } from '@tanstack/react-query'
-import { useState } from 'react'
 import CalendarWeek from '@components/pages/upcoming/CalendarWeek'
-import { chainId } from '@config/wagmi'
+import { getLayout } from '@layouts/LayoutUpcoming'
+import ListFilters from '@components/pages/upcoming/ListFilters'
+import DialogModalFilters from '@components/pages/upcoming/DialogModalFilters'
+import { createStoreIndexedAudioChatsFilters } from '@hooks/useStoreIndexedAudioChatsFilters'
+import useGetProfilesInterests from '@hooks/useGetProfileInterests'
+import useIndexedAudioChats from '@hooks/useIndexedAudioChats'
+import { useState } from 'react'
+import { isAddress } from 'ethers/lib/utils'
+import Button from '@components/Button'
+import { AdjustmentsHorizontalIcon } from '@heroicons/react/20/solid'
+import { Cog6ToothIcon } from '@heroicons/react/24/outline'
+import { useUnmountEffect } from '@react-hookz/web'
+import { useStorePersistedInterests } from '@hooks/usePersistedInterests'
+import useWalletAddressDefaultLensProfile from '@hooks/useWalletAddressDefaultLensProfile'
+import { useAccount } from 'wagmi'
+import { Popover } from '@headlessui/react'
+import button from '@components/Button/styles'
+import InputCheckboxToggle from '@components/InputCheckboxToggle'
 
-export function useUpcomingAudioChats() {
-  const [weeklyAudioChats, setWeeklyAudioChats] = useState([])
-  const queryAudioChatsByStateRawData = useContractRead({
-    ...contractConfigAudioChat,
-    chainId,
-    functionName: 'getAudioChatsByState',
-    enabled: true,
-    args: [
-      [
-        DICTIONARY_STATES_AUDIO_CHATS.PLANNED.value,
-        DICTIONARY_STATES_AUDIO_CHATS.READY.value,
-        DICTIONARY_STATES_AUDIO_CHATS.LIVE.value,
-      ],
-    ],
-    onSuccess(data) {
-      const upcoming = data
-        ?.filter((audioChat) => {
-          return isThisWeek(new Date(parseInt(`${audioChat.start_at}`) * 1000))
-        })
-        //@ts-ignore
-        .sort((a, b) => {
-          return parseInt(`${a.start_at}`) * 1000 < parseInt(`${b.start_at}`)
-        })
-      //@ts-ignore
-      setWeeklyAudioChats(upcoming)
-    },
-    onError(e) {
-      console.error(e)
-    },
-  })
-  const queriesUpcomingAudioChatsMetadata = useQueries({
-    //@ts-ignore
-    enabled: queryAudioChatsByStateRawData?.data?.length > 0 ?? false,
-    queries:
-      weeklyAudioChats?.length > 0
-        ? weeklyAudioChats.map((audioChat: any) => {
-            return {
-              queryKey: ['upcoming-audio-chat-metadata', audioChat?.audio_event_id],
-              queryFn: async () => {
-                const cid = audioChat?.cid_metadata
-                try {
-                  const response = await fetch(`https://${cid}.ipfs.w3s.link/data.json`)
-                  const result = await response.json()
-                  return {
-                    id: audioChat.audio_event_id,
-                    cid: audioChat.cid_metadata,
-                    //@ts-ignore
-                    state: DICTIONARY_STATES_AUDIO_CHATS[audioChat?.state],
-                    creator: audioChat.creator,
-                    epoch_time_start_at: parseInt(`${audioChat.start_at}`) * 1000,
-                    epoch_time_created_at: parseInt(`${audioChat.created_at}`) * 1000,
-                    datetime_start_at: new Date(parseInt(`${audioChat.start_at}`) * 1000),
-                    datetime_created_at: new Date(parseInt(`${audioChat.created_at}`) * 1000),
-                    ...result,
-                  }
-                } catch (e) {
-                  console.error(e)
-                }
-              },
-            }
-          })
-        : [],
-  })
-
-  return {
-    queriesUpcomingAudioChatsMetadata,
-    queryAudioChatsByStateRawData,
-  }
-}
+const PER_PAGE = 100
+const useStoreFiltersAudioChatsUpcomingPage = createStoreIndexedAudioChatsFilters()
 
 const Page: NextPage = () => {
-  const { queriesUpcomingAudioChatsMetadata, queryAudioChatsByStateRawData } = useUpcomingAudioChats()
+  const account = useAccount()
+  const useProfileInterest = useStoreFiltersAudioChatsUpcomingPage((state: any) => state.useProfileInterest)
+  const setUseProfileInterests = useStoreFiltersAudioChatsUpcomingPage((state: any) => state.setUseProfileInterests)
+  const setCategories = useStoreFiltersAudioChatsUpcomingPage((state: any) => state.setCategories)
+  const categories = useStoreFiltersAudioChatsUpcomingPage((state: any) => state.categories)
+  const interests = useStorePersistedInterests((state: any) => state.interests)
+  const queryCurrentUserDefaultLensProfile = useWalletAddressDefaultLensProfile(account?.address as `0x${string}`, {
+    enabled: account?.address ? true : false,
+    onSuccess(data: { interests: Array<string> }) {
+      if (data?.interests && categories?.length === 0) setCategories(data?.interests)
+    },
+  })
+  const setStatuses = useStoreFiltersAudioChatsUpcomingPage((state: any) => state.setStatuses)
+  const setCreatorEthAddress = useStoreFiltersAudioChatsUpcomingPage((state: any) => state.setCreatorEthAddress)
+  const setNameRally = useStoreFiltersAudioChatsUpcomingPage((state: any) => state.setNameRally)
+  const nameRally = useStoreFiltersAudioChatsUpcomingPage((state: any) => state.nameRally)
+  const creatorEthAddress = useStoreFiltersAudioChatsUpcomingPage((state: any) => state.creatorEthAddress)
+  const skip = useStoreFiltersAudioChatsUpcomingPage((state: any) => state.skip)
+  const toggleShowNSFW = useStoreFiltersAudioChatsUpcomingPage((state: any) => state.toggleShowNSFW)
+  const togglePublicOnly = useStoreFiltersAudioChatsUpcomingPage((state: any) => state.togglePublicOnly)
+  const showNSFW = useStoreFiltersAudioChatsUpcomingPage((state: any) => state.showNSFW)
+  const publicOnly = useStoreFiltersAudioChatsUpcomingPage((state: any) => state.publicOnly)
+  const statuses = useStoreFiltersAudioChatsUpcomingPage((state: any) => state.statuses)
+  const order = useStoreFiltersAudioChatsUpcomingPage((state: any) => state.order)
+  const resetFilters = useStoreFiltersAudioChatsUpcomingPage((state: any) => state.resetFilters)
+  const queryListInterests = useGetProfilesInterests()
+  const queryAudioChats = useIndexedAudioChats(
+    {
+      first: PER_PAGE,
+      skip,
+      categories:
+        categories?.length > 0
+          ? categories
+          : useProfileInterest === false || (useProfileInterest && categories?.length === 0)
+          ? queryListInterests.data
+          : //@ts-ignore
+          queryCurrentUserDefaultLensProfile?.data?.interests?.length > 0
+          ? queryCurrentUserDefaultLensProfile?.data?.interests
+          : interests?.length > 0
+          ? interests
+          : queryListInterests.data,
+      creator: isAddress(creatorEthAddress) ? creatorEthAddress : '', // ensure that we use a valid Ethereum address to filter on creator eth address
+      name: nameRally,
+      nsfw: showNSFW === true ? [true, false] : [false],
+      gated: publicOnly === true ? [false] : [true, false],
+      states: statuses,
+      orderBy: order[0],
+      orderDirection: order[1],
+      start_at_min: getUnixTime(startOfWeek(new Date())),
+      start_at_max: getUnixTime(endOfWeek(new Date())),
+    },
+    {
+      enabled:
+        //@ts-ignore
+        queryListInterests?.data?.length > 0 &&
+        (!account?.address || (account?.address && queryCurrentUserDefaultLensProfile?.isSuccess))
+          ? true
+          : false,
+    },
+  )
+  const [isModalFiltersOpen, setIsModalFiltersOpen] = useState(false)
+
+  useUnmountEffect(() => {
+    resetFilters()
+  })
 
   return (
     <>
@@ -94,33 +101,118 @@ const Page: NextPage = () => {
         />
       </Head>
       <main>
-        {queryAudioChatsByStateRawData.status === 'error' && <>Error</>}
-        {queryAudioChatsByStateRawData.status === 'success' && (
-          <>
-            <div className="mb-3 animate-appear  flex justify-between">
-              <h2 className="font-medium text-xs text-neutral-11">
-                {queriesUpcomingAudioChatsMetadata.filter((query) => query?.status === 'success')?.length} rallies
-                happening this week
-              </h2>
+        <div className="flex flex-col gap-12">
+          <div className="flex flex-wrap gap-4 items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Popover className="relative">
+                <Popover.Button
+                  className={button({
+                    intent: 'neutral-ghost',
+                    scale: 'xs',
+                    class: '!p-0 h-8 aspect-square',
+                  })}
+                >
+                  <Cog6ToothIcon className="w-5" />
+                  <span className="sr-only">Preferences</span>
+                </Popover.Button>
+                <Popover.Panel className="animate-appear bg-neutral-5 border border-neutral-8 rounded-md w-72 mt-1 absolute z-10">
+                  <div className="px-3 py-1.5 border-b border-neutral-7">
+                    <span className="text-xs font-medium text-neutral-12">Preferences</span>
+                  </div>
+                  <div className="px-3 pt-3 pb-5">
+                    <InputCheckboxToggle
+                      onChange={(e: boolean) => {
+                        if (
+                          e === true &&
+                          //@ts-ignore
+                          (queryCurrentUserDefaultLensProfile?.data?.interests?.length > 0 || interests?.length > 0)
+                        ) {
+                          setCategories(
+                            //@ts-ignore
+                            queryCurrentUserDefaultLensProfile?.data?.interests?.length > 0
+                              ? queryCurrentUserDefaultLensProfile?.data?.interests
+                              : interests,
+                          )
+                        }
+                        setUseProfileInterests(e)
+                      }}
+                      checked={useProfileInterest}
+                      scale="xs"
+                      classNameLabel="text-[0.95rem]"
+                      label="Apply profile interests"
+                    />
+                  </div>
+                </Popover.Panel>
+              </Popover>
+
+              <Button
+                type="button"
+                scale="xs"
+                className="!pis-3"
+                intent="interactive-outline"
+                onClick={() => setIsModalFiltersOpen(true)}
+                disabled={
+                  queryListInterests?.isLoading ||
+                  (account?.address && !queryCurrentUserDefaultLensProfile?.isSuccess) ||
+                  queryAudioChats?.isLoading
+                }
+                isLoading={
+                  queryListInterests?.isLoading ||
+                  (account?.address && !queryCurrentUserDefaultLensProfile?.isSuccess) ||
+                  queryAudioChats?.isLoading
+                }
+              >
+                <AdjustmentsHorizontalIcon className="w-5 mie-1ex" />
+                Filters
+                {categories.length +
+                  statuses.length +
+                  (nameRally?.length > 0 ? 1 : 0) +
+                  (showNSFW ? 1 : 0) +
+                  (publicOnly ? 1 : 0) >
+                0 + (isAddress(creatorEthAddress) ? 1 : 0)
+                  ? ` (${
+                      categories.length +
+                      statuses.length +
+                      (nameRally?.length > 0 ? 1 : 0) +
+                      (showNSFW ? 1 : 0) +
+                      (publicOnly ? 1 : 0) +
+                      (isAddress(creatorEthAddress) ? 1 : 0)
+                    })`
+                  : ''}
+              </Button>
             </div>
-            <CalendarWeek
-              events={queriesUpcomingAudioChatsMetadata?.filter((query) => isThisWeek(query?.data?.datetime_start_at))}
-            />
-          </>
-        )}
-        {(queryAudioChatsByStateRawData.status === 'loading' ||
-          queriesUpcomingAudioChatsMetadata.filter((query) => query?.status === 'loading')?.length > 0) && (
-          <div className="mb-6 flex items-center justify-center space-i-1ex">
-            <IconSpinner className="text-lg animate-spin" />
-            <p className="font-bold animate-pulse">Loading upcoming rallies...</p>
+            <Button title="Clear filters" type="button" scale="xs" intent="neutral-ghost" onClick={resetFilters}>
+              Clear
+            </Button>
           </div>
-        )}
+          <CalendarWeek queryAudioChats={queryAudioChats} />
+        </div>
       </main>
-      <p className="pt-8 text-center text-neutral-11">
-        This page is under construction and will be implemented in our 6th milestone.
-      </p>
+      <DialogModalFilters
+        onClickResetFilters={resetFilters}
+        isOpen={isModalFiltersOpen}
+        setIsOpen={setIsModalFiltersOpen}
+      >
+        <ListFilters
+          filterCategories={categories}
+          setCategoriesFilter={setCategories}
+          filterStatuses={statuses}
+          setStatusesFilter={setStatuses}
+          filterShowNSFW={showNSFW}
+          setFilterShowNSFW={toggleShowNSFW}
+          filterPublicOnly={publicOnly}
+          setFilterPublicOnly={togglePublicOnly}
+          setFilterNameRally={setNameRally}
+          filterNameRally={nameRally}
+          filterCreatorEthAddress={creatorEthAddress}
+          setFilterCreatorEthAddress={setCreatorEthAddress}
+        />
+      </DialogModalFilters>
     </>
   )
 }
+
+//@ts-ignore
+Page.getLayout = getLayout
 
 export default Page

@@ -105,7 +105,7 @@ export const FormJoinRoomAs = (props: FormJoinRoomAsProps) => {
           </FormField>
         </fieldset>
         {data()?.avatarUrl !== '' && data()?.displayName !== '' && (
-          <div className="mb-2 ">
+          <div className="mb-6 ">
             <p className="text-center text-neutral-11 text-[0.75rem] pb-2">Your profile</p>
             <div className="animate-appear items-center justify-center flex flex-col">
               <div className="w-20 h-20 rounded-full relative overflow-hidden">

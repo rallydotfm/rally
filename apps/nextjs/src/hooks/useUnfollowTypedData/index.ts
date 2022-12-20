@@ -1,7 +1,6 @@
 import { useAccount, useSigner, useSignTypedData } from 'wagmi'
 import { useQueryClient } from '@tanstack/react-query'
 import omit from '@helpers/omit'
-import splitSignature from '@helpers/splitSignature'
 import { lensFollowNFTContractABI } from '@rally/abi'
 import toast from 'react-hot-toast'
 import createUnfollowTypedData from '@services/lens/follow/unfollow'
@@ -33,21 +32,6 @@ export function useUnfollowTypedData() {
       if (result?.createUnfollowTypedData) {
         const typedData = result.createUnfollowTypedData.typedData
 
-        const signature = await signTypedDataUnfollow.signTypedDataAsync({
-          domain: omit(typedData?.domain, '__typename'),
-          //@ts-ignore
-          types: omit(typedData?.types, '__typename'),
-          //@ts-ignore
-          value: omit(typedData?.value, '__typename'),
-        })
-
-        const { v, r, s } = splitSignature(signature)
-        const sig = {
-          v,
-          r,
-          s,
-          deadline: typedData.value.deadline,
-        }
         const followNftContract = new Contract(
           typedData.domain.verifyingContract,
           lensFollowNFTContractABI,
@@ -119,14 +103,14 @@ export function useUnfollowTypedData() {
       } else {
         console.error('error', result)
         //@ts-ignore
-        toast.error(`Something went wrong: ${result?.error}`)
+        toast.error(`Something went wrong, please try again.`)
         setIsErrorContractUnfollow(true)
         setIsWritingContractUnfollow(false)
       }
     } catch (e) {
       console.error(e)
       //@ts-ignore
-      toast.error(`Something went wrong: ${e?.cause ?? e}`)
+      toast.error(`Something went wrong, please try again.`)
       setIsWritingContractUnfollow(false)
     }
   }

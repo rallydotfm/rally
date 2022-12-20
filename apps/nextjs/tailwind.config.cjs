@@ -71,9 +71,9 @@ module.exports = {
     fontSize: {
       '3xs': clamp(-5),
       '2xs': clamp(-2),
-      xs: clamp(-1),
-      sm: clamp(-0.5),
-      base: clamp(-0.25),
+      xs: clamp(-1.5),
+      sm: clamp(-1.25),
+      base: clamp(-1),
       md: clamp(0.125),
       lg: clamp(0.5),
       xl: clamp(1),
@@ -247,6 +247,7 @@ module.exports = {
       })
       addUtilities(utilities)
     }),
+    require('@vidstack/player/tailwind.cjs'),
     require('@headlessui/tailwindcss'),
     require('tailwindcss-logical'),
     require('@tailwindcss/typography'),

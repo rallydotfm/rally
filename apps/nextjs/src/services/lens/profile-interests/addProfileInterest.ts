@@ -1,12 +1,12 @@
-import { AddProfileInterestDocument } from '@graphql/generated'
-import type { AddProfileInterestsRequest } from '@graphql/generated'
-import { client } from '@config/graphql-request'
+import { AddProfileInterestDocument } from '@graphql/lens/generated'
+import type { AddProfileInterestsRequest } from '@graphql/lens/generated'
+import { clientLens } from '@config/graphql-request'
 
 /**
  * Add interest to profile
  */
 export async function addProfileInterest(request: AddProfileInterestsRequest) {
-  const result = await client.request(AddProfileInterestDocument, {
+  const result = await clientLens.request(AddProfileInterestDocument, {
     request,
   })
   return result

@@ -1,12 +1,12 @@
-import { ProfileInterestsDocument } from '@graphql/generated'
-import { client } from '@config/graphql-request'
+import { ProfileInterestsDocument } from '@graphql/lens/generated'
+import { clientLens } from '@config/graphql-request'
 
 /**
  * Get list of interests available on Lens
  * @returns Array<string>
  */
 export async function getListProfileInterests() {
-  const result = await client.request(ProfileInterestsDocument)
+  const result = await clientLens.request(ProfileInterestsDocument)
   return result
 }
 

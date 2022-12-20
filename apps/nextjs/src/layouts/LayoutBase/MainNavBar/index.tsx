@@ -1,6 +1,7 @@
 import button from '@components/Button/styles'
 import { ROUTE_RALLY_NEW } from '@config/routes'
 import { PlusIcon } from '@heroicons/react/24/outline'
+import useAudioPlayer from '@hooks/usePersistedAudioPlayer'
 import { useStoreHasSignedInWithLens } from '@hooks/useSignInWithLens'
 import { useStoreLiveVoiceChat } from '@hooks/useVoiceChat'
 import Link from 'next/link'
@@ -15,6 +16,7 @@ export const MainNavBar = (props: MainNavBarProps) => {
   const { address } = props
   const { room }: any = useStoreLiveVoiceChat()
   const isSignedIn = useStoreHasSignedInWithLens((state) => state.isSignedIn)
+  const isPlayerOpen = useAudioPlayer((state) => state.isOpen)
 
   return (
     <nav className="bg-black z-20 border-t-2 md:border-none border-neutral-4 fixed h-auto left-0 w-full bottom-0 md:w-auto md:sticky md:top-0 md:inline-start-0 md:h-full md:max-h-screen md:pt-6 flex flex-col md:col-span-1 lg:col-span-2">
@@ -40,11 +42,11 @@ export const MainNavBar = (props: MainNavBarProps) => {
       {address && address !== null && (
         <div
           className={`hidden md:mx-auto md:block pb-12 md:pt-4 transition-all ${
-            !isSignedIn && room?.state === 'disconnected'
+            !isSignedIn && room?.state === 'disconnected' && !isPlayerOpen
               ? 'mt-auto md:pb-32'
-              : room?.state === 'connected' && !isSignedIn
-              ? 'mt-auto md:pb-56'
-              : room?.state === 'connected'
+              : (room?.state === 'connected' || isPlayerOpen) && !isSignedIn
+              ? 'mt-auto md:pb-48'
+              : room?.state === 'connected' || isPlayerOpen
               ? 'mt-auto md:pb-24'
               : 'mt-auto md:pb-12'
           }`}

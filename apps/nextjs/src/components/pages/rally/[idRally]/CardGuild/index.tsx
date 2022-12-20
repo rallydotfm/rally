@@ -22,9 +22,9 @@ export const CardGuild = (props: CardGuildProps) => {
       </div>
     )
   return (
-    <article className="animate-appear grid gap-3 xs:gap-5 grid-cols-12">
+    <article className="animate-appear grid gap-5 grid-cols-12">
       <img
-        className="col-span-3 xs:col-span-2 rounded-md"
+        className="xs:self-center aspect-square col-span-3 xs:col-span-2 rounded-md"
         src={queryGuild.data.imageUrl}
         alt={queryGuild?.data?.name}
       />

@@ -43,7 +43,7 @@ export const useStoreDisplayParticipant = create<ParticipantToDisplay>((set) => 
   participant: undefined,
 }))
 
-export const DialogModalDisplayParticipant = (props: any) => {
+export const DialogModalDisplayParticipant = () => {
   const isDialogVisible = useStoreDisplayParticipant((state) => state.isDialogVisible)
   const setDialogVisibility = useStoreDisplayParticipant((state) => state.setDialogVisibility)
   const pickedParticipant = useStoreDisplayParticipant((state) => state.participant)
@@ -51,14 +51,21 @@ export const DialogModalDisplayParticipant = (props: any) => {
   const {
     room: { localParticipant, ...dataRoom },
   }: any = useStoreLiveVoiceChat()
-  const { mutationParticipantKickOut, mutationInviteToSpeak, mutationMoveBackToAudience, mutationRoomAddToBlacklist } =
+  const { mutationParticipantKickOut, mutationInviteToSpeak, mutationMoveBackToAudience } =
     useLiveVoiceChatInteractions()
 
   const rally = useStoreCurrentLiveRally((state: any) => state.rally)
-  const queryLensProfile = useWalletAddressDefaultLensProfile(pickedParticipant?.identity as `0x${string}`, true)
-  const queryUserAddressFollowers = useGetFollowing(pickedParticipant?.identity as `0x${string}`, {})
+  const queryPickedParticipantLensProfile = useWalletAddressDefaultLensProfile(
+    pickedParticipant?.identity as `0x${string}`,
+    {
+      enabled: pickedParticipant?.identity ? true : false,
+    },
+  )
+  const queryUserAddressFollowers = useGetFollowing(pickedParticipant?.identity as `0x${string}`, {
+    enabled: pickedParticipant?.identity ? true : false,
+  })
   const isSignedIn = useStoreHasSignedInWithLens((state) => state.isSignedIn)
-  const doesFollow = useDoesFollow(queryLensProfile?.data?.id)
+  const doesFollow = useDoesFollow(queryPickedParticipantLensProfile?.data?.id)
 
   const { publications } = useParticipant(pickedParticipant as Participant)
   return (
@@ -80,8 +87,14 @@ export const DialogModalDisplayParticipant = (props: any) => {
                 identity={pickedParticipant?.identity as string}
               />
             </p>
-            {queryLensProfile?.data?.handle && (
-              <p className="mt-1 text-2xs text-neutral-9">{queryLensProfile?.data?.handle}</p>
+            {queryPickedParticipantLensProfile?.data?.handle && (
+              <p className="mt-1 text-2xs text-neutral-9">{queryPickedParticipantLensProfile?.data?.handle}</p>
+            )}
+            {/* @ts-ignore */}
+            {pickedParticipant?.isLocal && (
+              <mark className="font-bold bg-transparent w-fit-content bg-interactive-12 px-2 py-1 text-interactive-11 rounded-md mt-1.5 flex text-[0.75rem]">
+                You
+              </mark>
             )}
             {/* @ts-ignore */}
             {queryUserAddressFollowers?.data?.following?.items?.filter(
@@ -92,28 +105,30 @@ export const DialogModalDisplayParticipant = (props: any) => {
                   Follows you
                 </mark>
               )}
-            {queryLensProfile?.data?.bio && (
+            {queryPickedParticipantLensProfile?.data?.bio && (
               <p className="pb-1 mt-2 overflow-hidden text-ellipsis leading-[25px] [-webkit-box-orient:vertical] [-webkit-line-clamp:2] [display:-webkit-box] text-xs text-neutral-11">
-                {queryLensProfile?.data?.bio}
+                {queryPickedParticipantLensProfile?.data?.bio}
               </p>
             )}
           </div>
 
-          {queryLensProfile?.data?.stats && (
+          {queryPickedParticipantLensProfile?.data?.stats && (
             <div className="mt-2">
               <ul className="grid grid-cols-2 gap-6 w-full">
                 <li className="flex space-i-1ex items-baseline">
                   <span className="font-bold text-white text-base">
                     {new Intl.NumberFormat('en-US', { maximumSignificantDigits: 3 }).format(
-                      queryLensProfile?.data?.stats?.totalFollowers,
+                      queryPickedParticipantLensProfile?.data?.stats?.totalFollowers,
                     )}
                   </span>{' '}
-                  <span className="text-2xs text-neutral-12">followers</span>
+                  <span className="text-2xs text-neutral-12">
+                    follower{queryPickedParticipantLensProfile?.data?.stats?.totalFollowers > 1 ? 's' : ''}
+                  </span>
                 </li>
                 <li className="flex space-i-1ex items-baseline">
                   <span className="font-bold text-white text-base">
                     {new Intl.NumberFormat('en-US', { maximumSignificantDigits: 3 }).format(
-                      queryLensProfile?.data?.stats?.totalFollowing,
+                      queryPickedParticipantLensProfile?.data?.stats?.totalFollowing,
                     )}
                   </span>{' '}
                   <span className="text-2xs text-neutral-12">following</span>
@@ -121,35 +136,36 @@ export const DialogModalDisplayParticipant = (props: any) => {
               </ul>
             </div>
           )}
-          {!queryLensProfile?.data?.stats?.totalFollowing && queryUserAddressFollowers?.data?.following?.items && (
-            <div className="mt-2">
-              <ul className="grid grid-cols-2 gap-6 w-full">
-                <li className="flex space-i-1ex items-baseline">
-                  <span className="font-bold text-white text-base">
-                    {new Intl.NumberFormat('en-US', { maximumSignificantDigits: 3 }).format(
-                      queryUserAddressFollowers?.data?.following?.items.length,
-                    )}
-                  </span>{' '}
-                  <span className="text-2xs text-neutral-12">following</span>
-                </li>
-              </ul>
-            </div>
-          )}
-          {!pickedParticipant?.isLocal && queryLensProfile?.data?.id && (
+          {!queryPickedParticipantLensProfile?.data?.stats?.totalFollowing &&
+            queryUserAddressFollowers?.data?.following?.items && (
+              <div className="mt-2">
+                <ul className="grid grid-cols-2 gap-6 w-full">
+                  <li className="flex space-i-1ex items-baseline">
+                    <span className="font-bold text-white text-base">
+                      {new Intl.NumberFormat('en-US', { maximumSignificantDigits: 3 }).format(
+                        queryUserAddressFollowers?.data?.following?.items.length,
+                      )}
+                    </span>{' '}
+                    <span className="text-2xs text-neutral-12">following</span>
+                  </li>
+                </ul>
+              </div>
+            )}
+          {!pickedParticipant?.isLocal && queryPickedParticipantLensProfile?.data?.id && (
             <div className="mt-4">
               {doesFollow?.data?.doesFollow?.[0] && (
                 <>
                   {doesFollow?.data?.doesFollow?.[0]?.follows === true ? (
                     <ButtonUnfollowOnLens
                       disabled={!isSignedIn}
-                      profile={queryLensProfile?.data}
+                      profile={queryPickedParticipantLensProfile?.data}
                       scale="xs"
                       intent="negative-outline"
                     />
                   ) : (
                     <ButtonFollowOnLens
                       disabled={!isSignedIn}
-                      profile={queryLensProfile?.data}
+                      profile={queryPickedParticipantLensProfile?.data}
                       scale="xs"
                       intent="primary-outline"
                     />
@@ -176,15 +192,21 @@ export const DialogModalDisplayParticipant = (props: any) => {
                 </button>
               </li>
             )}
-          {queryLensProfile?.data?.handle && (
-            <li>
-              <Link href={ROUTE_PROFILE.replace('[handleLensProfile]', queryLensProfile.data.handle)}>
+          <li>
+            {queryPickedParticipantLensProfile?.data?.handle ? (
+              <Link href={ROUTE_PROFILE.replace('[handleLensProfile]', queryPickedParticipantLensProfile.data.handle)}>
                 <a className="text-start block px-6 py-3 w-full focus:bg-neutral-12 hover:bg-neutral-3 focus:text-positive-9">
                   View profile
                 </a>
               </Link>
-            </li>
-          )}
+            ) : (
+              <span className="text-start block px-6 py-3 w-full text-neutral-11">
+                {pickedParticipant?.isLocal
+                  ? "You don't seem to have a Lens profile"
+                  : "This participant doesn't seem to have a Lens profile"}
+              </span>
+            )}
+          </li>
 
           {!pickedParticipant?.isLocal && (
             <>
@@ -264,26 +286,6 @@ export const DialogModalDisplayParticipant = (props: any) => {
                           })
                         }
                         className="disabled:opacity-50 disabled:cursor-not-allowed text-start text-negative-10 hover:bg-negative-1 hover:text-negative-11 focus:text-negative-11 focus:bg-negative-2 px-6 py-3 w-full "
-                      >
-                        Kick out
-                      </button>
-                    </li>
-                    <li>
-                      <button
-                        disabled={true}
-                        onClick={async () => {
-                          let roomMetadata = JSON.parse(dataRoom?.metadata ?? '')
-                          await mutationRoomAddToBlacklist.mutateAsync({
-                            id_rally: rally?.id,
-                            id_user: pickedParticipant?.identity as string,
-                            display_name: JSON.parse(pickedParticipant?.metadata as string)?.display_name,
-                            metadata: JSON.stringify({
-                              ...roomMetadata,
-                              blacklist: [...roomMetadata.blacklist, pickedParticipant?.identity],
-                            }),
-                          })
-                        }}
-                        className="disabled:opacity-50 text-start text-negative-10 hover:bg-negative-1 hover:text-negative-11 focus:text-negative-11 focus:bg-negative-2 px-6 py-3 w-full "
                       >
                         Ban permanently from this rally
                       </button>

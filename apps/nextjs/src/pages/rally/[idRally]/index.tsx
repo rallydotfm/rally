@@ -3,9 +3,9 @@ import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { useGetAudioChatById } from '@hooks/useGetAudioChatById'
 import { IconSpinner } from '@components/Icons'
-import { ROUTE_HOME } from '@config/routes'
+import { ROUTE_HOME, ROUTE_RALLY_PUBLISH_RECORDING } from '@config/routes'
 import { useConnectModal, useChainModal } from '@rainbow-me/rainbowkit'
-import { signOut, useSession } from 'next-auth/react'
+import { useSession } from 'next-auth/react'
 import Link from 'next/link'
 import button from '@components/Button/styles'
 import { ArrowLeftIcon } from '@heroicons/react/20/solid'
@@ -23,6 +23,8 @@ import CardGuild from '@components/pages/rally/[idRally]/CardGuild'
 import HostProfile from '@components/pages/rally/[idRally]/HostProfile'
 import FormJoinRoomAs from '@components/pages/rally/[idRally]/FormJoinRoomAs'
 import { useStoreHasSignedInWithLens } from '@hooks/useSignInWithLens'
+import { DICTIONARY_LOCALES_SIMPLIFIED } from '@helpers/mappingLocales'
+import { DICTIONARY_PROFILE_INTERESTS, DICTIONARY_PROFILE_INTERESTS_CATEGORIES } from '@helpers/mappingProfileInterests'
 
 const Page: NextPage = () => {
   const {
@@ -134,11 +136,27 @@ const Page: NextPage = () => {
                 <main className="h-full flex flex-col animate-appear items-center justify-center">
                   <article className="w-full max-w-[24rem]">
                     <header>
-                      <h1 className="text-center text-lg flex flex-col-reverse pb-6 leading-relaxed items-center justify-center font-bold">
-                        <span>{queryAudioChatMetadata?.data?.name}</span>
-                        <span className="text-xs text-neutral-12 uppercase font-semibold">
+                      <h1 className="text-center text-lg flex flex-col pb-6 leading-relaxed items-center justify-center font-bold">
+                        <span className="order-[2]">{queryAudioChatMetadata?.data?.name}</span>
+                        <span className="order-[1] text-xs text-neutral-12 uppercase font-semibold">
                           {queryAudioChatMetadata?.data?.state}
                         </span>
+                        <div className="flex flex-col items-center mt-2 gap-1 text-2xs order-[3]">
+                          {queryAudioChatMetadata?.data?.language && (
+                            <span className="text-neutral-11 order-[3]">
+                              {/* @ts-ignore */}
+                              {DICTIONARY_LOCALES_SIMPLIFIED?.[queryAudioChatMetadata?.data?.language]}
+                            </span>
+                          )}
+                          {queryAudioChatMetadata?.data?.category && (
+                            <mark className="bg-neutral-1 text-2xs text-neutral-12 py-0.5 px-2 rounded-md font-medium">
+                              {/* @ts-ignore */}
+                              {DICTIONARY_PROFILE_INTERESTS?.[queryAudioChatMetadata?.data?.category]?.label ??
+                                // @ts-ignore
+                                DICTIONARY_PROFILE_INTERESTS_CATEGORIES?.[queryAudioChatMetadata?.data?.category]}
+                            </mark>
+                          )}
+                        </div>
                       </h1>
                     </header>
                     <div className="bg-neutral-1 pb-6 border rounded-md border-neutral-4">
@@ -204,8 +222,15 @@ const Page: NextPage = () => {
                             </p>
                             <ul className="space-y-10">
                               {queryAudioChatMetadata?.data?.access_control?.guilds?.map((guild: any) => (
-                                <li className="animate-appear" key={`guild-${guild.id}`}>
+                                <li className="animate-appear relative" key={`guild-${guild.guild_id}`}>
                                   <CardGuild guild={guild} />
+                                  <a
+                                    className="absolute inset-0 block w-full h-full z-10 opacity-0"
+                                    target="_blank"
+                                    href={`https://guild.xyz/${guild.guild_id}`}
+                                  >
+                                    View guild page
+                                  </a>
                                 </li>
                               ))}
                             </ul>
@@ -216,13 +241,24 @@ const Page: NextPage = () => {
                         {([
                           DICTIONARY_STATES_AUDIO_CHATS.READY.label,
                           DICTIONARY_STATES_AUDIO_CHATS.PLANNED.label,
+                          DICTIONARY_STATES_AUDIO_CHATS.FINISHED.label,
                         ].includes(queryAudioChatMetadata.data?.state) ||
                           (queryAudioChatMetadata?.data?.state === DICTIONARY_STATES_AUDIO_CHATS.LIVE.label &&
                             stateVoiceChat?.room?.state === 'disconnected')) && (
-                          <div className="mt-4 pt-6 border-t border-neutral-4 px-6 xs:px-8 flex flex-col">
+                          <div
+                            className={`${
+                              [
+                                DICTIONARY_STATES_AUDIO_CHATS.LIVE.label,
+                                DICTIONARY_STATES_AUDIO_CHATS.PLANNED.label,
+                              ].includes(queryAudioChatMetadata.data.state)
+                                ? 'pt-6'
+                                : ''
+                            } mt-4 border-t border-neutral-4 px-6 xs:px-8 flex flex-col`}
+                          >
                             {[
                               DICTIONARY_STATES_AUDIO_CHATS.READY.label,
                               DICTIONARY_STATES_AUDIO_CHATS.PLANNED.label,
+                              DICTIONARY_STATES_AUDIO_CHATS.FINISHED.label,
                             ].includes(queryAudioChatMetadata.data?.state) && (
                               <>
                                 {queryAudioChatMetadata?.data?.state === DICTIONARY_STATES_AUDIO_CHATS.PLANNED.label &&
@@ -242,21 +278,61 @@ const Page: NextPage = () => {
                                       )}
                                     </>
                                   )}
+
                                 {address === queryAudioChatMetadata?.data?.creator && (
                                   <div className="animate-appear mt-5 flex flex-col justify-center">
-                                    <Button
-                                      disabled={rally && rally?.id !== idRally}
-                                      onClick={async () => {
-                                        stateTxUiRallyGoLive.setDialogVisibility(true)
-                                        await onClickGoLive(queryAudioChatMetadata.data?.id)
-                                      }}
-                                    >
-                                      Start live
-                                    </Button>
-                                    {rally && rally?.id !== idRally && (
-                                      <p className="animate-appear text-center text-2xs text-neutral-11 pt-4">
-                                        You're already in a rally - finish/leave it first!
-                                      </p>
+                                    {DICTIONARY_STATES_AUDIO_CHATS.PLANNED.label ===
+                                      queryAudioChatMetadata.data.state && (
+                                      <>
+                                        <Button
+                                          disabled={rally && rally?.id !== idRally}
+                                          onClick={async () => {
+                                            stateTxUiRallyGoLive.setDialogVisibility(true)
+                                            await onClickGoLive(queryAudioChatMetadata.data?.id)
+                                          }}
+                                        >
+                                          Start live
+                                        </Button>
+                                        {rally && rally?.id !== idRally && (
+                                          <p className="animate-appear text-center text-2xs text-neutral-11 pt-4">
+                                            You're already in a rally - finish/leave it first!
+                                          </p>
+                                        )}
+                                      </>
+                                    )}
+                                  </div>
+                                )}
+                                {DICTIONARY_STATES_AUDIO_CHATS.FINISHED.label === queryAudioChatMetadata.data.state && (
+                                  <div className="pt-4 flex flex-col justify-center items-center">
+                                    {queryAudioChatMetadata.data.will_be_recorded === false ? (
+                                      <p className="italic text-neutral-11 text-sm">No recordings available.</p>
+                                    ) : (
+                                      <>
+                                        {queryAudioChatMetadata?.data?.creator === address ? (
+                                          <>
+                                            <Link
+                                              href={ROUTE_RALLY_PUBLISH_RECORDING.replace(
+                                                '[idRally]',
+                                                queryAudioChatMetadata.data.id,
+                                              )}
+                                            >
+                                              <a
+                                                className={button({
+                                                  intent: 'primary-outline',
+                                                })}
+                                              >
+                                                Publish recording
+                                              </a>
+                                            </Link>
+                                          </>
+                                        ) : (
+                                          <>
+                                            <p className="italic text-neutral-11 text-sm">
+                                              The creator didn't publish any recording yet.
+                                            </p>
+                                          </>
+                                        )}
+                                      </>
                                     )}
                                   </div>
                                 )}
@@ -320,7 +396,10 @@ const Page: NextPage = () => {
                                                     ),
                                                   )
                                                   .filter((role) =>
-                                                    queryCurrentUserGuildMemberships?.data?.roles.includes(role),
+                                                    queryCurrentUserGuildMemberships?.data?.roles.includes(
+                                                      //@ts-ignore
+                                                      parseInt(role),
+                                                    ),
                                                   )?.length > 0 ? (
                                                   <>
                                                     <FormJoinRoomAs

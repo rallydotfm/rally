@@ -19,8 +19,13 @@ export const button = cva(
         ],
         'primary-outline': [
           'bg-transparent hover:bg-primary-3 focus:bg-primary-11 hover:focus:bg-opacity-95',
-          'text-white focus:text-primary-3',
+          'text-neutral-12 focus:text-primary-3',
           'border-primary-9 focus:border-primary-11',
+        ],
+        'interactive-outline': [
+          'bg-transparent hover:bg-interactive-3 focus:bg-interactive-11 hover:focus:bg-opacity-95',
+          'text-neutral-12 focus:text-interactive-3',
+          'border-interactive-9 focus:border-interactive-11',
         ],
         negative: [
           'bg-negative-10 hover:bg-negative-9 focus:bg-negative-11 hover:focus:bg-opacity-95',
@@ -29,7 +34,7 @@ export const button = cva(
         ],
         'negative-outline': [
           'bg-transparent hover:bg-negative-3 focus:bg-negative-11 hover:focus:bg-opacity-95',
-          'text-white focus:text-negative-3',
+          'text-neutral-12 focus:text-negative-3',
           'border-negative-9 focus:border-negative-11',
         ],
         'neutral-on-light-layer': [
@@ -40,7 +45,10 @@ export const button = cva(
         ],
 
         'neutral-outline': [
-          'border-neutral-9 hover:border-neutral-10 focus:border-white bg-white bg-opacity-0 text-white hover:bg-opacity-10 focus:border-transparent focus:bg-opacity-100 focus:text-black',
+          'border-neutral-9 hover:border-neutral-10 focus:border-white bg-white bg-opacity-0 text-neutral-12 hover:bg-opacity-10 focus:border-transparent focus:bg-opacity-100 focus:text-black',
+        ],
+        'neutral-outline-solid': [
+          'border-neutral-5 hover:border-neutral-6 focus:border-neutral-8 bg-black hover:bg-neutral-2 focus:bg-neutral-1 text-white',
         ],
         'primary-ghost': [
           'border-transparent bg-primary-10 bg-opacity-0 text-primary-10 hover:bg-opacity-10 focus:border-transparent focus:bg-opacity-100 focus:text-primary-1',
@@ -56,7 +64,7 @@ export const button = cva(
         default: ['text-xs', 'py-2 px-[3ex]', 'font-bold', 'border'],
         lg: ['text-md', 'py-1.5 px-[3ex]', 'font-bold', 'border'],
         sm: ['text-2xs', 'py-2 px-[3ex]', 'font-bold', 'border'],
-        xs: ['text-2xs', 'py-0.5 px-[3ex]', 'font-bold', 'border'],
+        xs: ['text-2xs', 'py-1 px-[3ex]', 'font-bold', 'border'],
       },
     },
     defaultVariants: {

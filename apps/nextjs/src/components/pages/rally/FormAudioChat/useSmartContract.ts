@@ -110,8 +110,8 @@ export function useSmartContract(stateTxUi: TxUi) {
       console.error(e)
       toast.error(e?.message)
     },
-    onSuccess(data) {
-      queryClient.invalidateQueries({
+    async onSuccess(data) {
+      await queryClient.invalidateQueries({
         queryKey: ['audio-chat-metadata', stateTxUi.rallyId],
         refetchType: 'none',
       })
@@ -190,7 +190,6 @@ export function useSmartContract(stateTxUi: TxUi) {
         // create JSON file with form values + uploaded image URL
         let rally_cohosts = []
         let rally_guests = []
-        let whitelist
 
         if (values?.rally_cohosts?.length > 0) {
           //@ts-ignore
@@ -203,17 +202,19 @@ export function useSmartContract(stateTxUi: TxUi) {
         }
 
         const rallyData = {
-          name: values.rally_name,
-          description: values.rally_description,
-          tags: values.rally_tags,
+          name: values.rally_name ?? '',
+          description: values.rally_description ?? '',
+          language: values.rally_language ?? 'en',
+          tags: values.rally_tags ?? [],
           has_cohosts: rally_cohosts?.length > 0,
           cohosts_list: rally_cohosts,
           guests_list: rally_guests,
           category: values?.rally_category,
           is_nsfw: values?.rally_is_nsfw,
           will_be_recorded: values.rally_is_recorded,
+          clips_allowed: values.rally_clips_allowed,
           is_gated: values.rally_is_gated,
-          max_attendees: values.rally_max_attendees,
+          max_attendees: values.rally_max_attendees ?? 100,
           access_control: {
             guilds: values.rally_access_control_guilds,
             whitelist: [account.address, ...values?.rally_cohosts?.map((cohost: any) => cohost.eth_address)],
@@ -260,6 +261,9 @@ export function useSmartContract(stateTxUi: TxUi) {
    * Upload form data as a JSON after preparing them (upload image, encrypt cohosts wallet address) and create a new audio chat on chain
    */
   async function onSubmitNewAudioChat(values: any) {
+    contractWriteNewAudioChat.reset()
+    mutationUploadImageFile.reset()
+    mutationUploadJsonFile.reset()
     stateTxUi.setDialogVisibility(true)
     try {
       const args = await prepareRallyData(values, false)
@@ -269,18 +273,21 @@ export function useSmartContract(stateTxUi: TxUi) {
         //@ts-ignore
         recklesslySetUnpreparedArgs: [
           /*
-              Datetime at which the rally will start,
-              Current datetime,
-              CID,
-              Current user wallet address,
-              should the audiochat be indexed or not
-            */
+            audio_event_id (bytes32)
+            new_cid (string)
+            start_at (uint256)
+            is_indexed (bool)
+            recording_arweave_transaction_id (string)
+            lens_publication_id (string) 
+          */
           startAt,
           //@ts-ignore
           getUnixTime(new Date()),
           metadata,
           creatorWalletAddress,
           isIndexed,
+          '',
+          '',
         ],
       })
     } catch (e) {
@@ -292,6 +299,9 @@ export function useSmartContract(stateTxUi: TxUi) {
    * Upload form data as a JSON after preparing them (upload image, encrypt cohosts wallet address) and update an audio chat data on chain
    */
   async function onSubmitEditAudioChat(args: any) {
+    contractWriteEditAudioChat.reset()
+    mutationUploadImageFile.reset()
+    mutationUploadJsonFile.reset()
     const { id, values } = args
     stateTxUi.setDialogVisibility(true)
     try {
@@ -303,15 +313,19 @@ export function useSmartContract(stateTxUi: TxUi) {
         //@ts-ignore
         recklesslySetUnpreparedArgs: [
           /*
-            audio chat id, 
-            new CID
-            new start_at
-            is indexed
+            audio_event_id (bytes32)
+            new_cid (string)
+            start_at (uint256)
+            is_indexed (bool)
+            recording_arweave_transaction_id (string)
+            lens_publication_id (string) 
           */
           id,
           metadata,
           startAt,
           values.rally_is_indexed,
+          '',
+          '',
         ],
       })
     } catch (e) {

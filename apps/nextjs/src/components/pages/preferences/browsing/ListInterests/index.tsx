@@ -25,7 +25,7 @@ export const ListInterests = (props: ListInterestsProps) => {
         {list
           .filter((label) => !label.includes('__'))
           .map((category) => (
-            <li>
+            <li key={category}>
               {/* @ts-ignore */}
               <span className="font-bold">{DICTIONARY_PROFILE_INTERESTS_CATEGORIES[category]}</span>
               <ul className="flex flex-wrap gap-3 pt-2">
@@ -66,7 +66,7 @@ export const ListInterests = (props: ListInterestsProps) => {
                       .filter((label) => label.includes('__') && label.includes(category))
                       .map((interest) => {
                         return (
-                          <li>
+                          <li key={interest}>
                             <Button
                               className={`${
                                 source?.includes(interest) ? '!pis-1ex' : '!pis-[2ex]'

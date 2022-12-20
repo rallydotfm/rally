@@ -1,7 +1,7 @@
 import NavMenu from '@components/NavMenu'
 import { getLayout as getProtectedLayout } from '../LayoutWalletRequired'
 import { getLayout as getBaseLayout } from '../LayoutBase'
-import { ROUTE_PREFERENCES_INTERESTS } from '@config/routes'
+import { ROUTE_PREFERENCES_BROWSING, ROUTE_PREFERENCES_LANGUAGES, ROUTE_PREFERENCES_ROOM } from '@config/routes'
 
 interface LayoutProps {
   children: React.ReactNode
@@ -15,8 +15,16 @@ export const LayoutPreferences = (props: LayoutProps) => {
       <NavMenu
         routes={[
           {
-            label: 'Interests',
-            href: ROUTE_PREFERENCES_INTERESTS,
+            label: 'Browsing',
+            href: ROUTE_PREFERENCES_BROWSING,
+          },
+          {
+            label: 'Room',
+            href: ROUTE_PREFERENCES_ROOM,
+          },
+          {
+            label: 'Languages',
+            href: ROUTE_PREFERENCES_LANGUAGES,
           },
         ]}
       />

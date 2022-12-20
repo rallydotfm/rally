@@ -218,7 +218,7 @@ export const FormEditProfile = (props: FormEditProfileProps) => {
           </FormField.InputField>
         </FormField>
       </fieldset>
-      <Button isLoading={isLoading} disabled={!isValid || isLoading}>
+      <Button isLoading={isLoading} disabled={!isValid() || chain?.unsupported || isLoading}>
         {labelCta}
       </Button>
     </form>

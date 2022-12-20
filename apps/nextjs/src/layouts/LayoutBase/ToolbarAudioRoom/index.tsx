@@ -2,12 +2,11 @@ import { useEffect, useState } from 'react'
 import {
   MicrophoneIcon as SolidMicrophoneIcon,
   HandRaisedIcon as SolidHandRaisedIcon,
-  Cog6ToothIcon,
   ArrowRightOnRectangleIcon,
-  SignalSlashIcon,
   UsersIcon,
+  XMarkIcon,
+  EllipsisHorizontalIcon,
 } from '@heroicons/react/20/solid'
-
 import { HandRaisedIcon, HeartIcon, MicrophoneIcon } from '@heroicons/react/24/outline'
 import { ROUTE_RALLY_VIEW } from '@config/routes'
 import Button from '@components/Button'
@@ -17,13 +16,14 @@ import { useRouter } from 'next/router'
 import { useStoreCurrentLiveRally } from '@hooks/useVoiceChat'
 import { trpc } from '@utils/trpc'
 import { useEndLiveAudioChat, useStoreTxUiEndLiveRally } from '@hooks/useEndLiveAudioChat'
-import { Listbox } from '@headlessui/react'
+import { Listbox, Menu } from '@headlessui/react'
 import DialogEndLive from '@components/DialogEndLive'
 import DialogModalSpeakerInvitation from '@components/pages/rally/[idRally]/DialogModalSpeakerInvitation'
 import { useAccount } from 'wagmi'
 import { RoomEvent } from 'livekit-client'
 import Link from 'next/link'
 import type { Participant, Track } from 'livekit-client'
+import DialogManageLive from '@components/DialogManageLive'
 
 export const ToolbarAudioRoom = () => {
   const { address } = useAccount()
@@ -51,6 +51,7 @@ export const ToolbarAudioRoom = () => {
   const stateTxUiEndLiveRally = useStoreTxUiEndLiveRally()
   const { onClickEndLive, stateEndLiveAudioChat } = useEndLiveAudioChat(stateTxUiEndLiveRally)
   const [isHandRaised, setIsHandRaised] = useState(false)
+  const [isDialogManageRallyOpen, setIsDialogManageRallyOpen] = useState(false)
 
   useEffect(() => {
     state.room?.on(RoomEvent.ParticipantPermissionsChanged, (prevPermissions: any, participant: Participant) => {
@@ -73,13 +74,18 @@ export const ToolbarAudioRoom = () => {
         )
       })}
 
-      <div className={`w-full justify-evenly flex xs:grid xs:grid-cols-3 2xs:gap-6 xs:gap-8 px-3 md:px-6`}>
+      <div className={`w-full justify-evenly flex xs:grid xs:grid-cols-3 2xs:gap-4 xs:gap-8 px-3 md:px-6`}>
         <div
           className={`col-span-1 flex items-baseline ${
             localUserPermissions?.canPublishData ? 'max-w-[5ex]' : 'max-w-[8ex]'
           } xs:max-w-unset shrink-1 `}
         >
           ​​{' '}
+          <mark className="text-[0.75rem] flex items-center mie-4 xs:mie-6 font-bold my-auto text-interactive-12 bg-interactive-3 px-1ex py-1 rounded">
+            <UsersIcon className="mie-1ex w-3" />
+
+            {new Intl.NumberFormat('en-US', { maximumSignificantDigits: 3 }).format(state.participants.length)}
+          </mark>
           {pathname !== ROUTE_RALLY_VIEW && (
             <Link href={ROUTE_RALLY_VIEW.replace('[idRally]', rally?.id)}>
               <a className="flex font-bold justify-start items-baseline space-i-1 overflow-hidden text-ellipsis 2xs:space-i-2 xs:space-i-4 self-center text-2xs">
@@ -103,11 +109,6 @@ export const ToolbarAudioRoom = () => {
               </a>
             </Link>
           )}
-          <mark className="text-[0.75rem] flex items-center mis-4 font-bold my-auto text-interactive-12 bg-interactive-3 px-1ex py-1 rounded">
-            <UsersIcon className="mie-1ex w-3" />
-
-            {new Intl.NumberFormat('en-US', { maximumSignificantDigits: 3 }).format(state.participants.length)}
-          </mark>
         </div>
 
         <div
@@ -126,26 +127,27 @@ export const ToolbarAudioRoom = () => {
               }}
               intent="neutral-ghost"
               scale="sm"
-              className={`ring-interactive-11 ${
+              className={`ring-interactive-11  ${
                 isSpeaking ? 'ring-4 ring-opacity-100' : 'ring-0 ring-opacity-0'
-              } relative aspect-square shrink-0`}
+              } relative aspect-square w-auto max-w-12 !p-2 shrink-0`}
               title={
                 !microphonePublication ? 'Activate your microphone' : microphonePublication.isMuted ? 'Unmute' : 'Mute'
               }
             >
               {!microphonePublication ? (
                 <>
-                  <MicrophoneIcon className="w-7" />
-                  <Cog6ToothIcon className="absolute animate-bounce bottom-2.5 inline-end-2.5 pointer-events-none text-neutral-9 w-4" />
+                  <MicrophoneIcon className="w-7 pointer-events-none" />
+                  <XMarkIcon className="absolute shadow w-[1.2rem] pointer-events-none bottom-1 inline-end-0 text-negative-9" />
                 </>
               ) : (
                 <>
                   {microphonePublication.isMuted ? (
                     <>
-                      <MicrophoneIcon className="w-7" />
+                      <MicrophoneIcon className="w-7 pointer-events-none" />
+                      <XMarkIcon className="absolute shadow w-[1.2rem] pointer-events-none bottom-1 inline-end-0 text-negative-9" />
                     </>
                   ) : (
-                    <SolidMicrophoneIcon className="w-7" />
+                    <SolidMicrophoneIcon className="w-7 pointer-events-none" />
                   )}
                 </>
               )}
@@ -165,9 +167,13 @@ export const ToolbarAudioRoom = () => {
             }}
             intent="neutral-ghost"
             scale="sm"
-            className="aspect-square shrink-0"
+            className="aspect-square w-auto max-w-12 !p-2 shrink-0"
           >
-            {isHandRaised ? <SolidHandRaisedIcon className="w-7" /> : <HandRaisedIcon className="w-7" />}
+            {isHandRaised ? (
+              <SolidHandRaisedIcon className="w-[1.35rem] pointer-events-none" />
+            ) : (
+              <HandRaisedIcon className="w-[1.35rem] pointer-events-none" />
+            )}
           </Button>
           <div className="shrink-0 relative">
             <Listbox
@@ -180,44 +186,70 @@ export const ToolbarAudioRoom = () => {
               }}
               horizontal
             >
-              <Listbox.Button as={Button} intent="neutral-ghost" scale="sm" className="aspect-square">
-                {<HeartIcon className="w-7" />}
+              <Listbox.Button
+                as={Button}
+                intent="neutral-ghost"
+                scale="sm"
+                className="aspect-square w-auto max-w-12 !p-2"
+              >
+                {<HeartIcon className="w-[1.35rem] pointer-events-none" />}
               </Listbox.Button>
-              <Listbox.Options className="border-neutral-7 flex -top-full left-1/2 -translate-y-3 -translate-x-1/2 text-xl flex-row absolute divide-i divide-neutral-7 max-w-72 w-fit-content overflow-x-auto rounded-md bg-neutral-5 focus:outline-none ">
-                {['👋', '👍', '✌️', '❤️', '🔥', '💯', '✨', '🫡', '😂', '😭', '😠'].map((emote) => (
-                  <Listbox.Option
-                    className="flex-grow cursor-pointer hover:bg-neutral-7 focus:bg-white flex items-center justify-center py-1 px-4 border-neutral-5 aspect-square shrink-0"
-                    key={emote}
-                    value={emote}
-                  >
-                    {emote}
-                  </Listbox.Option>
-                ))}
+              <Listbox.Options>
+                <div className="rotate-45 bg-neutral-5 inset-0 w-full h-full absolute -translate-y-[125%]" />
+                <div className="max-h-64 border-neutral-7 bg-neutral-5 absolute w-64 rounded-md overflow-y-auto top-0 left-1/2 -translate-y-[105%] -translate-x-1/2 ">
+                  <div className="text-2xs text-center pt-3 pb-2 font-bold">Send a reaction</div>
+                  <div className="p-1 border-t border-neutral-3 grid grid-cols-5 text-xl">
+                    {['👋', '👍', '✌️', '❤️', '🔥', '💯', '✨', '🫡', '😂', '😭', '😠'].map((emote) => (
+                      <Listbox.Option
+                        className="col-span-1 cursor-pointer rounded-full hover:bg-neutral-7 focus:bg-white flex items-center justify-center aspect-square"
+                        key={emote}
+                        value={emote}
+                      >
+                        {emote}
+                      </Listbox.Option>
+                    ))}
+                  </div>
+                </div>
               </Listbox.Options>
             </Listbox>
           </div>
         </div>
-        <div className="col-span-1 grow-1 flex items-center justify-end">
+        <div className="col-span-1 grow-1 flex items-center relative z-10 justify-end">
           {rally?.creator !== address ? (
-            <Button scale="sm" intent="negative-ghost" onClick={async () => await state.room.disconnect()}>
+            <Button
+              scale="sm"
+              className="aspect-square w-auto max-w-12 xs:max-w-unset xs:w-unset xs:aspect-auto !p-2 xs:!px-[3ex]"
+              intent="negative-ghost"
+              onClick={async () => await state.room.disconnect()}
+            >
               <ArrowRightOnRectangleIcon className="w-5" />
               <span className="sr-only xs:not-sr-only xs:px-1ex">Leave quietly</span>
             </Button>
           ) : (
             <Button
+              className="aspect-square w-auto max-w-12 xs:max-w-unset xs:w-unset xs:aspect-auto !p-2 xs:!px-[3ex]"
               scale="sm"
-              intent="negative-ghost"
-              onClick={async () => {
-                stateTxUiEndLiveRally.setDialogVisibility(true)
-                await onClickEndLive(rally?.id)
-              }}
+              intent="neutral-ghost"
+              onClick={() => setIsDialogManageRallyOpen(true)}
             >
-              <SignalSlashIcon className="w-6 xs:w-5" />
-              <span className="sr-only xs:not-sr-only xs:px-1ex">End rally</span>
+              <span className="sr-only xs:not-sr-only">Manage live</span>
+              <EllipsisHorizontalIcon className="w-5 xs:hidden" />
             </Button>
           )}
         </div>
       </div>
+      <DialogManageLive
+        onClickEndRally={async () => {
+          setIsDialogManageRallyOpen(false)
+          stateTxUiEndLiveRally.setDialogVisibility(true)
+          await onClickEndLive(rally?.id)
+        }}
+        rally={rally}
+        participants={state.participants}
+        canRecord={localUserPermissions?.canRecord}
+        isOpen={isDialogManageRallyOpen}
+        setIsOpen={setIsDialogManageRallyOpen}
+      />
       <DialogEndLive stateTxUi={stateTxUiEndLiveRally} stateEndLiveAudioChat={stateEndLiveAudioChat} />
       {localUserPermissions?.canPublish && !localUserPermissions?.canPublishData && (
         <DialogModalSpeakerInvitation

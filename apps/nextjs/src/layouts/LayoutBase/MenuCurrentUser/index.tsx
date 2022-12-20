@@ -4,13 +4,12 @@ import { useDisconnect, useEnsName, useNetwork } from 'wagmi'
 import { EllipsisHorizontalIcon } from '@heroicons/react/24/outline'
 import { shortenEthereumAddress } from '@helpers/shortenEthereumAddress'
 import useWalletAddressDefaultLensProfile from '@hooks/useWalletAddressDefaultLensProfile'
-import { ROUTE_PROFILE, ROUTE_ACCOUNT, ROUTE_PREFERENCES_INTERESTS } from '@config/routes'
+import { ROUTE_PROFILE, ROUTE_ACCOUNT, ROUTE_PREFERENCES_BROWSING } from '@config/routes'
 import { useChainModal } from '@rainbow-me/rainbowkit'
-
 import Profile from './Profile'
 import { ExclamationTriangleIcon, ShieldExclamationIcon } from '@heroicons/react/20/solid'
 import Button from '@components/Button'
-import { signOut, useSession } from 'next-auth/react'
+import { useSession } from 'next-auth/react'
 import { useStoreHasSignedInWithLens } from '@hooks/useSignInWithLens'
 
 interface MenuCurrentUserProps {
@@ -20,7 +19,9 @@ export const MenuCurrentUser = (props: MenuCurrentUserProps) => {
   const { address } = props
   const { openChainModal } = useChainModal()
   const { disconnect } = useDisconnect()
-  const queryUserProfileLens = useWalletAddressDefaultLensProfile(address)
+  const queryUserProfileLens = useWalletAddressDefaultLensProfile(address, {
+    enabled: address ? true : false,
+  })
   const { chain } = useNetwork()
   const queryEns = useEnsName({
     chainId: 1,
@@ -76,15 +77,15 @@ export const MenuCurrentUser = (props: MenuCurrentUserProps) => {
         </Menu.Button>
         <Menu.Items
           className={`
-        border border-neutral-6 border-solid
-        bg-neutral-3
+        border border-neutral-7 border-solid
+        bg-neutral-5
         overflow-hidden flex flex-col
         absolute top-10/12
         md:top-0
         inline-start-1/2 -translate-x-1/2 md:-translate-x-1/4 lg:-translate-x-1/2 md:inline-start-full 
         w-72 2xs:w-56 max-w-screen
         md:mb-4
-        divide-y divide-neutral-4 
+        divide-y divide-neutral-7 
         md:-translate-y-full 3xl:inline-start-1/2
         3xl:-translate-x-1/2
         rounded-md`}
@@ -105,7 +106,7 @@ export const MenuCurrentUser = (props: MenuCurrentUserProps) => {
               <a className="hover:bg-interactive-10 ui-active:bg-interactive-10 px-3 py-2">Account</a>
             </Menu.Item>
           )}
-          <Menu.Item as={Link} href={ROUTE_PREFERENCES_INTERESTS}>
+          <Menu.Item as={Link} href={ROUTE_PREFERENCES_BROWSING}>
             <a className="hover:bg-interactive-10 ui-active:bg-interactive-10 px-3 py-2">Preferences</a>
           </Menu.Item>
 

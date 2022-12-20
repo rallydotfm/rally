@@ -7,10 +7,9 @@ import EditProfile from '@components/pages/account/edit-profile/EditProfile'
 
 const Page: NextPage = () => {
   const account = useAccount()
-  const queryLensProfile = useWalletAddressDefaultLensProfile(
-    account?.address as `0x${string}`,
-    account?.address ? true : false,
-  )
+  const queryLensProfile = useWalletAddressDefaultLensProfile(account?.address as `0x${string}`, {
+    enabled: account?.address ? true : false,
+  })
   return (
     <>
       <Head>
@@ -20,8 +19,8 @@ const Page: NextPage = () => {
           content="Rally is an open-source alternative to Twitter Space/Clubhouse for web3 communities."
         />
       </Head>
-      <main>
-        <h1 className="font-bold text-md pb-8 animate-appear">Edit your profile</h1>
+      <main className="animate-appear">
+        <h1 className="font-bold text-md pb-8">Edit your profile</h1>
         {queryLensProfile?.isLoading && <p className="animate-pulse">Loading profile data...</p>}
         {queryLensProfile?.data?.handle && <EditProfile profile={queryLensProfile?.data} />}
       </main>

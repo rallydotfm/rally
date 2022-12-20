@@ -1,9 +1,9 @@
-import { CreateUnfollowTypedDataDocument } from '@graphql/generated'
-import { client } from '@config/graphql-request'
-import type { UnfollowRequest } from '@graphql/generated'
+import { CreateUnfollowTypedDataDocument } from '@graphql/lens/generated'
+import { clientLens } from '@config/graphql-request'
+import type { UnfollowRequest } from '@graphql/lens/generated'
 
 export const createUnfollowTypedData = async (request: UnfollowRequest) => {
-  const result = await client.request(CreateUnfollowTypedDataDocument, {
+  const result = await clientLens.request(CreateUnfollowTypedDataDocument, {
     request,
   })
 

@@ -55,6 +55,9 @@
     @apply grow flex flex-col;
   }
 
+  .link {
+    @apply font-semibold text-primary-10 focus:text-primary-9 hover:text-primary-11;
+  }
   .navLink-desktop {
     @apply py-2 px-3 rounded-full font-semibold;
   }

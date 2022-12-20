@@ -29,6 +29,7 @@ export const ButtonUnfollowOnLens = (props: ButtonUnfollowOnLensProps) => {
         isWritingContractUnfollow,
       ].includes(true)}
       onClick={() => unfollowProfile(profile)}
+      type="button"
     >
       {signTypedDataUnfollow?.isLoading
         ? 'Sign message...'

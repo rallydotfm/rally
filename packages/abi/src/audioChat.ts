@@ -10,15 +10,8 @@ export const audioChatABI = [
   },
   {
     anonymous: false,
-    inputs: [
-      { indexed: false, internalType: 'bytes32', name: 'audio_event_id', type: 'bytes32' },
-      { indexed: false, internalType: 'uint256', name: 'start_at', type: 'uint256' },
-      { indexed: false, internalType: 'uint256', name: 'created_at', type: 'uint256' },
-      { indexed: false, internalType: 'string', name: 'cid_metadata', type: 'string' },
-      { indexed: false, internalType: 'enum AudioChat.stateOptions', name: 'current_state', type: 'uint8' },
-      { indexed: false, internalType: 'bool', name: 'is_indexed', type: 'bool' },
-    ],
-    name: 'handleEventUpdated',
+    inputs: [{ indexed: false, internalType: 'bytes32', name: 'audio_event_id', type: 'bytes32' }],
+    name: 'handleAudioChatDeleted',
     type: 'event',
   },
   {
@@ -30,6 +23,20 @@ export const audioChatABI = [
       { indexed: false, internalType: 'string', name: 'cid_metadata', type: 'string' },
       { indexed: false, internalType: 'enum AudioChat.stateOptions', name: 'current_state', type: 'uint8' },
       { indexed: false, internalType: 'bool', name: 'is_indexed', type: 'bool' },
+    ],
+    name: 'handleAudioChatUpdated',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: false, internalType: 'bytes32', name: 'audio_event_id', type: 'bytes32' },
+      { indexed: false, internalType: 'uint256', name: 'start_at', type: 'uint256' },
+      { indexed: false, internalType: 'uint256', name: 'created_at', type: 'uint256' },
+      { indexed: false, internalType: 'string', name: 'cid_metadata', type: 'string' },
+      { indexed: false, internalType: 'enum AudioChat.stateOptions', name: 'current_state', type: 'uint8' },
+      { indexed: false, internalType: 'bool', name: 'is_indexed', type: 'bool' },
+      { indexed: false, internalType: 'address', name: 'creator', type: 'address' },
     ],
     name: 'handleNewAudioChat',
     type: 'event',
@@ -85,7 +92,7 @@ export const audioChatABI = [
   },
   {
     inputs: [],
-    name: 'getAllChats',
+    name: 'getAllAudioChats',
     outputs: [
       {
         components: [
@@ -130,7 +137,7 @@ export const audioChatABI = [
   },
   {
     inputs: [{ internalType: 'address', name: 'creator', type: 'address' }],
-    name: 'getAudioChatsByAdress',
+    name: 'getAudioChatsByAddress',
     outputs: [
       {
         components: [
