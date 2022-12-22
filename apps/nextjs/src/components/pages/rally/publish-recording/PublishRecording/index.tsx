@@ -285,7 +285,6 @@ export const PublishRecording = (props: any) => {
               </Button>
             </div>
           )}
-          {console.log(stateTxUi?.metadataArweaveTxId)}
           {statePublishRecording?.transaction?.isSuccess && (
             <div className="animate-appear space-y-4 mt-6">
               <Notice>

@@ -15,12 +15,14 @@ export function useGetAllAudioChats(options?: any) {
     },
   })
   const queriesAudioChatsMetadata = useQueries({
+    //@ts-ignore
     enabled: queryGetAudioChatsRawMetadata?.data?.length ?? false,
     //@ts-ignore
     queries:
       //@ts-ignore
       queryGetAudioChatsRawMetadata?.data?.length > 0
-        ? queryGetAudioChatsRawMetadata?.data?.map((audioChat: any) => {
+        ? //@ts-ignore
+          queryGetAudioChatsRawMetadata?.data?.map((audioChat: any) => {
             return {
               ...options,
               queryKey: ['audio-chat-metadata', audioChat?.audio_event_id],

@@ -115,7 +115,6 @@ export function useSmartContract(stateTxUi: TxUi) {
    * @param values - values returned by our form
    */
   async function prepareRecordingData(values: any) {
-    console.log(values)
     try {
       let idTxUploadAudioFileToArweave = audioFileArweaveTxId
       if (!idTxUploadAudioFileToArweave) {
@@ -163,12 +162,11 @@ export function useSmartContract(stateTxUi: TxUi) {
         //@ts-ignore
         metadata = await mutationUploadMetadataToBundlr.mutateAsync({ data: recordingDataJSON, tags })
         let lensPostId = ''
+        /*
         if (values?.recording_publish_on_lens === true) {
           const tx = await publishPost(`https://arweave.net/${metadata}`, values)
-          console.log(tx)
           const polled = await pollUntilIndexed(tx as `0x${string}`)
-          console.log(polled)
-        }
+        }*/
 
         setMetadataArweaveTxId(metadata)
       }

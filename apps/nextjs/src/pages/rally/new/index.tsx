@@ -42,7 +42,6 @@ const Page: NextPage = () => {
   useUnmountEffect(() => {
     stateTxUi.resetState()
   })
-  console.log(supabase)
   return (
     <>
       <Head>

@@ -1,14 +1,11 @@
 import button from '@components/Button/styles'
 import { IconSpinner } from '@components/Icons'
+import { ListFilteredRallies } from '@components/pages/home/ListFilteredRallies'
 import { ROUTE_PREFERENCES_BROWSING, ROUTE_RALLY_NEW, ROUTE_SEARCH_RALLIES } from '@config/routes'
-import useGetHomeAudioChatsSelection from '@hooks/useGetHomeAudioChatsSelection'
+import { ArrowRightIcon } from '@heroicons/react/20/solid'
+import { useGetHomeAudioChatsSelectionFromRESTIndexer } from '@hooks/useGetHomeAudioChatsSelection'
 import { useStorePersistedInterests } from '@hooks/usePersistedInterests'
 import useWalletAddressDefaultLensProfile from '@hooks/useWalletAddressDefaultLensProfile'
-import {
-  queryAudioChatsHappeningLater,
-  queryAudioChatsHappeningNow,
-  queryAudioChatsHappeningSoon,
-} from '@services/supabase/queryAudioChatsHappening/queryAudioChatsHappening'
 import type { NextPage } from 'next'
 import { useSession } from 'next-auth/react'
 import Head from 'next/head'
@@ -22,12 +19,13 @@ const Page: NextPage = () => {
   const queryLensProfile = useWalletAddressDefaultLensProfile(account?.address as `0x${string}`, {
     enabled: account?.address ? true : false,
   })
-  const audioChatsHappeningSoon = queryAudioChatsHappeningSoon()
-  const audioChatsHappeningLater = queryAudioChatsHappeningLater()
-  const audioChatsHappeningNow = queryAudioChatsHappeningNow()
-  console.log(audioChatsHappeningSoon)
-  console.log(audioChatsHappeningLater)
-  console.log(audioChatsHappeningNow)
+  const {
+    queryAudioChatsHostedByCurrentUserToday,
+    queryAudioChatsHappeningLater,
+    queryAudioChatsHappeningNow,
+    queryAudioChatsHappeningSoon,
+  } = useGetHomeAudioChatsSelectionFromRESTIndexer()
+
   return (
     <>
       <Head>
@@ -77,6 +75,50 @@ const Page: NextPage = () => {
             </div>
           )}
           <div className="grid grid-cols-1 gap-6 animate-appear">
+            {account?.address && (
+              <section className=" animate-appear pb-8 border-b border-neutral-4">
+                <h2 className="text-md font-bold">🗣️🎙️ Hosting</h2>
+                {queryAudioChatsHostedByCurrentUserToday?.isLoading && (
+                  <div className="mb-6 pt-12 animate-appear flex items-center justify-center space-i-1ex">
+                    <IconSpinner className="text-lg animate-spin" />
+                    <p className="font-bold animate-pulse">Loading rallies...</p>
+                  </div>
+                )}
+                {queryAudioChatsHostedByCurrentUserToday?.data && (
+                  <>
+                    {queryAudioChatsHostedByCurrentUserToday?.data?.length === 0 ? (
+                      <>
+                        <section className="mt-6 p-6 bg-neutral-1 w-full rounded-lg  animate-appear min-w-max-content 2xs:max-w-72">
+                          <p className="text-xs text-neutral-11 mb-3">You aren't hosting any rally today.</p>
+
+                          <Link href={ROUTE_SEARCH_RALLIES}>
+                            <a className="text-2xs link">Browse all rallies happening now</a>
+                          </Link>
+                        </section>
+                      </>
+                    ) : (
+                      <div className="gap-2 flex flex-col mt-4">
+                        <ListFilteredRallies
+                          skip={0}
+                          perPage={8}
+                          isLoading={queryAudioChatsHostedByCurrentUserToday?.isLoading}
+                          isError={queryAudioChatsHostedByCurrentUserToday?.isError}
+                          list={queryAudioChatsHostedByCurrentUserToday?.data}
+                          setSkip={() => console.log('')}
+                        />
+
+                        <Link href={ROUTE_SEARCH_RALLIES}>
+                          <a className="text-2xs flex items-center link">
+                            Go to your dahsboard
+                            <ArrowRightIcon className="w-4 mis-2" />
+                          </a>
+                        </Link>
+                      </div>
+                    )}
+                  </>
+                )}
+              </section>
+            )}
             <section className="pb-8 border-b border-neutral-4">
               <h2 className="text-md font-bold">🔴🗣️ Happening now</h2>
               {queryAudioChatsHappeningNow?.isLoading && (
@@ -89,7 +131,7 @@ const Page: NextPage = () => {
                 <>
                   {queryAudioChatsHappeningNow?.data?.length === 0 ? (
                     <>
-                      <section className="mt-6 p-6 bg-neutral-1 w-full rounded-lg max-w-screen-xs">
+                      <section className="mt-6 p-6 bg-neutral-1 w-full rounded-lg  animate-appear min-w-max-content 2xs:max-w-72">
                         <p className="text-xs text-neutral-11 mb-3">
                           It seems there's currently no rally happening now that matches your interests.
                         </p>
@@ -100,7 +142,23 @@ const Page: NextPage = () => {
                       </section>
                     </>
                   ) : (
-                    <></>
+                    <div className="gap-2 flex flex-col mt-4">
+                      <ListFilteredRallies
+                        skip={0}
+                        perPage={8}
+                        isLoading={queryAudioChatsHappeningNow?.isLoading}
+                        isError={queryAudioChatsHappeningNow?.isError}
+                        list={queryAudioChatsHappeningNow?.data}
+                        setSkip={() => console.log('')}
+                      />
+
+                      <Link href={ROUTE_SEARCH_RALLIES}>
+                        <a className="text-2xs flex items-center font-semibold text-neutral-12">
+                          Browse more rallies happening now
+                          <ArrowRightIcon className="w-4 mis-2" />
+                        </a>
+                      </Link>
+                    </div>
                   )}
                 </>
               )}
@@ -117,7 +175,7 @@ const Page: NextPage = () => {
                 <>
                   {queryAudioChatsHappeningSoon?.data?.length === 0 ? (
                     <>
-                      <section className="mt-6 p-6 bg-neutral-1 w-full rounded-lg max-w-screen-xs">
+                      <section className="mt-6 p-6 bg-neutral-1 w-full rounded-lg animate-appear min-w-max-content 2xs:max-w-72">
                         <p className="text-xs text-neutral-11 mb-3">
                           It seems there's currently no rally happening soon that matches your interests.
                         </p>
@@ -128,7 +186,22 @@ const Page: NextPage = () => {
                       </section>
                     </>
                   ) : (
-                    <></>
+                    <div className="gap-2 flex flex-col mt-4">
+                      <ListFilteredRallies
+                        skip={0}
+                        perPage={8}
+                        isLoading={queryAudioChatsHappeningSoon?.isLoading}
+                        isError={queryAudioChatsHappeningSoon?.isError}
+                        list={queryAudioChatsHappeningSoon?.data}
+                        setSkip={() => console.log('')}
+                      />
+                      <Link href={ROUTE_SEARCH_RALLIES}>
+                        <a className="px-3 text-2xs font-semibold text-neutral-12 flex items-center">
+                          Browse more rallies happening soon
+                          <ArrowRightIcon className="w-4 mis-2" />
+                        </a>
+                      </Link>
+                    </div>
                   )}
                 </>
               )}
@@ -146,7 +219,7 @@ const Page: NextPage = () => {
                 <>
                   {queryAudioChatsHappeningLater?.data?.length === 0 ? (
                     <>
-                      <section className="mt-6 p-6 bg-neutral-1 w-full rounded-lg max-w-screen-xs">
+                      <section className="mt-6 p-6 bg-neutral-1 w-full rounded-lg  animate-appear min-w-max-content 2xs:max-w-72">
                         <p className="text-xs text-neutral-11 mb-3">
                           It seems there's currently no rally happening later today that matches your interests.
                         </p>
@@ -157,13 +230,28 @@ const Page: NextPage = () => {
                       </section>
                     </>
                   ) : (
-                    <></>
+                    <div className="gap-2 flex flex-col mt-4">
+                      <ListFilteredRallies
+                        skip={0}
+                        perPage={8}
+                        isLoading={queryAudioChatsHappeningLater?.isLoading}
+                        isError={queryAudioChatsHappeningLater?.isError}
+                        list={queryAudioChatsHappeningLater?.data}
+                        setSkip={() => console.log('')}
+                      />
+                      <Link href={ROUTE_SEARCH_RALLIES}>
+                        <a className="px-3 text-2xs font-semibold text-neutral-12 flex items-center">
+                          Browse more rallies happening later today
+                          <ArrowRightIcon className="w-4 mis-2" />
+                        </a>
+                      </Link>
+                    </div>
                   )}
                 </>
               )}
             </section>
           </div>
-          <section className="mt-56 py-8 px-6 mx-auto text-start xs:text-center bg-neutral-3 w-full rounded-lg flex flex-col xs:items-center justify-center max-w-screen-xs">
+          <section className="mt-56 py-8 px-6 mx-auto text-start xs:text-center bg-neutral-3 w-full rounded-lg flex flex-col xs:items-center justify-center ">
             <p className="font-bold">Want to host live audio rooms ?</p>
             <p className="text-xs mt-2  text-neutral-11">
               Rally makes it easy to create and find interesting audio rooms without compromising your privacy or

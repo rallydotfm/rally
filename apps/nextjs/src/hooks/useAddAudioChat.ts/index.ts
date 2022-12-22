@@ -5,16 +5,12 @@ import { toast } from 'react-hot-toast'
 export function useIndexAudioChat() {
   const mutationIndexAudioChat = useMutation(
     async (audioChatToIndexData) => {
-      console.log('I am now in index.ts')
       await addAudioChat(audioChatToIndexData)
     },
     {
-      onSuccess() {
-        console.log('rallz created')
-      },
       onError(e) {
         console.error(e)
-        toast.error('Your rally couldn4t be indexed.')
+        toast.error('Your rally couldn"t be indexed.')
       },
     },
   )

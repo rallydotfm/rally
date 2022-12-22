@@ -1,5 +1,5 @@
 import Button from '@components/Button'
-import CardRally from '@components/pages/search/rallies/ListFilteredRallies/CardRally'
+import CardRally from './CardRally'
 import { isPast } from 'date-fns'
 
 interface ListFilteredRalliesProps {
@@ -15,11 +15,11 @@ export const ListFilteredRallies = (props: ListFilteredRalliesProps) => {
 
   return (
     <>
-      <ul className="animate-appear space-y-8 flex flex-col">
+      <ul className="animate-appear space-y-10 divide-y divide-neutral-4 flex flex-col">
         {list.map((audioChat: any, i: number) => {
           return (
             <li
-              className={`${isPast(audioChat.datetime_start_at) ? 'opacity-50' : ''} pt-6 animate-appear`}
+              className={`${isPast(audioChat.datetime_start_at) ? 'opacity-50' : ''} pt-10 animate-appear`}
               key={`${audioChat.cid}`}
             >
               <CardRally data={audioChat} />

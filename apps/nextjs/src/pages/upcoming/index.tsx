@@ -7,13 +7,13 @@ import ListFilters from '@components/pages/upcoming/ListFilters'
 import DialogModalFilters from '@components/pages/upcoming/DialogModalFilters'
 import { createStoreIndexedAudioChatsFilters } from '@hooks/useStoreIndexedAudioChatsFilters'
 import useGetProfilesInterests from '@hooks/useGetProfileInterests'
-import useIndexedAudioChats from '@hooks/useIndexedAudioChats'
+import useIndexedAudioChatsRest from '@hooks/useGetIndexedAudioChatREST'
 import { useState } from 'react'
 import { isAddress } from 'ethers/lib/utils'
 import Button from '@components/Button'
 import { AdjustmentsHorizontalIcon } from '@heroicons/react/20/solid'
 import { Cog6ToothIcon } from '@heroicons/react/24/outline'
-import { useUnmountEffect } from '@react-hookz/web'
+import { useUnmountEffect, useUpdateEffect } from '@react-hookz/web'
 import { useStorePersistedInterests } from '@hooks/usePersistedInterests'
 import useWalletAddressDefaultLensProfile from '@hooks/useWalletAddressDefaultLensProfile'
 import { useAccount } from 'wagmi'
@@ -51,7 +51,7 @@ const Page: NextPage = () => {
   const order = useStoreFiltersAudioChatsUpcomingPage((state: any) => state.order)
   const resetFilters = useStoreFiltersAudioChatsUpcomingPage((state: any) => state.resetFilters)
   const queryListInterests = useGetProfilesInterests()
-  const queryAudioChats = useIndexedAudioChats(
+  const queryAudioChats = useIndexedAudioChatsRest(
     {
       first: PER_PAGE,
       skip,
@@ -87,6 +87,15 @@ const Page: NextPage = () => {
   )
   const [isModalFiltersOpen, setIsModalFiltersOpen] = useState(false)
 
+  useUpdateEffect(() => {
+    if (categories?.length && queryCurrentUserDefaultLensProfile?.data?.interests?.length) {
+      if (categories.sort().toString() == queryCurrentUserDefaultLensProfile?.data?.interests.sort().toString()) {
+        setUseProfileInterests(true)
+      } else {
+        setUseProfileInterests(false)
+      }
+    }
+  }, [categories])
   useUnmountEffect(() => {
     resetFilters()
   })

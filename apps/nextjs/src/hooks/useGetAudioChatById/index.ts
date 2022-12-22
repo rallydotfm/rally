@@ -19,6 +19,7 @@ export function useGetAudioChatById(idAudioChat?: `0x${string}`) {
     },
   })
   const queryAudioChatMetadata = useQuery(
+    //@ts-ignore
     ['audio-chat-metadata', queryAudioChatByIdRawData?.data?.audio_event_id],
     async () => {
       const audioChat = queryAudioChatByIdRawData?.data
@@ -30,6 +31,7 @@ export function useGetAudioChatById(idAudioChat?: `0x${string}`) {
       refetchOnWindowFocus: false,
       enabled:
         queryAudioChatByIdRawData.status === 'success' &&
+        //@ts-ignore
         queryAudioChatByIdRawData?.data?.audio_event_id !==
           '0x0000000000000000000000000000000000000000000000000000000000000000'
           ? true

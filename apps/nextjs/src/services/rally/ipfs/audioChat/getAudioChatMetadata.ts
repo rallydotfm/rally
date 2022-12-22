@@ -13,6 +13,7 @@ export async function getAudioChatMetadata(audioChat: {
 }) {
   const cid = audioChat?.cid_metadata
   try {
+    console.log(audioChat)
     const response = await fetch(`https://${cid}.ipfs.w3s.link/data.json`)
     const result = await response.json()
     return {

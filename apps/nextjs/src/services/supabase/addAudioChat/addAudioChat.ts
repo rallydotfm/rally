@@ -23,7 +23,6 @@ export async function addAudioChat(audioChatData: any) {
   } = audioChatData
   const convertToTimestampStartAt = new Date(parseInt(start_at.toString()) * 1000).toISOString()
   const convertToTimestampCreatedAt = new Date(parseInt(created_at.toString()) * 1000).toISOString()
-  console.log(audioChatData)
   const { data, error } = await supabase.from('AudioChat').upsert([
     {
       audio_chat_id: audio_event_id,
@@ -55,26 +54,5 @@ export async function addAudioChat(audioChatData: any) {
       category: category,
     },
   ])
-  if (error) {
-    console.log(error)
-  }
-  if (data) {
-    console.log(data)
-  }
-  /*   audio_chat_id
-start_at
-created_at
-cid_metadata
-state
-creator
-name
-description
-image
-category
-is_gated
-max_attendees
-language
-recording_arweave_transaction_id
-*/
 }
 export default addAudioChat

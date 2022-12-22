@@ -147,7 +147,6 @@ export function useSmartContract(stateTxUi: TxUi) {
         ...stateTxUi.primedRally,
       }))
       const updatedData = queryClient.getQueryData(['audio-chat-metadata', stateTxUi.rallyId])
-      console.log('updatedDAta', updatedData)
       await mutationIndexAudioChat.mutateAsync(
         //@ts-ignore
         {
@@ -369,7 +368,6 @@ export function useSmartContract(stateTxUi: TxUi) {
       const args = await prepareRallyData(values, true)
       //@ts-ignore
       const { startAt, metadata } = args
-      console.log(id, metadata, startAt, values.rally_is_indexed, '', '')
 
       await contractWriteEditAudioChat?.writeAsync?.({
         //@ts-ignore
@@ -391,7 +389,6 @@ export function useSmartContract(stateTxUi: TxUi) {
           '',
         ],
       })
-      console.log(rallyDataToIndex)
       await mutationIndexAudioChat.mutateAsync(
         //@ts-ignore
         {

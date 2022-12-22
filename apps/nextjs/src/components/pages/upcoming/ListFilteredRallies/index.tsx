@@ -1,5 +1,5 @@
 import Button from '@components/Button'
-import CardRally from '@components/pages/search/rallies/ListFilteredRallies/CardRally'
+import CardRally from './CardRally'
 import { isPast } from 'date-fns'
 
 interface ListFilteredRalliesProps {

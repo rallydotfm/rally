@@ -22,8 +22,10 @@ export function useGetAudioChatsByWalletAddress(address?: string) {
   const queriesAudioChatsByAddressMetadata = useQueries({
     //@ts-ignore
     enabled: queryAudioChatsByAddressRawData?.data?.length > 0 ?? false,
+    //@ts-ignore
     queries: queryAudioChatsByAddressRawData?.data?.length
-      ? queryAudioChatsByAddressRawData?.data?.map((audioChat) => {
+      ? //@ts-ignore
+        queryAudioChatsByAddressRawData?.data?.map((audioChat) => {
           return {
             queryKey: ['audio-chat-metadata', audioChat?.audio_event_id],
             queryFn: async () => await getAudioChatMetadata(audioChat),

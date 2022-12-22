@@ -58,6 +58,7 @@ const Page: NextPage = () => {
           ))}
         {queryAudioChatByIdRawData?.status === 'success' && (
           <>
+            {/* @ts-ignore */}
             {queryAudioChatByIdRawData?.data?.creator !== address ? (
               <>
                 <Notice>You can't access this page.</Notice>

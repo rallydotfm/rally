@@ -22,34 +22,25 @@ interface CardRallyProps {
 export const CardRally = (props: CardRallyProps) => {
   const { data } = props
   return (
-    <article className={`${isPast(data.datetime_start_at) ? 'opacity-50' : ''} relative`}>
+    <article
+      className={`${
+        isPast(data.datetime_start_at) ? 'opacity-50' : ''
+      } bg-neutral-1 hover:bg-neutral-2 focus:bg-neutral-3 border-neutral-4 border p-6 rounded-xl h-full relative`}
+    >
       <div className="flex flex-col space-y-4 xs:flex-row xs:space-y-0 xs:space-i-6">
-        {data?.image && (
-          <div className="shrink-0 relative w-full overflow-hidden xs:w-20 sm:w-28 aspect-twitter-card xs:aspect-auto xs:grow xs:max-w-56 rounded-t-md xs:rounded-b-md">
-            <div className="bg-neutral-5 absolute w-full h-full inset-0 animate-pulse" />
-            <img
-              alt=""
-              loading="lazy"
-              width="128px"
-              height="86px"
-              src={`https://ipfs.io/ipfs/${data?.image}`}
-              className="relative z-10 block w-full h-full object-cover "
-            />
-          </div>
-        )}
-
         <div className="px-4 flex-grow flex flex-col xs:px-0">
           <h1 className="font-bold flex flex-col-reverse">
             <span className="py-2">{data?.name}</span>
             <div className="flex gap-3">
-              <BadgeRallyState state={data?.state} />
-              <span className="font-semibold text-2xs ">{formatRelative(data.datetime_start_at, new Date())}</span>
+              <span className="font-semibold text-neutral-11 text-2xs ">
+                {formatRelative(data.datetime_start_at, new Date())}
+              </span>
             </div>
           </h1>
-          <div className="flex items-center mt-2 gap-4 text-2xs">
+          <div className="flex flex-wrap items-center mt-2 gap-x-4 gap-y-2 text-2xs">
             {/* @ts-ignore */}
             {data?.category && (
-              <mark className="bg-neutral-1 text-2xs text-neutral-12 py-0.5 px-2 rounded-md font-medium">
+              <mark className="bg-transparent text-2xs text-neutral-12 font-medium">
                 {/* @ts-ignore */}
                 {`${DICTIONARY_PROFILE_INTERESTS?.[data?.category]?.emoji} ` ?? ''}&nbsp;
                 {/* @ts-ignore */}

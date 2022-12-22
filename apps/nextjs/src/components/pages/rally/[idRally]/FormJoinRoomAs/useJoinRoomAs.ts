@@ -13,7 +13,6 @@ export const schema = object({
   avatarUrl: string().url().optional(),
 })
 export function useJoinRoomAs(dataAudioChat: any) {
-  console.log(dataAudioChat)
   const { mutationJoinRoom } = useConnectToVoiceChat(dataAudioChat)
   const configureIdentityInLocalStorage = useStorePersistedPreferences((state: any) => state.configureIdentity)
   const persistedPreferences = useStorePersistedPreferences((state: any) => state.preferences)

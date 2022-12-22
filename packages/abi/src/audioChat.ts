@@ -152,10 +152,10 @@ export const audioChatABI = [
     type: 'function',
   },
   {
-    inputs: [{ internalType: 'bytes32', name: 'audio_event_id', type: 'bytes32' }],
+    inputs: [{ internalType: 'bytes32', name: 'audio_id', type: 'bytes32' }],
     name: 'getAudioChatById',
     outputs: [
-      { internalType: 'bytes32', name: '', type: 'bytes32' },
+      { internalType: 'bytes32', name: 'audio_event_id', type: 'bytes32' },
       { internalType: 'uint256', name: 'created_at', type: 'uint256' },
       { internalType: 'uint256', name: 'start_at', type: 'uint256' },
       { internalType: 'string', name: 'cid_metadata', type: 'string' },

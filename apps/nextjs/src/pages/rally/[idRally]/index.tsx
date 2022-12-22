@@ -61,6 +61,7 @@ const Page: NextPage = () => {
       <Head>
         <title>
           {' '}
+          {/* @ts-ignore */}
           {queryAudioChatByIdRawData?.data?.audio_event_id ===
           '0x0000000000000000000000000000000000000000000000000000000000000000'
             ? 'Not found'
@@ -88,6 +89,7 @@ const Page: NextPage = () => {
             {!isReady ||
               queryAudioChatByIdRawData?.status === 'loading' ||
               (queryAudioChatMetadata?.status === 'loading' &&
+                //@ts-ignore
                 queryAudioChatByIdRawData?.data?.audio_event_id !==
                   '0x0000000000000000000000000000000000000000000000000000000000000000' && (
                   <main className="mx-auto pt-8 px-6 animate-appear flex items-center space-i-1ex">
@@ -95,6 +97,7 @@ const Page: NextPage = () => {
                     <p className="font-medium animate-pulse">Loading rally...</p>
                   </main>
                 ))}
+            {/* @ts-ignore */}
             {queryAudioChatByIdRawData?.data?.audio_event_id ===
               '0x0000000000000000000000000000000000000000000000000000000000000000' && (
               <main className="animate-appear">
@@ -110,6 +113,7 @@ const Page: NextPage = () => {
           <>
             {stateVoiceChat?.room?.state && rally?.id === idRally && stateVoiceChat?.room?.state === 'connected' ? (
               <div className="animate-appear h-full">
+                {/* @ts-ignore */}
                 <div className="pb-8 flex gap-4 flex-col 2xs:flex-row leading-loose -mis-8 -mie-6 pis-8 pie-6 border-neutral-4 border-b">
                   {queryAudioChatMetadata?.data?.image && (
                     <div className="relative overflow-hidden w-full 2xs:w-36 aspect-twitter-banner 2xs:aspect-square rounded-md">
@@ -151,10 +155,10 @@ const Page: NextPage = () => {
                         </span>
                         <div className="flex flex-col items-center mt-2 gap-1 text-2xs order-[3]">
                           {queryAudioChatMetadata?.data?.language && (
-                            <span className="text-neutral-11 order-[3]">
+                            <mark className="bg-transparent text-neutral-11 order-[3]">
                               {/* @ts-ignore */}
                               {DICTIONARY_LOCALES_SIMPLIFIED?.[queryAudioChatMetadata?.data?.language]}
-                            </span>
+                            </mark>
                           )}
                           {queryAudioChatMetadata?.data?.category && (
                             <mark className="bg-neutral-1 text-2xs text-neutral-12 py-0.5 px-2 rounded-md font-medium">

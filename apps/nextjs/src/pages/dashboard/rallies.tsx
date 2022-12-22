@@ -78,32 +78,43 @@ const Page: NextPage = () => {
               } space-y-8 animate-appear`}
             >
               {queriesAudioChatsByAddressMetadata
+                //@ts-ignore
                 .filter((query) => query?.data?.id)
                 /* @ts-ignore */
                 .sort((a, b) => {
                   if (sortOrder === SORT_ORDER.START_CLOSEST)
+                    //@ts-ignore
                     return a.data.epoch_time_start_at > b.data.epoch_time_start_at
+                  //@ts-ignore
                   if (sortOrder === SORT_ORDER.START_FURTHEST)
+                    //@ts-ignore
                     return a.data.epoch_time_start_at < b.data.epoch_time_start_at
                   if (sortOrder === SORT_ORDER.CREATED_NEWEST)
+                    //@ts-ignore
                     return a.data.epoch_time_created_at > b.data.epoch_time_created_at
                   if (sortOrder === SORT_ORDER.CREATED_OLDEST)
+                    //@ts-ignore
                     return a.data.epoch_time_created_at < b.data.epoch_time_created_at
                 })
                 .map((audioChat) => {
                   return (
+                    //@ts-ignore
                     <li className={`animate-appear focus-within:z-10 relative`} key={audioChat.data.id}>
                       <CardRally
                         data={audioChat.data}
                         onClickGoLive={async () => {
                           stateTxUiRallyGoLive.setDialogVisibility(true)
+                          //@ts-ignore
                           await onClickGoLive(audioChat.data.id)
                         }}
                         onClickEndLive={async () => {
                           stateTxUiEndLiveRally.setDialogVisibility(true)
+                          //@ts-ignore
                           await onClickEndLive(audioChat.data.id)
                         }}
+                        //@ts-ignore
                         onSelectRallyToCancel={() => stateTxUiCancelRally.selectRallyToCancel(audioChat.data.id)}
+                        //@ts-ignore
                         onSelectRallyToDelete={() => stateTxUiDeleteRally.selectRallyToDelete(audioChat.data.id)}
                       />
                     </li>

@@ -90,6 +90,7 @@ export function useCreateLensPost() {
           followerOnly: values?.collect_module === 1,
         }
       } else if (values?.collect_module === 2) {
+        //@ts-ignore
         collectModule.revertCollectModule = true
       }
       if (values?.reference_module === 1) {
