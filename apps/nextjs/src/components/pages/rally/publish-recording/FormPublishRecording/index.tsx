@@ -191,7 +191,10 @@ export const FormPublishRecording = (props: FormPublishRecording) => {
                               </FormField.Label>
                               <FormField.Description id="input-collect_module_is_limited_amount-description">
                                 Make collecting your recording more exclusive or more accessible by allowing a finite or
-                                infinite amount of eligible accounts to collect it.
+                                infinite amount of eligible accounts to collect it. <br />
+                                <span className="font-bold">
+                                  Limited editions must all specify a positive collect fee amount.
+                                </span>
                               </FormField.Description>
                               <FormRadioGroup
                                 name="collect_module_is_limited_amount"
@@ -205,7 +208,9 @@ export const FormPublishRecording = (props: FormPublishRecording) => {
                                 value={data()?.collect_module_is_limited_amount}
                                 onChange={(value: boolean) => {
                                   setData('collect_module_is_limited_amount', value)
-                                  if (value === false) {
+                                  if (value === true) {
+                                    setData('collect_module_has_fee', true)
+                                  } else {
                                     setFields('collect_module_amount', '')
                                   }
                                 }}
@@ -289,6 +294,7 @@ export const FormPublishRecording = (props: FormPublishRecording) => {
                               <FormRadioGroup
                                 name="collect_module_has_fee"
                                 disabled={
+                                  data()?.collect_module_is_limited_amount === true ||
                                   disabled ||
                                   data()?.recording_publish_on_lens !== true ||
                                   !showSectionLens ||
@@ -300,11 +306,11 @@ export const FormPublishRecording = (props: FormPublishRecording) => {
                                   if (value === false) {
                                     setData('collect_module_fee_amount', '')
                                     setData('collect_module_referral_fee_amount', 0)
-                                    setData('collect_module_fee_collect_module_fee_currency_address', '')
+                                    setData('collect_module_fee_currency_address', '')
 
                                     setFields('collect_module_fee_amount', '')
                                     setFields('collect_module_referral_fee_amount', 0)
-                                    setFields('collect_module_fee_collect_module_fee_currency_address', '')
+                                    setFields('collect_module_fee_currency_address', '')
                                   }
                                   setFields('collect_module_has_fee', value)
                                 }}
@@ -429,7 +435,7 @@ export const FormPublishRecording = (props: FormPublishRecording) => {
                                           /* @ts-ignore */
                                           type="number"
                                           min="0"
-                                          step="any"
+                                          step="1"
                                           scale="sm"
                                           name="collect_module_referral_fee_amount"
                                           hasError={errors()?.collect_module_referral_fee_amount?.length > 0}
@@ -531,7 +537,10 @@ export const FormPublishRecording = (props: FormPublishRecording) => {
                     !data()?.collect_module_referral_fee_amount ||
                     data()?.collect_module_referral_fee_amount === '' ||
                     data()?.collect_module_fee_currency_address === '')) ||
-                (data()?.collect_module_is_limited_amount === true && data()?.collect_module_amount === '')))
+                (data()?.collect_module_is_limited_amount === true &&
+                  (data()?.collect_module_amount === '' ||
+                    !data()?.collect_module_fee_amount ||
+                    data()?.collect_module_fee_amount === ''))))
           }
         >
           {[state.transaction, state.contract, state?.publishToLens, state?.uploadAudioFile, state?.uploadData].filter(

@@ -10,6 +10,8 @@ import { PublicationMainFocus } from '@graphql/lens/generated'
 
 import { v4 as uuidv4 } from 'uuid'
 import { useStoreBundlr } from '@hooks/useBundlr'
+import useCreateLensPost from '@hooks/useCreateLensPost'
+import { pollUntilIndexed } from '@services/lens/indexer/pollUntilIndexed'
 export interface TxUi {
   isDialogVisible: boolean
   metadataArweaveTxId: string | undefined
@@ -42,6 +44,7 @@ export const useStoreTxUi = create<TxUi>((set) => ({
 }))
 
 export function useSmartContract(stateTxUi: TxUi) {
+  const { publishPost, mutationPollTransaction, contractWriteFollow, signTypedDataFollow } = useCreateLensPost()
   const audioFileArweaveTxId = useStoreTxUi((state) => state?.audioFileArweaveTxId)
   const metadataArweaveTxId = useStoreTxUi((state) => state?.metadataArweaveTxId)
   const setAudioFileArweaveTxId = useStoreTxUi((state: any) => state?.setAudioFileArweaveTxId)
@@ -112,6 +115,7 @@ export function useSmartContract(stateTxUi: TxUi) {
    * @param values - values returned by our form
    */
   async function prepareRecordingData(values: any) {
+    console.log(values)
     try {
       let idTxUploadAudioFileToArweave = audioFileArweaveTxId
       if (!idTxUploadAudioFileToArweave) {
@@ -158,10 +162,16 @@ export function useSmartContract(stateTxUi: TxUi) {
 
         //@ts-ignore
         metadata = await mutationUploadMetadataToBundlr.mutateAsync({ data: recordingDataJSON, tags })
+        let lensPostId = ''
+        if (values?.recording_publish_on_lens === true) {
+          const tx = await publishPost(`https://arweave.net/${metadata}`, values)
+          console.log(tx)
+          const polled = await pollUntilIndexed(tx as `0x${string}`)
+          console.log(polled)
+        }
+
         setMetadataArweaveTxId(metadata)
       }
-      console.log(idTxUploadAudioFileToArweave)
-      console.log(metadata)
 
       return metadata
     } catch (e) {
@@ -180,11 +190,10 @@ export function useSmartContract(stateTxUi: TxUi) {
     mutationUploadMetadataToBundlr.reset()
     // mutationPublishToLens.reset()
 
-    const { id, is_indexed, start_at, metadata_cid, values } = args
+    const { id, is_indexed, start_at, metadata_cid, values, profileId } = args
     stateTxUi.setDialogVisibility(true)
-    console.log(id, is_indexed, start_at, metadata_cid)
     try {
-      const recording_metadata = await prepareRecordingData({ ...values, id })
+      const recording_metadata = await prepareRecordingData({ ...values, id, profileId })
       await contractWriteUpdateAudioChat?.writeAsync?.({
         //@ts-ignore
         recklesslySetUnpreparedArgs: [

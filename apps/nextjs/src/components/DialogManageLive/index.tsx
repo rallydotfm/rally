@@ -2,59 +2,75 @@ import DialogModal from '@components/DialogModal'
 import { useAccount } from 'wagmi'
 import { PauseCircleIcon, SignalSlashIcon, UsersIcon } from '@heroicons/react/20/solid'
 import { PlayCircleIcon } from '@heroicons/react/24/outline'
-import useLiveVoiceChatRecordRoom from '@hooks/useLiveVoiceChatRecordRoom'
+import useLiveVoiceChatRecordRoom, { useStorePersistedOngoingRecording } from '@hooks/useLiveVoiceChatRecordRoom'
 
 export const DialogManageLive = (props: any) => {
   const { rally, onClickEndRally, canRecord, participants, ...dialogProps } = props
   const { mutationStopRecording, mutationStartRecording } = useLiveVoiceChatRecordRoom()
-  const account = useAccount()
+  const ongoingRecordingId = useStorePersistedOngoingRecording((state) => state.ongoingRecordingId)
 
   return (
     <DialogModal title="Manage live" {...dialogProps}>
       <h1 className="break-all font-semibold">{rally?.name}</h1>
       <div className="flex items-center text-neutral-12 mt-2.5">
         <UsersIcon className="mie-1ex w-5" />
-        <p className="text-xs">{participants?.length ?? 0} participants</p>
+        <p className="text-xs">
+          {participants?.length ?? 0} participant{participants?.length > 1 ? 's' : ''}
+        </p>
       </div>
       <div className="pt-8">
         <ul className="pt-2 border-t-neutral-4 border-transparent border -mis-6 -mie-9 text-2xs">
           <li>
-            <button
-              onClick={async () =>
-                await mutationStartRecording.mutate({
-                  id_rally: rally?.id,
-                })
-              }
-              disabled={mutationStartRecording?.isLoading || rally.will_be_recorded === false || canRecord === false}
-              className="flex items-center disabled:opacity-50 disabled:cursor-not-allowed font-medium text-start px-6 py-3 w-full focus:bg-neutral-12 hover:bg-neutral-3 focus:text-interactive-9"
-            >
-              <PlayCircleIcon className="shrink-0 w-6 mie-1ex" />
-              <span className="grow flex items-center justify-between">
-                Start recording{' '}
-                {rally.will_be_recorded === false && <span className="text-2xs italic pis-1ex">disabled</span>}
-              </span>
-            </button>
+            {!ongoingRecordingId ? (
+              <button
+                onClick={async () =>
+                  await mutationStartRecording.mutate({
+                    id_rally: rally?.id,
+                  })
+                }
+                disabled={
+                  mutationStartRecording?.isLoading ||
+                  !!ongoingRecordingId ||
+                  rally.will_be_recorded === false ||
+                  canRecord === false
+                }
+                className="flex items-center disabled:opacity-50 disabled:cursor-not-allowed font-medium text-start px-6 py-3 w-full focus:bg-neutral-12 hover:bg-neutral-3 focus:text-interactive-9"
+              >
+                <PlayCircleIcon className="shrink-0 w-6 mie-1ex" />
+                <span className="grow flex items-center justify-between">
+                  Start recording{' '}
+                  {rally.will_be_recorded === false && <span className="text-2xs italic pis-1ex">disabled</span>}
+                </span>
+              </button>
+            ) : (
+              <button
+                onClick={async () =>
+                  await mutationStopRecording.mutateAsync({
+                    id_egress: ongoingRecordingId as string,
+                  })
+                }
+                disabled={mutationStartRecording?.isLoading || rally.will_be_recorded === false || canRecord === false}
+                className="flex items-center disabled:opacity-50 disabled:cursor-not-allowed font-medium text-start px-6 py-3 w-full focus:bg-neutral-12 hover:bg-neutral-3 focus:text-interactive-9"
+              >
+                <PauseCircleIcon className="shrink-0 w-6 mie-1ex" />
+                <span className="grow flex items-center justify-between">
+                  Stop recording{' '}
+                  {rally.will_be_recorded === false && <span className="text-2xs italic pis-1ex">disabled</span>}
+                </span>
+              </button>
+            )}
           </li>
+
           <li>
             <button
-              onClick={async () =>
-                await mutationStopRecording.mutate({
-                  id_egress: 'EG_yRiGsVQjW2FD',
-                })
-              }
-              disabled={mutationStartRecording?.isLoading || rally.will_be_recorded === false || canRecord === false}
-              className="flex items-center disabled:opacity-50 disabled:cursor-not-allowed font-medium text-start px-6 py-3 w-full focus:bg-neutral-12 hover:bg-neutral-3 focus:text-interactive-9"
-            >
-              <PauseCircleIcon className="shrink-0 w-6 mie-1ex" />
-              <span className="grow flex items-center justify-between">
-                Stop recording{' '}
-                {rally.will_be_recorded === false && <span className="text-2xs italic pis-1ex">disabled</span>}
-              </span>
-            </button>
-          </li>
-          <li>
-            <button
-              onClick={onClickEndRally}
+              onClick={async () => {
+                if (ongoingRecordingId) {
+                  mutationStopRecording.mutate({
+                    id_egress: ongoingRecordingId as string,
+                  })
+                }
+                onClickEndRally()
+              }}
               className="flex items-center disabled:opacity-50 disabled:cursor-not-allowed font-medium text-start text-negative-10 hover:bg-negative-1 hover:text-negative-11 focus:text-negative-11 focus:bg-negative-2 px-6 py-3 w-full "
             >
               <SignalSlashIcon className="w-6 mie-1ex" />

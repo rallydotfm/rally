@@ -22,6 +22,9 @@ export const button = cva(
           'text-neutral-12 focus:text-primary-3',
           'border-primary-9 focus:border-primary-11',
         ],
+        'primary-ghost': [
+          'border-transparent bg-primary-10 bg-opacity-0 text-primary-10 hover:bg-opacity-10 focus:border-transparent focus:bg-opacity-100 focus:text-primary-1',
+        ],
         'interactive-outline': [
           'bg-transparent hover:bg-interactive-3 focus:bg-interactive-11 hover:focus:bg-opacity-95',
           'text-neutral-12 focus:text-interactive-3',
@@ -37,6 +40,9 @@ export const button = cva(
           'text-neutral-12 focus:text-negative-3',
           'border-negative-9 focus:border-negative-11',
         ],
+        'negative-ghost': [
+          'border-transparent bg-negative-11 bg-opacity-0 text-negative-11 hover:bg-opacity-10 focus:border-transparent focus:bg-opacity-100 focus:text-negative-1',
+        ],
         'neutral-on-light-layer': [
           'border-transparent bg-black text-white hover:bg-neutral-12 hover:border-black focus:border-black hover:border-opacity-50 focus:border-opacity-50 focus:bg-white hover:text-black focus:text-black',
         ],
@@ -50,14 +56,9 @@ export const button = cva(
         'neutral-outline-solid': [
           'border-neutral-5 hover:border-neutral-6 focus:border-neutral-8 bg-black hover:bg-neutral-2 focus:bg-neutral-1 text-white',
         ],
-        'primary-ghost': [
-          'border-transparent bg-primary-10 bg-opacity-0 text-primary-10 hover:bg-opacity-10 focus:border-transparent focus:bg-opacity-100 focus:text-primary-1',
-        ],
+
         'neutral-ghost': [
           'border-transparent bg-white bg-opacity-0 text-white hover:bg-opacity-10 focus:border-transparent focus:bg-opacity-100 focus:text-black',
-        ],
-        'negative-ghost': [
-          'border-transparent bg-negative-11 bg-opacity-0 text-negative-11 hover:bg-opacity-10 focus:border-transparent focus:bg-opacity-100 focus:text-negative-1',
         ],
       },
       scale: {

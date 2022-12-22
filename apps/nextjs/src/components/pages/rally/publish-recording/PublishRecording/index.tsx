@@ -18,9 +18,12 @@ import Link from 'next/link'
 import { ROUTE_DASHBOARD, ROUTE_RALLY_VIEW } from '@config/routes'
 import button from '@components/Button/styles'
 import { useState } from 'react'
+import useWalletAddressDefaultLensProfile from '@hooks/useWalletAddressDefaultLensProfile'
+import { useAccount } from 'wagmi'
 
 export const PublishRecording = (props: any) => {
   const { values, showSectionLens } = props
+  const account = useAccount()
   const [fileSize, setFileSize] = useState(undefined)
   const isSignedIn = useStoreHasSignedInWithLens((state: { isSignedIn: boolean }) => state.isSignedIn)
   const bundlr = useStoreBundlr((state: any) => state.bundlr)
@@ -203,119 +206,122 @@ export const PublishRecording = (props: any) => {
         isOpen={stateTxUi.isDialogVisible}
         setIsOpen={stateTxUi.setDialogVisibility}
       >
-        <span className="font-bold">Uploading and deploying recording</span>
-        {/* @ts-ignore */}
-        <ol className="space-y-3 mt-6 font-medium text-xs">
-          <li className={`flex items-center text-white`}>
-            <DeploymentStep
-              isLoading={statePublishRecording.uploadAudioFile.isLoading}
-              isError={statePublishRecording.uploadAudioFile.isError}
-              isSuccess={statePublishRecording.uploadAudioFile.isSuccess}
-            >
-              Uploading recording audio file to Bundlr (transaction required)
-            </DeploymentStep>
-          </li>
+        <>
+          <span className="font-bold">Uploading and deploying recording</span>
+          {/* @ts-ignore */}
+          <ol className="space-y-3 mt-6 font-medium text-xs">
+            <li className={`flex items-center text-white`}>
+              <DeploymentStep
+                isLoading={statePublishRecording.uploadAudioFile.isLoading}
+                isError={statePublishRecording.uploadAudioFile.isError}
+                isSuccess={statePublishRecording.uploadAudioFile.isSuccess}
+              >
+                Uploading recording audio file to Bundlr (transaction required)
+              </DeploymentStep>
+            </li>
 
-          <li
-            className={`
+            <li
+              className={`
             flex items-center
             ${statePublishRecording.uploadMetadata.isIdle ? 'text-neutral-11' : 'text-white'}`}
-          >
-            <DeploymentStep
-              isLoading={statePublishRecording.uploadMetadata.isLoading}
-              isError={statePublishRecording.uploadMetadata.isError}
-              isSuccess={statePublishRecording.uploadMetadata.isSuccess}
             >
-              Uploading recording metadata file to Bundlr (transaction required)
-            </DeploymentStep>
-          </li>
-          <li
-            className={`
+              <DeploymentStep
+                isLoading={statePublishRecording.uploadMetadata.isLoading}
+                isError={statePublishRecording.uploadMetadata.isError}
+                isSuccess={statePublishRecording.uploadMetadata.isSuccess}
+              >
+                Uploading recording metadata file to Bundlr (transaction required)
+              </DeploymentStep>
+            </li>
+            <li
+              className={`
             flex items-center 
             ${statePublishRecording.contract.isIdle ? 'text-neutral-11' : 'text-white'}`}
-          >
-            <DeploymentStep
-              isLoading={statePublishRecording.contract.isLoading}
-              isError={statePublishRecording.contract.isError}
-              isSuccess={statePublishRecording.contract.isSuccess}
             >
-              Sign the 'Publish recording' transaction{' '}
-            </DeploymentStep>
-          </li>
-          <li
-            className={`
+              <DeploymentStep
+                isLoading={statePublishRecording.contract.isLoading}
+                isError={statePublishRecording.contract.isError}
+                isSuccess={statePublishRecording.contract.isSuccess}
+              >
+                Sign the 'Publish recording' transaction{' '}
+              </DeploymentStep>
+            </li>
+            <li
+              className={`
             flex items-center 
             ${statePublishRecording.transaction.isIdle ? 'text-neutral-11' : 'text-white'}`}
-          >
-            <DeploymentStep
-              isLoading={statePublishRecording.transaction.isLoading}
-              isError={statePublishRecording.transaction.isError}
-              isSuccess={statePublishRecording.transaction.isSuccess}
             >
-              Publishing recording
-            </DeploymentStep>
-          </li>
-        </ol>
-        {[
-          statePublishRecording.transaction,
-          statePublishRecording.contract,
-          statePublishRecording.uploadAudioFile,
-          statePublishRecording.uploadMetadata,
-        ].filter((slice) => slice.isError)?.length > 0 && (
-          <div className="mt-6 animate-appear">
-            {[
-              statePublishRecording.transaction,
-              statePublishRecording.contract,
-              statePublishRecording.uploadAudioFile,
-              statePublishRecording.uploadMetadata,
-            ]
-              .filter((slice) => slice.isError)
-              .map((slice, key) => (
-                <Notice className="overflow-hidden text-ellipsis" intent="negative-outline" key={`error-${key}`}>
-                  {/* @ts-ignore */}
-                  {slice.error?.message ?? slice?.error}
-                </Notice>
-              ))}
-            <Button className="mt-6" onClick={() => formPublishRecording.handleSubmit()}>
-              Try again
-            </Button>
-          </div>
-        )}
-        {console.log(stateTxUi?.metadataArweaveTxId)}
-        {statePublishRecording?.transaction?.isSuccess && (
-          <div className="animate-appear space-y-4 mt-6">
-            <Notice>
-              🎉 Your recording was published successfully ! <br />
-              <Link href={ROUTE_RALLY_VIEW.replace('[idRally]', values?.id)}>
-                <a>
-                  Check it <span className="underline hover:no-underline">here</span>
-                </a>
-              </Link>
-            </Notice>
-            <p className="flex flex-col gap-4 text-2xs mt-6">
-              <a
-                className="block text-neutral-11"
-                target="_blank"
-                href={`https://arweave.net/${stateTxUi?.audioFileArweaveTxId}`}
+              <DeploymentStep
+                isLoading={statePublishRecording.transaction.isLoading}
+                isError={statePublishRecording.transaction.isError}
+                isSuccess={statePublishRecording.transaction.isSuccess}
               >
-                Recording file Arweave transaction id : <span className="link">{stateTxUi?.audioFileArweaveTxId}</span>
-              </a>
-              <a
-                className="block text-neutral-11"
-                target="_blank"
-                href={`https://arweave.net/${stateTxUi?.metadataArweaveTxId}`}
-              >
-                Metadata Arweave transaction id : <span className="link">{stateTxUi?.metadataArweaveTxId}</span>
-              </a>
-            </p>
-
-            <div className="flex flex-col space-y-3 xs:space-y-0 xs:space-i-3 xs:flex-row ">
-              <Link href={ROUTE_DASHBOARD}>
-                <a className={button({ intent: 'primary-outline' })}>Go to my dashboard</a>
-              </Link>
+                Publishing recording
+              </DeploymentStep>
+            </li>
+          </ol>
+          {[
+            statePublishRecording.transaction,
+            statePublishRecording.contract,
+            statePublishRecording.uploadAudioFile,
+            statePublishRecording.uploadMetadata,
+          ].filter((slice) => slice.isError)?.length > 0 && (
+            <div className="mt-6 animate-appear">
+              {[
+                statePublishRecording.transaction,
+                statePublishRecording.contract,
+                statePublishRecording.uploadAudioFile,
+                statePublishRecording.uploadMetadata,
+              ]
+                .filter((slice) => slice.isError)
+                .map((slice, key) => (
+                  <Notice className="overflow-hidden text-ellipsis" intent="negative-outline" key={`error-${key}`}>
+                    {/* @ts-ignore */}
+                    {slice.error?.message ?? slice?.error}
+                  </Notice>
+                ))}
+              <Button className="mt-6" onClick={() => formPublishRecording.handleSubmit()}>
+                Try again
+              </Button>
             </div>
-          </div>
-        )}
+          )}
+          {console.log(stateTxUi?.metadataArweaveTxId)}
+          {statePublishRecording?.transaction?.isSuccess && (
+            <div className="animate-appear space-y-4 mt-6">
+              <Notice>
+                🎉 Your recording was published successfully ! <br />
+                <Link href={ROUTE_RALLY_VIEW.replace('[idRally]', values?.id)}>
+                  <a>
+                    Check it <span className="underline hover:no-underline">here</span>
+                  </a>
+                </Link>
+              </Notice>
+              <p className="flex flex-col gap-4 text-2xs mt-6">
+                <a
+                  className="block text-neutral-11"
+                  target="_blank"
+                  href={`https://arweave.net/${stateTxUi?.audioFileArweaveTxId}`}
+                >
+                  Recording file Arweave transaction id :{' '}
+                  <span className="link">{stateTxUi?.audioFileArweaveTxId}</span>
+                </a>
+                <a
+                  className="block text-neutral-11"
+                  target="_blank"
+                  href={`https://arweave.net/${stateTxUi?.metadataArweaveTxId}`}
+                >
+                  Metadata Arweave transaction id : <span className="link">{stateTxUi?.metadataArweaveTxId}</span>
+                </a>
+              </p>
+
+              <div className="flex flex-col space-y-3 xs:space-y-0 xs:space-i-3 xs:flex-row ">
+                <Link href={ROUTE_DASHBOARD}>
+                  <a className={button({ intent: 'primary-outline' })}>Go to my dashboard</a>
+                </Link>
+              </div>
+            </div>
+          )}
+        </>
       </DialogModal>
     </div>
   )

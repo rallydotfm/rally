@@ -9,6 +9,7 @@ import {
   CalendarIcon,
   EllipsisHorizontalIcon,
   ExclamationCircleIcon,
+  PauseIcon,
   PencilIcon,
   PlayCircleIcon,
   PlayIcon,
@@ -22,6 +23,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { IconSpinner } from '@components/Icons'
 import { trpc } from '@utils/trpc'
+import { useStoreLiveVoiceChat } from '@hooks/useVoiceChat'
 
 interface CardRallyProps {
   data: any
@@ -34,6 +36,8 @@ interface CardRallyProps {
 export const CardRally = (props: CardRallyProps) => {
   const { data, onSelectRallyToDelete, onSelectRallyToCancel, onClickEndLive, onClickGoLive } = props
   const { push } = useRouter()
+  const playedRally = useAudioPlayer((state: any) => state.rally)
+  const stateVoiceChat: any = useStoreLiveVoiceChat()
   const queryPublishedRecording = useGetAudioChatPublishedRecording(data.id, data.recording)
   const querySessionRecordings: any = trpc.recordings.rally_available_recordings.useQuery(
     {
@@ -166,7 +170,12 @@ export const CardRally = (props: CardRallyProps) => {
                       {queryPublishedRecording?.data?.recording_file && (
                         <>
                           <Button
-                            intent="interactive-outline"
+                            disabled={stateVoiceChat?.room.state === 'connected' || playedRally?.id === data?.id}
+                            intent={
+                              stateVoiceChat?.room.state === 'connected' || playedRally?.id === data?.id
+                                ? 'neutral-ghost'
+                                : 'interactive-outline'
+                            }
                             onClick={() => {
                               setAudioPlayer({
                                 isOpen: true,
@@ -181,8 +190,14 @@ export const CardRally = (props: CardRallyProps) => {
                             scale="sm"
                             className="!pis-2 !pie-3"
                           >
-                            <PlayIcon className="w-5 mie-1ex" />
-                            Play recording
+                            {playedRally?.id === data?.id ? (
+                              <>Playing</>
+                            ) : (
+                              <>
+                                <PlayIcon className="w-5 mie-1ex" />
+                                Play
+                              </>
+                            )}
                           </Button>
                         </>
                       )}

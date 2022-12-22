@@ -70,7 +70,7 @@ export const LayoutBase = (props: LayoutProps) => {
           } fixed bottom-12 md:bottom-0 w-full`}
         >
           <div className="transition-all pointer-events-auto border-transparent flex pb-1 pt-2 bg-neutral-1 md:bg-black border-y-neutral-4 border">
-            <NoSSRToolbarAudioPlayer />
+            {isPlayerOpen && <NoSSRToolbarAudioPlayer />}
           </div>
         </div>
         <div

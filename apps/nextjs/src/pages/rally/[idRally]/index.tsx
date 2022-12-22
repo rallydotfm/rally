@@ -8,7 +8,7 @@ import { useConnectModal, useChainModal } from '@rainbow-me/rainbowkit'
 import { useSession } from 'next-auth/react'
 import Link from 'next/link'
 import button from '@components/Button/styles'
-import { ArrowLeftIcon, PlayIcon } from '@heroicons/react/20/solid'
+import { ArrowLeftIcon, PauseIcon, PlayIcon } from '@heroicons/react/20/solid'
 import Button from '@components/Button'
 import { useAccount, useDisconnect, useNetwork } from 'wagmi'
 import { DICTIONARY_STATES_AUDIO_CHATS } from '@helpers/mappingAudioChatState'
@@ -49,6 +49,7 @@ const Page: NextPage = () => {
   const stateTxUiRallyGoLive = useStoreTxUiGoLiveRally()
   const { onClickGoLive, stateGoLive } = useGoLiveAudioChat(stateTxUiRallyGoLive)
   const setAudioPlayer = useAudioPlayer((state: any) => state.setAudioPlayer)
+  const playedRally = useAudioPlayer((state: any) => state.rally)
 
   const stateVoiceChat: any = useStoreLiveVoiceChat()
   const rally = useStoreCurrentLiveRally((state: any) => state.rally)
@@ -325,7 +326,7 @@ const Page: NextPage = () => {
                                             >
                                               <a
                                                 className={button({
-                                                  intent: 'primary-outline',
+                                                  intent: 'primary-ghost',
                                                   scale: 'sm',
                                                 })}
                                               >
@@ -355,7 +356,16 @@ const Page: NextPage = () => {
                                           queryPublishedRecording?.data?.recording_file && (
                                             <>
                                               <Button
-                                                intent="interactive-outline"
+                                                disabled={
+                                                  stateVoiceChat?.room.state === 'connected' ||
+                                                  playedRally?.id === idRally
+                                                }
+                                                intent={
+                                                  stateVoiceChat?.room.state === 'connected' ||
+                                                  playedRally?.id === idRally
+                                                    ? 'neutral-ghost'
+                                                    : 'interactive-outline'
+                                                }
                                                 onClick={() => {
                                                   setAudioPlayer({
                                                     isOpen: true,
@@ -370,8 +380,14 @@ const Page: NextPage = () => {
                                                 scale="sm"
                                                 className="!pis-2 !pie-3"
                                               >
-                                                <PlayIcon className="w-5 mie-1ex" />
-                                                Play recording
+                                                {playedRally?.id === idRally ? (
+                                                  <>Playing</>
+                                                ) : (
+                                                  <>
+                                                    <PlayIcon className="w-5 mie-1ex" />
+                                                    Play recording
+                                                  </>
+                                                )}
                                               </Button>
                                             </>
                                           )}
