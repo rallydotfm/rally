@@ -36,11 +36,8 @@ export function useConnectToVoiceChat(rally) {
     onMutate() {
       setAudioPlayer({
         isOpen: false,
-        isPlaying: false,
         rally: undefined,
         trackSrc: undefined,
-        startAt: 0,
-        playSpeed: 1,
       })
     },
     async onSuccess(data) {

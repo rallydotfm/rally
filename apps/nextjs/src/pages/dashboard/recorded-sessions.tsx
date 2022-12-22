@@ -4,23 +4,6 @@ import { getLayout } from '@layouts/LayoutDashboard'
 import { trpc } from '@utils/trpc'
 
 const Page: NextPage = () => {
-  const queryUserRecordings = trpc.recordings.available_recordings.useMutation()
-  const downloadRecordingsMutation = trpc.recordings.recording_presigned_url.useMutation({
-    onSuccess(data) {
-      const link = document.createElement('a')
-      link.href = data?.signedUrl
-      link.setAttribute('download', `file.ogg`)
-
-      // Append to html link element page
-      document.body.appendChild(link)
-
-      // Start download
-      link.click()
-
-      // Clean up and remove the link
-      link.parentNode.removeChild(link)
-    },
-  })
   return (
     <>
       <Head>

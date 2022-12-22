@@ -8,7 +8,7 @@ import { useConnectModal, useChainModal } from '@rainbow-me/rainbowkit'
 import { useSession } from 'next-auth/react'
 import Link from 'next/link'
 import button from '@components/Button/styles'
-import { ArrowLeftIcon } from '@heroicons/react/20/solid'
+import { ArrowLeftIcon, PlayIcon } from '@heroicons/react/20/solid'
 import Button from '@components/Button'
 import { useAccount, useDisconnect, useNetwork } from 'wagmi'
 import { DICTIONARY_STATES_AUDIO_CHATS } from '@helpers/mappingAudioChatState'
@@ -25,6 +25,8 @@ import FormJoinRoomAs from '@components/pages/rally/[idRally]/FormJoinRoomAs'
 import { useStoreHasSignedInWithLens } from '@hooks/useSignInWithLens'
 import { DICTIONARY_LOCALES_SIMPLIFIED } from '@helpers/mappingLocales'
 import { DICTIONARY_PROFILE_INTERESTS, DICTIONARY_PROFILE_INTERESTS_CATEGORIES } from '@helpers/mappingProfileInterests'
+import useGetAudioChatPublishedRecording from '@hooks/useGetAudioChatPublishedRecording'
+import useAudioPlayer from '@hooks/usePersistedAudioPlayer'
 
 const Page: NextPage = () => {
   const {
@@ -40,8 +42,13 @@ const Page: NextPage = () => {
   const queryCurrentUserGuildMemberships = useGetGuildMembershipsByWalletAddress(address as `0x${string}`, {
     enabled: address && queryAudioChatMetadata?.data?.access_control?.guilds?.length > 0 ? true : false,
   })
+  const queryPublishedRecording = useGetAudioChatPublishedRecording(
+    idRally as `0x${string}`,
+    queryAudioChatMetadata?.data?.recording,
+  )
   const stateTxUiRallyGoLive = useStoreTxUiGoLiveRally()
   const { onClickGoLive, stateGoLive } = useGoLiveAudioChat(stateTxUiRallyGoLive)
+  const setAudioPlayer = useAudioPlayer((state: any) => state.setAudioPlayer)
 
   const stateVoiceChat: any = useStoreLiveVoiceChat()
   const rally = useStoreCurrentLiveRally((state: any) => state.rally)
@@ -303,7 +310,7 @@ const Page: NextPage = () => {
                                   </div>
                                 )}
                                 {DICTIONARY_STATES_AUDIO_CHATS.FINISHED.label === queryAudioChatMetadata.data.state && (
-                                  <div className="pt-4 flex flex-col justify-center items-center">
+                                  <div className="pt-4  gap-3 flex flex-col justify-center items-center">
                                     {queryAudioChatMetadata.data.will_be_recorded === false ? (
                                       <p className="italic text-neutral-11 text-sm">No recordings available.</p>
                                     ) : (
@@ -319,19 +326,55 @@ const Page: NextPage = () => {
                                               <a
                                                 className={button({
                                                   intent: 'primary-outline',
+                                                  scale: 'sm',
                                                 })}
                                               >
-                                                Publish recording
+                                                Update recording
                                               </a>
                                             </Link>
                                           </>
                                         ) : (
                                           <>
-                                            <p className="italic text-neutral-11 text-sm">
-                                              The creator didn't publish any recording yet.
-                                            </p>
+                                            {queryPublishedRecording?.isSuccess &&
+                                              !queryPublishedRecording?.data?.recording_file && (
+                                                <p className="italic text-neutral-11 text-sm">
+                                                  The creator didn't publish any recording yet.
+                                                </p>
+                                              )}
                                           </>
                                         )}
+
+                                        {queryPublishedRecording?.isLoading && (
+                                          <div className="mb-6 flex items-center justify-center space-i-1ex">
+                                            <IconSpinner className="text-xs animate-spin" />
+                                            <p className="font-bold animate-pulse">Loading recording...</p>
+                                          </div>
+                                        )}
+
+                                        {queryPublishedRecording?.isSuccess &&
+                                          queryPublishedRecording?.data?.recording_file && (
+                                            <>
+                                              <Button
+                                                intent="interactive-outline"
+                                                onClick={() => {
+                                                  setAudioPlayer({
+                                                    isOpen: true,
+                                                    trackSrc: queryPublishedRecording?.data?.recording_file,
+                                                    rally: {
+                                                      name: queryPublishedRecording?.data?.name,
+                                                      imageSrc: queryPublishedRecording?.data?.image,
+                                                      id: idRally,
+                                                    },
+                                                  })
+                                                }}
+                                                scale="sm"
+                                                className="!pis-2 !pie-3"
+                                              >
+                                                <PlayIcon className="w-5 mie-1ex" />
+                                                Play recording
+                                              </Button>
+                                            </>
+                                          )}
                                       </>
                                     )}
                                   </div>

@@ -1,4 +1,12 @@
-import { PauseIcon, PlayIcon, PlayPauseIcon, SpeakerWaveIcon, SpeakerXMarkIcon } from '@heroicons/react/20/solid'
+import { ROUTE_RALLY_VIEW } from '@config/routes'
+import {
+  PauseIcon,
+  PlayIcon,
+  PlayPauseIcon,
+  SpeakerWaveIcon,
+  SpeakerXMarkIcon,
+  StopIcon,
+} from '@heroicons/react/20/solid'
 import useAudioPlayer from '@hooks/usePersistedAudioPlayer'
 import { MediaSeekedEvent, MediaSeekingEvent } from '@vidstack/player'
 import {
@@ -13,13 +21,14 @@ import {
   useMediaContext,
   useMediaRemote,
 } from '@vidstack/player-react'
+import Link from 'next/link'
 import { useRef } from 'react'
 
 export const ToolbarAudioPlayer = () => {
   const trackSrc = useAudioPlayer((state) => state.trackSrc)
-  const remote = useMediaRemote()
+  const rally = useAudioPlayer((state) => state.rally)
+  const setAudioPlayer = useAudioPlayer((state) => state.setAudioPlayer)
   const media = useRef(null)
-  const { currentTime, duration } = useMediaContext(media)
 
   return (
     <>
@@ -48,20 +57,39 @@ export const ToolbarAudioPlayer = () => {
               <Time type="duration" />
             </div>
           </div>
-          <div className="flex w-full justify-center gap-6 items-center">
+          <div className="flex w-full justify-between xs:justify-center gap-8 xs:gap-12 items-center">
+            <button
+              onClick={() =>
+                setAudioPlayer({
+                  isOpen: false,
+                  rally: undefined,
+                  trackSrc: undefined,
+                })
+              }
+              title="Stop and close player"
+            >
+              <StopIcon className="w-5 text-neutral-11 hover:text-neutral-12 focus:text-white" />
+              <span className="sr-only">Stop and close audio player</span>
+            </button>
+
             <PlayButton title="Toggle play">
               <PlayPauseIcon className="w-6 media-playing:hidden media-can-play:block media-paused:hidden" />
               <PlayIcon className="w-6 media-playing:hidden media-can-play:hidden media-paused:block" />
               <PauseIcon className="w-6 media-playing:block media-can-play:hidden media-paused:hidden" />
               <span className="sr-only">Toggle play</span>
             </PlayButton>
-
             <MuteButton className="text-neutral-11 hover:text-neutral-12 focus:text-white">
               <SpeakerWaveIcon className="w-5 hidden media-muted:block " />
               <SpeakerXMarkIcon className="w-5 media-muted:hidden block" />
               <span className="sr-only">Toggle mute audio</span>
             </MuteButton>
           </div>
+          {/* @ts-ignore */}
+          <Link href={ROUTE_RALLY_VIEW.replace('[idRally]', rally?.id)}>
+            <a className="text-[0.775rem] font-medium text-interactive-12">
+              <span className="sr-only">Now playing:</span> {rally?.name}
+            </a>
+          </Link>
         </div>
       </Media>
     </>

@@ -34,10 +34,9 @@ export const recordingsRouter = router({
         // if not connected, throw an error
         if (!sub) throw Error('Not connected')
 
-        console.log(`${process.env.S3_RECORDINGS_BASE_KEY as string}/${user_ethereum_address}/${id_rally}/${filename}`)
         const params = {
           Bucket: process.env.S3_BUCKET_NAME,
-          ResponseContentDisposition: 'attachment; filename="recording.ogg"',
+          ResponseContentDisposition: `attachment; filename="recording_${id_rally}_${new Date().toISOString()}.ogg"`,
           Key: `${process.env.S3_RECORDINGS_BASE_KEY as string}/${user_ethereum_address}/${id_rally}/${filename}`,
         }
         const command = new GetObjectCommand(params)
@@ -62,7 +61,7 @@ export const recordingsRouter = router({
       const user_ethereum_address = sub
       const params = {
         Bucket: process.env.S3_BUCKET_NAME,
-        Delimiter: `${process.env.RECORDINGS_BASE_PATH}/${user_ethereum_address}`,
+        Delimiter: `${process.env.S3_RECORDINGS_BASE_KEY}/${user_ethereum_address}`,
       }
       const command = new ListObjectsV2Command(params)
       const raw_list = await s3Client.send(command)
@@ -100,7 +99,7 @@ export const recordingsRouter = router({
         const user_ethereum_address = sub
         const params = {
           Bucket: process.env.S3_BUCKET_NAME,
-          Delimiter: `${process.env.RECORDINGS_BASE_PATH}/${user_ethereum_address}/${id_rally}`,
+          Prefix: `${process.env.S3_RECORDINGS_BASE_KEY}/${user_ethereum_address}/${id_rally}`,
         }
         const command = new ListObjectsV2Command(params)
         const raw_list = await s3Client.send(command)

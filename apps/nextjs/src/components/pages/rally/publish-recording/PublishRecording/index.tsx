@@ -4,48 +4,39 @@ import {
   useStoreTxUi,
 } from '@components/pages/rally/publish-recording/FormPublishRecording/useSmartContract'
 import useForm from '@components/pages/rally/publish-recording/FormPublishRecording/useForm'
-import { useUnmountEffect, useUpdateEffect } from '@react-hookz/web'
+import { useMountEffect, useUnmountEffect, useUpdateEffect } from '@react-hookz/web'
 import DialogModal from '@components/DialogModal'
 import Button from '@components/Button'
 import useBundlr, { useStoreBundlr } from '@hooks/useBundlr'
-import { useState } from 'react'
-import useGetAudioChatSessionRecording from '@hooks/useGetAudioChatSessionRecordings'
 import { IconSpinner } from '@components/Icons'
-import useGetRecordingPresignedUrl from '@hooks/useGetRecordingPresignedUrl'
-import dynamic from 'next/dynamic'
 import { useStoreHasSignedInWithLens } from '@hooks/useSignInWithLens'
 import { ChevronDownIcon, ExclamationTriangleIcon } from '@heroicons/react/20/solid'
-import { Disclosure, Listbox } from '@headlessui/react'
-const NoSSRPlayerPreview = dynamic(() => import('./../PlayerPreview'), { ssr: false })
+import { Disclosure } from '@headlessui/react'
+import DeploymentStep from '@components/DeploymentStep'
+import Notice from '@components/Notice'
+import Link from 'next/link'
+import { ROUTE_DASHBOARD, ROUTE_RALLY_VIEW } from '@config/routes'
+import button from '@components/Button/styles'
+import { useState } from 'react'
 
 export const PublishRecording = (props: any) => {
   const { values, showSectionLens } = props
+  const [fileSize, setFileSize] = useState(undefined)
   const isSignedIn = useStoreHasSignedInWithLens((state: { isSignedIn: boolean }) => state.isSignedIn)
   const bundlr = useStoreBundlr((state: any) => state.bundlr)
   const { queryGetBundlrBalance, mutationFundBalance, mutationEstimateUploadCost } = useBundlr()
-  const querySessionRecordings = useGetAudioChatSessionRecording(values)
   const stateTxUi = useStoreTxUi()
-  const [valueListBoxFile, setValueListBoxFile] = useState(undefined)
-  const [pickedFile, setPickedFile] = useState(undefined)
-  const [pickedFileSrc, setPickedFileSrc] = useState(undefined)
-  const mutationSelectRecording = useGetRecordingPresignedUrl({
-    onSuccess(mutationData: any, args) {
-      setPickedFile({
-        name: mutationData,
-        size: args.size,
-      })
-      setPickedFileSrc(mutationData)
-    },
-  })
 
   const { onSubmitRecording, statePublishRecording } = useSmartContract(stateTxUi)
   const { formPublishRecording, apiInputRecordingTags } = useForm({
     onSubmit: (formValues: any) => {
       onSubmitRecording({
-        values: formValues,
+        values: {
+          ...formValues,
+        },
         id: values.id,
         is_indexed: values.is_indexed,
-        start_at: values.epoch_time_start_at,
+        start_at: values.start_at,
         metadata_cid: values.cid,
       })
     },
@@ -57,7 +48,7 @@ export const PublishRecording = (props: any) => {
       recording_language: values?.language,
       recording_is_nsfw: values?.is_nsfw,
       recording_image_src: values?.image,
-      recording_publish_to_lens: !isSignedIn || !showSectionLens,
+      recording_publish_on_lens: false,
     },
   })
 
@@ -65,16 +56,23 @@ export const PublishRecording = (props: any) => {
     stateTxUi.resetState()
   })
 
+  useMountEffect(() => {
+    stateTxUi.resetState()
+  })
+
   useUpdateEffect(() => {
-    if (pickedFile) {
-      mutationEstimateUploadCost.mutate(pickedFile?.size)
+    //@ts-ignore
+    if (fileSize) {
+      //@ts-ignore
+      mutationEstimateUploadCost.mutate(fileSize)
     }
-  }, [pickedFile])
+  }, [formPublishRecording?.data()?.file])
+
   return (
     <div className="mt-6 mb-8">
       <Disclosure>
-        <div className="animate-appear border-neutral-4 border text-xs p-2 rounded-lg">
-          <Disclosure.Button className="font-bold w-full flex items-center justify-between">
+        <div className="animate-appear border-neutral-4 border text-xs p-1 rounded-lg">
+          <Disclosure.Button className="font-bold w-full flex items-center px-3 py-2 justify-between">
             <div className="shrink-0 flex-grow flex items-center">
               <span className="inline-flex items-center">
                 {queryGetBundlrBalance?.data === '0' && (
@@ -95,10 +93,10 @@ export const PublishRecording = (props: any) => {
                 </span>
               </span>
             </div>
-            <ChevronDownIcon className="shrink-0 text-neutral-9 rotate-0 transition-all ui-open:rotate-180 ui-open:text-white w-8" />
+            <ChevronDownIcon className="shrink-0 pointer-events-none text-neutral-9 rotate-0 transition-all ui-open:rotate-180 ui-open:text-white w-6" />
           </Disclosure.Button>
 
-          <Disclosure.Panel className="px-1 pb-2">
+          <Disclosure.Panel className="px-3 pb-2">
             {queryGetBundlrBalance?.data === '0' && (
               <p className="mt-1.5 font-bold animate-appear">
                 You need to deposit funds in your balance to be able to upload your files.
@@ -112,6 +110,7 @@ export const PublishRecording = (props: any) => {
                   <li key={`${value}`}>
                     <Button
                       onClick={async () => {
+                        //@ts-ignore
                         await mutationFundBalance.mutateAsync(value)
                       }}
                       disabled={mutationFundBalance?.isLoading}
@@ -136,76 +135,46 @@ export const PublishRecording = (props: any) => {
         </div>
       </Disclosure>
       <section className="mt-6 animate-appear p-6 text-start xs:text-center bg-neutral-1 w-full rounded-lg flex flex-col xs:items-center justify-center">
-        <p className="font-bold mb-3">Select the file to upload to Bundlr</p>
+        <p className="font-bold">Your recording file</p>
 
-        {/* @ts-ignore */}
-        {querySessionRecordings?.data?.length > 0 && (
-          <>
-            <Listbox
-              value={valueListBoxFile}
-              onChange={async (value) => {
-                if (valueListBoxFile !== value?.name) {
-                  setValueListBoxFile(value?.name)
-
-                  await mutationSelectRecording.mutateAsync({
-                    id_rally: values?.id,
-                    filename: value?.name,
-                    size: value?.size,
-                  })
-                }
-              }}
-            >
-              <Listbox.Button>Pick one of your raw recording</Listbox.Button>
-              <Listbox.Options className="mt-3 flex flex-col gap-4" static>
-                {querySessionRecordings?.data.map((file) => (
-                  <Listbox.Option
-                    className="relative z-20 bg-neutral-6 animate-appear delay-75 pis-2 py-1 rounded-full border-neutral-4 text-2xs flex justify-between items-center"
-                    key={file.name}
-                    value={file}
-                  >
-                    {valueListBoxFile === file?.name &&
-                      mutationSelectRecording?.isSuccess &&
-                      mutationSelectRecording?.data && <NoSSRPlayerPreview src={mutationSelectRecording?.data} />}
-
-                    <span className="px-3">{file.name}</span>
-                  </Listbox.Option>
-                ))}
-              </Listbox.Options>
-            </Listbox>
-          </>
-        )}
-
-        <p className="pt-8 text-2xs text-neutral-11 mb-3">Or upload your own :</p>
+        <p className="pt-4 text-2xs text-neutral-11 mb-3">Upload your file below :</p>
         <div className="relative">
           <input
             className="w-full"
             onChange={(e) => {
               //@ts-ignore
-              setPickedFile(e.target.files[0])
+              const file = e.target.files[0]
               //@ts-ignore
-              setPickedFileSrc(URL.createObjectURL(e.target.files[0]))
-              setValueListBoxFile(undefined)
+              setFileSize(file?.size)
+              if (file) {
+                let reader = new FileReader()
+                reader.onload = () => {
+                  if (reader.result) {
+                    formPublishRecording?.setData('file', Buffer.from(reader.result as any))
+                  }
+                }
+                reader.readAsArrayBuffer(file)
+              }
             }}
             type="file"
             accept="audio/*"
           />
         </div>
 
-        {pickedFile && (
+        {fileSize && (
           <div className="mt-8 animate-appear flex flex-col gap-4">
             <Button
               intent="negative-ghost"
               scale="xs"
               onClick={() => {
-                setPickedFile(undefined)
-                setPickedFileSrc(undefined)
+                formPublishRecording?.setData('file', undefined)
               }}
             >
               Reset file
             </Button>
           </div>
         )}
-        {pickedFile && mutationEstimateUploadCost?.data && (
+        {fileSize && (
           <p className="inline-flex flex-wrap text-2xs font-medium animate-appear">
             Estimated cost of upload:&nbsp; <br />
             {!mutationEstimateUploadCost?.data ? (
@@ -216,27 +185,137 @@ export const PublishRecording = (props: any) => {
           </p>
         )}
       </section>
-
-      <section className="mt-20 animate-appear">
-        <FormPublishRecording
-          showSectionLens={showSectionLens}
-          disabled={!pickedFile || !isSignedIn ? true : false}
-          storeForm={formPublishRecording}
-          apiInputRecordingTags={apiInputRecordingTags}
-          state={statePublishRecording}
-          labelButtonSubmit="Publish recording"
-          labelButtonSubmitting="Publishing..."
-        />
-      </section>
-
+      <div className={!fileSize ? 'opacity-50 pointer-events-none' : ''}>
+        <section className={`mt-20  animate-appear`}>
+          <FormPublishRecording
+            showSectionLens={showSectionLens}
+            disabled={!fileSize || !isSignedIn ? true : false}
+            storeForm={formPublishRecording}
+            apiInputRecordingTags={apiInputRecordingTags}
+            state={statePublishRecording}
+            labelButtonSubmit="Publish recording"
+            labelButtonSubmitting="Publishing..."
+          />
+        </section>
+      </div>
       <DialogModal
         title="Publishing recording"
         isOpen={stateTxUi.isDialogVisible}
         setIsOpen={stateTxUi.setDialogVisibility}
       >
-        <span className="font-bold">Publishing rally</span>
-        1. Upload to Arweave 2. Post to Lens 3. Link Rally to Lens publication & recording
+        <span className="font-bold">Uploading and deploying recording</span>
         {/* @ts-ignore */}
+        <ol className="space-y-3 mt-6 font-medium text-xs">
+          <li className={`flex items-center text-white`}>
+            <DeploymentStep
+              isLoading={statePublishRecording.uploadAudioFile.isLoading}
+              isError={statePublishRecording.uploadAudioFile.isError}
+              isSuccess={statePublishRecording.uploadAudioFile.isSuccess}
+            >
+              Uploading recording audio file to Bundlr (transaction required)
+            </DeploymentStep>
+          </li>
+
+          <li
+            className={`
+            flex items-center
+            ${statePublishRecording.uploadMetadata.isIdle ? 'text-neutral-11' : 'text-white'}`}
+          >
+            <DeploymentStep
+              isLoading={statePublishRecording.uploadMetadata.isLoading}
+              isError={statePublishRecording.uploadMetadata.isError}
+              isSuccess={statePublishRecording.uploadMetadata.isSuccess}
+            >
+              Uploading recording metadata file to Bundlr (transaction required)
+            </DeploymentStep>
+          </li>
+          <li
+            className={`
+            flex items-center 
+            ${statePublishRecording.contract.isIdle ? 'text-neutral-11' : 'text-white'}`}
+          >
+            <DeploymentStep
+              isLoading={statePublishRecording.contract.isLoading}
+              isError={statePublishRecording.contract.isError}
+              isSuccess={statePublishRecording.contract.isSuccess}
+            >
+              Sign the 'Publish recording' transaction{' '}
+            </DeploymentStep>
+          </li>
+          <li
+            className={`
+            flex items-center 
+            ${statePublishRecording.transaction.isIdle ? 'text-neutral-11' : 'text-white'}`}
+          >
+            <DeploymentStep
+              isLoading={statePublishRecording.transaction.isLoading}
+              isError={statePublishRecording.transaction.isError}
+              isSuccess={statePublishRecording.transaction.isSuccess}
+            >
+              Publishing recording
+            </DeploymentStep>
+          </li>
+        </ol>
+        {[
+          statePublishRecording.transaction,
+          statePublishRecording.contract,
+          statePublishRecording.uploadAudioFile,
+          statePublishRecording.uploadMetadata,
+        ].filter((slice) => slice.isError)?.length > 0 && (
+          <div className="mt-6 animate-appear">
+            {[
+              statePublishRecording.transaction,
+              statePublishRecording.contract,
+              statePublishRecording.uploadAudioFile,
+              statePublishRecording.uploadMetadata,
+            ]
+              .filter((slice) => slice.isError)
+              .map((slice, key) => (
+                <Notice className="overflow-hidden text-ellipsis" intent="negative-outline" key={`error-${key}`}>
+                  {/* @ts-ignore */}
+                  {slice.error?.message ?? slice?.error}
+                </Notice>
+              ))}
+            <Button className="mt-6" onClick={() => formPublishRecording.handleSubmit()}>
+              Try again
+            </Button>
+          </div>
+        )}
+        {console.log(stateTxUi?.metadataArweaveTxId)}
+        {statePublishRecording?.transaction?.isSuccess && (
+          <div className="animate-appear space-y-4 mt-6">
+            <Notice>
+              🎉 Your recording was published successfully ! <br />
+              <Link href={ROUTE_RALLY_VIEW.replace('[idRally]', values?.id)}>
+                <a>
+                  Check it <span className="underline hover:no-underline">here</span>
+                </a>
+              </Link>
+            </Notice>
+            <p className="flex flex-col gap-4 text-2xs mt-6">
+              <a
+                className="block text-neutral-11"
+                target="_blank"
+                href={`https://arweave.net/${stateTxUi?.audioFileArweaveTxId}`}
+              >
+                Recording file Arweave transaction id : <span className="link">{stateTxUi?.audioFileArweaveTxId}</span>
+              </a>
+              <a
+                className="block text-neutral-11"
+                target="_blank"
+                href={`https://arweave.net/${stateTxUi?.metadataArweaveTxId}`}
+              >
+                Metadata Arweave transaction id : <span className="link">{stateTxUi?.metadataArweaveTxId}</span>
+              </a>
+            </p>
+
+            <div className="flex flex-col space-y-3 xs:space-y-0 xs:space-i-3 xs:flex-row ">
+              <Link href={ROUTE_DASHBOARD}>
+                <a className={button({ intent: 'primary-outline' })}>Go to my dashboard</a>
+              </Link>
+            </div>
+          </div>
+        )}
       </DialogModal>
     </div>
   )

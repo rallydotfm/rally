@@ -45,7 +45,7 @@ export const MainNavBar = (props: MainNavBarProps) => {
             !isSignedIn && room?.state === 'disconnected' && !isPlayerOpen
               ? 'mt-auto md:pb-32'
               : (room?.state === 'connected' || isPlayerOpen) && !isSignedIn
-              ? 'mt-auto md:pb-48'
+              ? 'mt-auto md:pb-56'
               : room?.state === 'connected' || isPlayerOpen
               ? 'mt-auto md:pb-24'
               : 'mt-auto md:pb-12'

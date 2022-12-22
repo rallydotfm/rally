@@ -11,15 +11,17 @@ import {
   ExclamationCircleIcon,
   PencilIcon,
   PlayCircleIcon,
+  PlayIcon,
   TrashIcon,
 } from '@heroicons/react/20/solid'
-import useGetAudioChatSessionRecording from '@hooks/useGetAudioChatSessionRecordings'
 import useAudioPlayer from '@hooks/usePersistedAudioPlayer'
 import useGetRecordingPresignedUrl from '@hooks/useGetRecordingPresignedUrl'
+import useGetAudioChatPublishedRecording from '@hooks/useGetAudioChatPublishedRecording'
 import { formatRelative, format, isFuture } from 'date-fns'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { IconSpinner } from '@components/Icons'
+import { trpc } from '@utils/trpc'
 
 interface CardRallyProps {
   data: any
@@ -32,9 +34,25 @@ interface CardRallyProps {
 export const CardRally = (props: CardRallyProps) => {
   const { data, onSelectRallyToDelete, onSelectRallyToCancel, onClickEndLive, onClickGoLive } = props
   const { push } = useRouter()
-  const querySessionRecordings = useGetAudioChatSessionRecording(data)
+  const queryPublishedRecording = useGetAudioChatPublishedRecording(data.id, data.recording)
+  const querySessionRecordings: any = trpc.recordings.rally_available_recordings.useQuery(
+    {
+      id_rally: data?.id,
+    },
+    {
+      enabled:
+        data?.recording === '' &&
+        data?.will_be_recorded === true &&
+        [
+          DICTIONARY_STATES_AUDIO_CHATS.LIVE.label,
+          DICTIONARY_STATES_AUDIO_CHATS.FINISHED.label,
+          //@ts-ignore
+        ].includes(data.state),
+    },
+  )
+
   const setAudioPlayer = useAudioPlayer((state) => state.setAudioPlayer)
-  const mutationPlayRecording = useGetRecordingPresignedUrl({
+  const mutationPlaySessionRecording = useGetRecordingPresignedUrl({
     onSuccess(mutationData: any) {
       setAudioPlayer({
         isOpen: true,
@@ -45,6 +63,19 @@ export const CardRally = (props: CardRallyProps) => {
           id: data?.id,
         },
       })
+    },
+  })
+
+  const mutationDownloadRecording = useGetRecordingPresignedUrl({
+    onSuccess(mutationData: any) {
+      const url = mutationData
+      const link = document.createElement('a')
+      link.href = url
+      link.setAttribute('download', `recording.ogg`)
+      document.body.appendChild(link)
+      link.click()
+      //@ts-ignore
+      link.parentNode.removeChild(link)
     },
   })
   return (
@@ -102,7 +133,7 @@ export const CardRally = (props: CardRallyProps) => {
         </article>
         <div className="relative z-20">
           <Disclosure>
-            <div className="flex flex-col 2xs:flex-row gap-3 items-center border-t border-t-neutral-5 pt-3 px-4 xs:pt-1.5 md:pt-4 mt-6 xs:-mis-4 xs:-mie-8 xs:px-6">
+            <div className="flex flex-col 2xs:flex-row gap-4 xs:gap-3 items-center border-t border-t-neutral-5 pt-3 px-4 xs:pt-1.5 md:pt-4 mt-6 xs:-mis-4 xs:-mie-8 xs:px-6">
               {[
                 DICTIONARY_STATES_AUDIO_CHATS.PLANNED.label,
                 DICTIONARY_STATES_AUDIO_CHATS.READY.label,
@@ -115,17 +146,49 @@ export const CardRally = (props: CardRallyProps) => {
                 )}
 
               {data.state === DICTIONARY_STATES_AUDIO_CHATS.FINISHED.label && data.will_be_recorded === true && (
-                <Link href={ROUTE_RALLY_PUBLISH_RECORDING.replace('[idRally]', data.id)}>
-                  <a
-                    className={button({
-                      intent: 'primary-outline',
-                      scale: 'sm',
-                      class: 'w-auto',
-                    })}
-                  >
-                    Publish recording
-                  </a>
-                </Link>
+                <>
+                  {data?.recording === '' ? (
+                    <>
+                      <Link href={ROUTE_RALLY_PUBLISH_RECORDING.replace('[idRally]', data.id)}>
+                        <a
+                          className={button({
+                            intent: 'primary-outline',
+                            scale: 'sm',
+                            class: 'w-auto',
+                          })}
+                        >
+                          Publish recording
+                        </a>
+                      </Link>
+                    </>
+                  ) : (
+                    <>
+                      {queryPublishedRecording?.data?.recording_file && (
+                        <>
+                          <Button
+                            intent="interactive-outline"
+                            onClick={() => {
+                              setAudioPlayer({
+                                isOpen: true,
+                                trackSrc: queryPublishedRecording?.data?.recording_file,
+                                rally: {
+                                  name: queryPublishedRecording?.data?.name,
+                                  imageSrc: queryPublishedRecording?.data?.image,
+                                  id: data?.id,
+                                },
+                              })
+                            }}
+                            scale="sm"
+                            className="!pis-2 !pie-3"
+                          >
+                            <PlayIcon className="w-5 mie-1ex" />
+                            Play recording
+                          </Button>
+                        </>
+                      )}
+                    </>
+                  )}
+                </>
               )}
 
               {data.state === DICTIONARY_STATES_AUDIO_CHATS.LIVE.label && (
@@ -134,7 +197,7 @@ export const CardRally = (props: CardRallyProps) => {
                 </Button>
               )}
 
-              <div className="mx-auto 2xs:mie-0 flex flex-wrap gap-4">
+              <div className="mx-auto 2xs:mie-0 flex items-center flex-wrap gap-2">
                 <>
                   {[
                     DICTIONARY_STATES_AUDIO_CHATS.LIVE.label,
@@ -149,12 +212,17 @@ export const CardRally = (props: CardRallyProps) => {
                         <Disclosure.Button
                           className={button({
                             intent: 'primary-ghost',
-                            scale: 'sm',
-                            class: 'animate-appear w-auto space-i-2 inline-flex',
+                            scale: 'xs',
+                            class: 'animate-appear md:!pis-2 md:!pie-4  w-auto space-i-2 inline-flex',
                           })}
                         >
                           <ArrowDownTrayIcon className="w-5 mie-2" />
-                          {querySessionRecordings?.data?.length} recorded files
+                          {querySessionRecordings?.data?.length}&nbsp;
+                          <span className="sr-only xs:not-sr-only md:sr-only lg:not-sr-only">
+                            available file
+                            {/* @ts-ignore */}
+                            {querySessionRecordings?.data?.length > 1 ? 's' : ''}
+                          </span>
                         </Disclosure.Button>
                       </>
                     )}
@@ -174,9 +242,10 @@ export const CardRally = (props: CardRallyProps) => {
                           class: 'ui-open:bg-opacity-10 rounded-md',
                         })}
                       >
-                        More <EllipsisHorizontalIcon className="mis-2 w-5" />
+                        <span className="sr-only lg:not-sr-only">More</span>
+                        <EllipsisHorizontalIcon className="mis-2 w-5" />
                       </Menu.Button>
-                      <Menu.Items className="absolute flex flex-col w-full  xs:w-max-content inline-end-0 mt-2 origin-top-right divide-y border-neutral-6 border divide-neutral-4 rounded-md overflow-hidden bg-neutral-3 focus:outline-none">
+                      <Menu.Items className="z-20 absolute flex flex-col w-full  xs:w-max-content inline-end-0 mt-2 origin-top-right divide-y border-neutral-6 border divide-neutral-4 rounded-md overflow-hidden bg-neutral-3 focus:outline-none">
                         {[
                           DICTIONARY_STATES_AUDIO_CHATS.PLANNED.label,
                           DICTIONARY_STATES_AUDIO_CHATS.READY.label,
@@ -202,6 +271,14 @@ export const CardRally = (props: CardRallyProps) => {
                               </Menu.Item>
                             </>
                           )}
+                        {data?.recording !== '' && (
+                          <Menu.Item as={Link} href={ROUTE_RALLY_PUBLISH_RECORDING.replace('[idRally]', data.id)}>
+                            <a className="flex items-center space-i-2 px-4 text-start py-2.5 ui-active:bg-neutral-12 ui-active:text-neutral-1 font-bold">
+                              <PencilIcon className="ui-active:text-interactive-9 w-4 mie-1ex" />
+                              Update published recording
+                            </a>
+                          </Menu.Item>
+                        )}
                         {/* @ts-ignore */}
                         {![DICTIONARY_STATES_AUDIO_CHATS.LIVE.label].includes(data.state) && (
                           <Menu.Item
@@ -227,39 +304,51 @@ export const CardRally = (props: CardRallyProps) => {
               leaveFrom="transform scale-100 opacity-100"
               leaveTo="transform scale-95 opacity-0"
             >
-              <Disclosure.Panel className="flex relative z-20 flex-col 2xs:flex-row gap-3 items-center border-t border-t-neutral-5 pt-3 px-4 xs:pt-1.5 md:pt-4 mt-6 xs:-mis-4 xs:-mie-8 xs:px-6">
+              <Disclosure.Panel className="flex relative z-20 flex-col gap-8 items-center border-t border-t-neutral-5 pt-3 px-4 xs:pt-1.5 md:pt-4 mt-6 xs:-mis-4 xs:-mie-8 xs:px-6">
                 {/* @ts-ignore */}
                 {querySessionRecordings?.data?.length > 0 && (
                   <ul className="w-full gap-4 flex flex-col">
-                    {querySessionRecordings?.data?.map((recording) => {
+                    {querySessionRecordings?.data?.map((recording: any) => {
                       return (
                         <li
                           className="relative z-20 bg-neutral-5 animate-appear delay-75 pis-4 py-1 pie-1 rounded-full text-2xs flex justify-between items-center"
-                          key={recording}
+                          key={`${data.id}-${recording?.name}`}
                         >
                           <div className="flex items-center">
                             <button
                               type="button"
                               onClick={async () => {
-                                mutationPlayRecording.mutateAsync({
+                                mutationPlaySessionRecording.mutateAsync({
                                   id_rally: data?.id,
-                                  filename: recording,
+                                  filename: recording?.name,
                                 })
                               }}
-                              disabled={mutationPlayRecording?.isLoading}
+                              disabled={mutationPlaySessionRecording?.isLoading}
                               className="disabled:opacity-50 disabled:cursor-not-allowed text-white"
                             >
-                              {mutationPlayRecording?.isLoading ? (
+                              {mutationPlaySessionRecording?.isLoading ? (
                                 <IconSpinner className="animate-spin mie-2" />
                               ) : (
                                 <PlayCircleIcon className="mie-2 w-7" />
                               )}
                               <span className="sr-only">Play</span>
                             </button>
-                            <span className="font-mono"> {recording}</span>
+                            <span className="font-mono"> {recording?.name}</span>
                           </div>
 
-                          <Button type="button" intent="neutral-on-dark-layer" scale="xs">
+                          <Button
+                            disabled={mutationDownloadRecording.isLoading}
+                            isLoading={mutationDownloadRecording.isLoading}
+                            onClick={async () => {
+                              await mutationDownloadRecording.mutateAsync({
+                                id_rally: data?.id,
+                                filename: recording?.name,
+                              })
+                            }}
+                            type="button"
+                            intent="neutral-on-dark-layer"
+                            scale="xs"
+                          >
                             Download
                           </Button>
                         </li>
@@ -267,6 +356,9 @@ export const CardRally = (props: CardRallyProps) => {
                     })}
                   </ul>
                 )}
+                <p className="font-medium text-2xs text-neutral-12">
+                  Make sure to download your files ! <br /> Rally only stores them for 3 days.
+                </p>
               </Disclosure.Panel>
             </Transition>
           </Disclosure>

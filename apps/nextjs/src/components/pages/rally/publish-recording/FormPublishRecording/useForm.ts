@@ -11,7 +11,7 @@ export const schema = object({
   recording_description: string().trim(),
   recording_image_src: string().optional(),
   recording_is_nsfw: boolean(),
-  recording_publish_to_lens: boolean(),
+  recording_publish_on_lens: boolean(),
   recording_category: string().trim().min(1),
   recording_tags: array(string()),
 })

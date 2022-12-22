@@ -46,13 +46,14 @@ export const LayoutBase = (props: LayoutProps) => {
         <MobileTopMenu address={address} />
         <div
           className={`pt-5  ${
-            (stateVoiceChat?.room.state === 'connected' || isPlayerOpen) &&
-            !isSignedIn &&
-            queryCurrentUserLensProfile?.data?.handle
-              ? 'pb-20 md:pb-56'
-              : stateVoiceChat?.room.state === 'connected' || isPlayerOpen
-              ? 'pb-20 md:pb-48'
-              : 'pb-12 md:pb-32'
+            ((stateVoiceChat?.room.state === 'connected' || isPlayerOpen) &&
+              !isSignedIn &&
+              queryCurrentUserLensProfile?.data?.handle) ||
+            isPlayerOpen
+              ? 'pb-64'
+              : stateVoiceChat?.room.state === 'connected'
+              ? 'pb-48'
+              : 'pb-32'
           } md:border-x flex flex-col md:border-neutral-4 md:border-solid md:col-span-8 px-3 md:px-6 flex-grow`}
         >
           <p className="w-full text-center text-[0.775rem] pb-8 text-neutral-9">

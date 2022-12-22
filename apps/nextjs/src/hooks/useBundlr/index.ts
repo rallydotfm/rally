@@ -1,10 +1,10 @@
 import create from 'zustand'
 import { providers } from 'ethers'
 import { WebBundlr } from '@bundlr-network/client'
-import { useMountEffect } from '@react-hookz/web'
 import { useMutation, useQuery } from '@tanstack/react-query'
-import { useAccount, useProvider } from 'wagmi'
 import BigNumber from 'bignumber.js'
+import { chainId } from '@config/wagmi'
+import { chain } from 'wagmi'
 
 export const useStoreBundlr = create((set) => ({
   bundlr: undefined,
@@ -15,9 +15,14 @@ export const useStoreBundlr = create((set) => ({
     const provider = new providers.Web3Provider(window?.ethereum)
     await provider._ready()
 
-    const bundlr = new WebBundlr('https://devnet.bundlr.network', 'matic', provider, {
-      providerUrl: process.env.NEXT_PUBLIC_RPC_URL,
-    })
+    const bundlr = new WebBundlr(
+      chainId === chain.polygonMumbai.id ? 'https://devnet.bundlr.network' : 'https://node1.bundlr.network',
+      'matic',
+      provider,
+      {
+        providerUrl: process.env.NEXT_PUBLIC_RPC_URL,
+      },
+    )
     await bundlr.ready()
     set(() => ({
       bundlr,
@@ -46,7 +51,7 @@ export function useBundlr() {
   )
   const mutationFundBalance = useMutation(
     async (price) => {
-      console.log('price', price)
+      //@ts-ignore
       const response = await bundlr.fund(new BigNumber(price).multipliedBy(bundlr.currencyConfig.base[1]))
       return response
     },

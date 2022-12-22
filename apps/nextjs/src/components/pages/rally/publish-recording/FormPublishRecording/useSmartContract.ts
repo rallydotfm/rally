@@ -1,8 +1,6 @@
-import { getUnixTime } from 'date-fns'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { makeStorageClient } from '@config/web3storage'
 import { CONTRACT_AUDIO_CHATS } from '@config/contracts'
-import { useContractWrite, useAccount, useWaitForTransaction } from 'wagmi'
+import { useContractWrite, useWaitForTransaction } from 'wagmi'
 import { audioChatABI } from '@rally/abi'
 import create from 'zustand'
 import toast from 'react-hot-toast'
@@ -11,33 +9,44 @@ import { useRouter } from 'next/router'
 import { PublicationMainFocus } from '@graphql/lens/generated'
 
 import { v4 as uuidv4 } from 'uuid'
+import { useStoreBundlr } from '@hooks/useBundlr'
 export interface TxUi {
   isDialogVisible: boolean
-  arweaveTxId: string | undefined
+  metadataArweaveTxId: string | undefined
+  audioFileArweaveTxId: string | undefined
   lensPublicationId: string | undefined
   setDialogVisibility: (visibility: boolean) => void
-  setArweaveTxId: (newFileCid?: string) => void
-  setLensPublicationId: (newImageCid?: string) => void
+  setMetadataArweaveTxId: (cid?: string) => void
+  setAudioFileArweaveTxId: (txId?: string) => void
+  setLensPublicationId: (publicationId?: string) => void
   resetState: () => void
 }
 
 export const useStoreTxUi = create<TxUi>((set) => ({
   setDialogVisibility: (visibility: boolean) => set(() => ({ isDialogVisible: visibility })),
-  setArweaveTxId: (cid?: string) => set(() => ({ arweaveTxId: cid })),
-  setLensPublicationId: (cid?: string) => set(() => ({ lensPublicationId: cid })),
+  setMetadataArweaveTxId: (tx?: string) => set(() => ({ metadataArweaveTxId: tx })),
+  setAudioFileArweaveTxId: (tx?: string) => set(() => ({ audioFileArweaveTxId: tx })),
+
+  setLensPublicationId: (id?: string) => set(() => ({ lensPublicationId: id })),
   resetState: () =>
     set(() => ({
       isDialogVisible: false,
-      arweaveTxId: undefined,
+      metadataArweaveTxId: undefined,
+      audioFileArweaveTxId: undefined,
       lensPublicationId: undefined,
     })),
   isDialogVisible: false,
-  arweaveTxId: undefined,
+  metadataArweaveTxId: undefined,
+  audioFileArweaveTxId: undefined,
   lensPublicationId: undefined,
 }))
 
 export function useSmartContract(stateTxUi: TxUi) {
-  const account = useAccount()
+  const audioFileArweaveTxId = useStoreTxUi((state) => state?.audioFileArweaveTxId)
+  const metadataArweaveTxId = useStoreTxUi((state) => state?.metadataArweaveTxId)
+  const setAudioFileArweaveTxId = useStoreTxUi((state: any) => state?.setAudioFileArweaveTxId)
+  const setMetadataArweaveTxId = useStoreTxUi((state: any) => state?.setMetadataArweaveTxId)
+  const bundlr = useStoreBundlr((state: any) => state.bundlr)
   const queryClient = useQueryClient()
   const { query } = useRouter()
 
@@ -68,75 +77,50 @@ export function useSmartContract(stateTxUi: TxUi) {
   })
 
   /**
-   * Upload our recording file to Bundlr
+   * Upload audio file to Bundlr
    */
-  const mutationPublishToLens = useMutation(async (file) => {
+  const mutationUploadAudioFileToBundlr = useMutation(async (filePath) => {
     try {
-      const client = makeStorageClient()
-      //@ts-ignore
-      const cid = await client.put([file])
-      //@ts-ignore
-      stateTxUi.setLensPublicationId(cid)
-      return cid
+      const txn = await bundlr.upload(filePath, [{ name: 'Content-Type', value: 'audio/ogg' }])
+      setAudioFileArweaveTxId(txn?.id)
+      return txn?.id
     } catch (e) {
       console.error(e)
-      //@ts-ignore
-      toast.error(e?.message ?? e)
+      toast.error('Something went wrong while uploading your recording file.')
     }
   })
 
   /**
-   * Upload our recording file to Bundlr
+   * Upload our JSON file to Bundlr
    */
-  const mutationUploadAudioFile = useMutation(async (file) => {
+  const mutationUploadMetadataToBundlr = useMutation(async (args: any) => {
+    const { data, tags } = args
     try {
-      const client = makeStorageClient()
-      //@ts-ignore
-      const cid = await client.put([file])
-      //@ts-ignore
-      stateTxUi.setLensPublicationId(cid)
-      return cid
+      const txn = await bundlr.createTransaction(data, { tags: tags })
+      await txn.sign()
+      setMetadataArweaveTxId(txn.id)
+      await txn.upload()
+      return txn.id
     } catch (e) {
       console.error(e)
-      //@ts-ignore
-      toast.error(e?.message ?? e)
+      toast.error('Something went wrong while uploading your recording metadata.')
     }
   })
 
   /**
-   * Upload our JSON file to IPFS (using web3 storage)
-   */
-  const mutationUploadJsonFile = useMutation(async (file) => {
-    try {
-      const client = makeStorageClient()
-      //@ts-ignore
-      const cid = await client.put([file])
-      //@ts-ignore
-      stateTxUi.setArweaveTxId(cid)
-      return cid
-    } catch (e) {
-      console.error(e)
-      //@ts-ignore
-      toast.error(e?.message ?? e)
-    }
-  })
-
-  /**
-   *  Upload Rally image to IPFS (if necessary) and format and upload Rally data as a JSON file to IPFS (if necessary)
+   *  Upload audio file to Bundlr, publish metadata file
    * @param values - values returned by our form
    */
-  async function prepareRecordingData(values: any, isUpdate: boolean) {
+  async function prepareRecordingData(values: any) {
     try {
-      let image = stateTxUi.lensPublicationId
-      let metadata = stateTxUi.arweaveTxId
-
-      // upload image file (if it exists) to IPFS
-      if (values?.rally_image_file) {
-        image = await mutationUploadAudioFile.mutateAsync(values?.rally_image_file)
-        stateTxUi.setLensPublicationId(image)
+      let idTxUploadAudioFileToArweave = audioFileArweaveTxId
+      if (!idTxUploadAudioFileToArweave) {
+        idTxUploadAudioFileToArweave = await mutationUploadAudioFileToBundlr.mutateAsync(values.file)
       }
 
-      if (!stateTxUi.arweaveTxId?.length || isUpdate === true) {
+      let metadata = metadataArweaveTxId
+
+      if (!metadataArweaveTxId?.length) {
         // create JSON file with form values + uploaded recording
 
         const recordingData = {
@@ -146,8 +130,8 @@ export function useSmartContract(stateTxUi: TxUi) {
           description: values.recording_description,
           locale: values.recording_language,
           content: values.recording_description,
-          external_url: `${process.env.NEXT_PUBLIC_APP_URL}/rally/${query?.id_rally}`,
-          image: values.recording_image_src,
+          external_url: `${process.env.NEXT_PUBLIC_APP_URL}/rally/${values?.id}`,
+          image: values?.recording_image_src ?? '',
           imageMimeType: 'image/*',
           name: values.recording_title,
           attributes: [
@@ -162,38 +146,24 @@ export function useSmartContract(stateTxUi: TxUi) {
           media: [
             {
               type: 'audio/ogg',
-              item: 'https://arweave.net/',
+              item: `https://arweave.net/${idTxUploadAudioFileToArweave}`,
             },
           ],
           appId: 'Rally',
         }
 
-        if (image && values.rally_image_file) {
-          //@ts-ignore
-          recordingData.image = `${image}/${values?.rally_image_file.name}`
-        } else {
-          //@ts-ignore
-          if (values.rally_image_src) recordingData.image = values.rally_image_src
-        }
+        const recordingDataJSON = JSON.stringify(recordingData)
 
-        const recordingDataJSON = new File([JSON.stringify(recordingData)], 'data.json', {
-          type: 'application/json',
-        })
+        const tags = [{ name: 'Content-Type', value: 'application/json' }]
 
         //@ts-ignore
-        metadata = await mutationUploadJsonFile.mutateAsync(recordingDataJSON)
-        stateTxUi.setArweaveTxId(metadata)
+        metadata = await mutationUploadMetadataToBundlr.mutateAsync({ data: recordingDataJSON, tags })
+        setMetadataArweaveTxId(metadata)
       }
+      console.log(idTxUploadAudioFileToArweave)
+      console.log(metadata)
 
-      const creatorWalletAddress = account?.address
-      const isIndexed = values.rally_is_indexed
-
-      return {
-        startAt: values.rally_start_at,
-        metadata,
-        creatorWalletAddress,
-        isIndexed,
-      }
+      return metadata
     } catch (e) {
       console.error(e)
       //@ts-ignore
@@ -206,16 +176,15 @@ export function useSmartContract(stateTxUi: TxUi) {
    */
   async function onSubmitRecording(args: any) {
     contractWriteUpdateAudioChat.reset()
-    mutationUploadAudioFile.reset()
-    mutationUploadJsonFile.reset()
-    mutationPublishToLens.reset()
+    mutationUploadAudioFileToBundlr.reset()
+    mutationUploadMetadataToBundlr.reset()
+    // mutationPublishToLens.reset()
 
-    const { id, is_indexed, start_at, cid, values } = args
+    const { id, is_indexed, start_at, metadata_cid, values } = args
     stateTxUi.setDialogVisibility(true)
+    console.log(id, is_indexed, start_at, metadata_cid)
     try {
-      const args = await prepareRecordingData(values, true)
-      //@ts-ignore
-
+      const recording_metadata = await prepareRecordingData({ ...values, id })
       await contractWriteUpdateAudioChat?.writeAsync?.({
         //@ts-ignore
         recklesslySetUnpreparedArgs: [
@@ -228,11 +197,11 @@ export function useSmartContract(stateTxUi: TxUi) {
             lens_publication_id (string) 
           */
           id,
-          cid,
+          metadata_cid,
           start_at,
           is_indexed,
-          args?.arweaveTxId ?? '',
-          args?.lensPublicationId ?? '',
+          recording_metadata as string,
+          '',
         ],
       })
     } catch (e) {
@@ -245,9 +214,8 @@ export function useSmartContract(stateTxUi: TxUi) {
     statePublishRecording: {
       contract: contractWriteUpdateAudioChat,
       transaction: txUpdateAudioChat,
-      uploadAudioFile: mutationUploadAudioFile,
-      uploadData: mutationUploadJsonFile,
-      publishToLens: mutationPublishToLens,
+      uploadAudioFile: mutationUploadAudioFileToBundlr,
+      uploadMetadata: mutationUploadMetadataToBundlr,
     },
   }
 }
