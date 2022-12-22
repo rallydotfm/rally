@@ -51,6 +51,7 @@ const Page: NextPage = () => {
                     //@ts-ignore
                     values={{
                       ...queryAudioChatMetadata.data,
+                      id: idRally,
                     }}
                   />
                 )}

@@ -18,6 +18,9 @@ export const FormEditAudioChat = (props: any) => {
     onSubmit: (formValues: any) =>
       onSubmitEditAudioChat({
         id: values.id,
+        // other values that might be necessary can go here
+        created_at: values.epoch_time_created_at,
+        current_state: values.state,
         values: formValues,
       }),
     initialValues: {

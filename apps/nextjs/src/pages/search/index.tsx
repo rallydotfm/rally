@@ -11,6 +11,7 @@ import useGetProfilesInterests from '@hooks/useGetProfileInterests'
 import useIndexedAudioChats from '@hooks/useIndexedAudioChats'
 import { useState } from 'react'
 import { isAddress } from 'ethers/lib/utils'
+import useIndexedAudioChatsRest from '@hooks/useGetIndexedAudioChatREST'
 
 const PER_PAGE = 30
 const useStoreFiltersAudioChatsSearchPage = createStoreIndexedAudioChatsFilters()
@@ -36,7 +37,7 @@ const Page: NextPage = () => {
   const startBetweenRange = useStoreFiltersAudioChatsSearchPage((state: any) => state.startBetweenRange)
   const setStartBetweenRange = useStoreFiltersAudioChatsSearchPage((state: any) => state.setStartBetweenRange)
   const queryListInterests = useGetProfilesInterests()
-  const queryAudioChats = useIndexedAudioChats(
+  const queryAudioChats = useIndexedAudioChatsRest(
     {
       first: PER_PAGE,
       skip,

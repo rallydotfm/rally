@@ -4,6 +4,11 @@ import { ROUTE_PREFERENCES_BROWSING, ROUTE_RALLY_NEW, ROUTE_SEARCH_RALLIES } fro
 import useGetHomeAudioChatsSelection from '@hooks/useGetHomeAudioChatsSelection'
 import { useStorePersistedInterests } from '@hooks/usePersistedInterests'
 import useWalletAddressDefaultLensProfile from '@hooks/useWalletAddressDefaultLensProfile'
+import {
+  queryAudioChatsHappeningLater,
+  queryAudioChatsHappeningNow,
+  queryAudioChatsHappeningSoon,
+} from '@services/supabase/queryAudioChatsHappening/queryAudioChatsHappening'
 import type { NextPage } from 'next'
 import { useSession } from 'next-auth/react'
 import Head from 'next/head'
@@ -17,8 +22,12 @@ const Page: NextPage = () => {
   const queryLensProfile = useWalletAddressDefaultLensProfile(account?.address as `0x${string}`, {
     enabled: account?.address ? true : false,
   })
-  const { queryAudioChatsHappeningSoon, queryAudioChatsHappeningLater, queryAudioChatsHappeningNow } =
-    useGetHomeAudioChatsSelection()
+  const audioChatsHappeningSoon = queryAudioChatsHappeningSoon()
+  const audioChatsHappeningLater = queryAudioChatsHappeningLater()
+  const audioChatsHappeningNow = queryAudioChatsHappeningNow()
+  console.log(audioChatsHappeningSoon)
+  console.log(audioChatsHappeningLater)
+  console.log(audioChatsHappeningNow)
   return (
     <>
       <Head>

@@ -27,6 +27,7 @@
     "@rally/auth": "*",
     "@rally/db": "*",
     "@react-hookz/web": "^16.1.0",
+    "@supabase/supabase-js": "^v2.2.1",
     "@tanstack/react-query": "^4.13.0",
     "@tanstack/react-table": "^8.5.22",
     "@trpc/client": "10.0.0-proxy-beta.13",

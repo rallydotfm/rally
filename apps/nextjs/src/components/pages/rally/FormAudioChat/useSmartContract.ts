@@ -22,7 +22,8 @@ export interface TxUi {
   primedRally: any
   setPrimedRally: (rally: any) => void
 }
-
+import useIndexAudioChat from '@hooks/useAddAudioChat.ts'
+import { useState } from 'react'
 export const useStoreTxUi = create<TxUi>((set) => ({
   setDialogVisibility: (visibility: boolean) => set(() => ({ isDialogVisible: visibility })),
   setRallyId: (newId?: string) => set(() => ({ rallyId: newId })),
@@ -47,7 +48,8 @@ export const useStoreTxUi = create<TxUi>((set) => ({
 export function useSmartContract(stateTxUi: TxUi) {
   const account = useAccount()
   const queryClient = useQueryClient()
-
+  const mutationIndexAudioChat = useIndexAudioChat()
+  const [rallyDataToIndex, setRallyDataToIndex] = useState({})
   // Query to create a new audio chat
   const contractWriteNewAudioChat = useContractWrite({
     mode: 'recklesslyUnprepared',
@@ -74,6 +76,20 @@ export function useSmartContract(stateTxUi: TxUi) {
         log[0],
       ).args
 
+      await mutationIndexAudioChat.mutateAsync(
+        //@ts-ignore
+        {
+          audio_event_id,
+          creator: account?.address,
+          is_indexed,
+          start_at,
+          created_at,
+          cid_metadata,
+          current_state,
+          ...rallyDataToIndex,
+        },
+      )
+      setRallyDataToIndex({})
       stateTxUi.setRallyId(audio_event_id)
       queryClient.setQueryData(['audio-chat-metadata', stateTxUi.rallyId], {
         id: audio_event_id,
@@ -119,7 +135,7 @@ export function useSmartContract(stateTxUi: TxUi) {
       const log = data.logs
       //@ts-ignore
       const { is_indexed, start_at, cid_metadata, current_state } = iface.parseLog(log[0]).args
-      queryClient.setQueryData(['audio-chat-metadata', stateTxUi.rallyId], (prev) => ({
+      queryClient.setQueryData(['audio-chat-metadata', stateTxUi.rallyId], (prev: any) => ({
         //@ts-ignore
         ...prev,
         cid: cid_metadata,
@@ -130,6 +146,49 @@ export function useSmartContract(stateTxUi: TxUi) {
         epoch_time_start_at: parseInt(`${start_at}`) * 1000,
         ...stateTxUi.primedRally,
       }))
+      const updatedData = queryClient.getQueryData(['audio-chat-metadata', stateTxUi.rallyId])
+      console.log('updatedDAta', updatedData)
+      await mutationIndexAudioChat.mutateAsync(
+        //@ts-ignore
+        {
+          //@ts-ignore
+          audio_event_id: updatedData.id,
+          //@ts-ignore
+          creator: updatedData.creator,
+          //@ts-ignore
+          is_indexed: updatedData.is_indexed,
+          //@ts-ignore
+          start_at: updatedData.epoch_time_start_at,
+          //@ts-ignore
+          created_at: updatedData.epoch_time_created_at,
+          //@ts-ignore
+          cid_metadata: updatedData.cid,
+          //@ts-ignore
+          current_state: updatedData.state,
+          //@ts-ignore
+          category: updatedData.category,
+          //@ts-ignore
+          description: updatedData.description,
+          //@ts-ignore
+          name: updatedData.name,
+          //@ts-ignore
+          image: updatedData.image,
+          //@ts-ignore
+          is_gated: updatedData.is_gated,
+          //@ts-ignore
+          max_attendees: updatedData.max_attendees,
+          //@ts-ignore
+          language: updatedData.language,
+          //@ts-ignore
+          recording_arweave_transaction_id: updatedData.recording_arweave_transaction_id,
+          //@ts-ignore
+          will_be_recorded: updatedData.will_be_recorded,
+          //@ts-ignore
+          is_nsfw: updatedData.is_nsfw,
+          //@ts-ignore
+          recording_arweave_transaction_id: updatedData.recording_arweave_transaction_id,
+        },
+      )
 
       toast.success('Your rally was updated successfully !')
     },
@@ -238,6 +297,7 @@ export function useSmartContract(stateTxUi: TxUi) {
         //@ts-ignore
         metadata = await mutationUploadJsonFile.mutateAsync(rallyDataJSON)
         stateTxUi.setFileRallyCID(metadata)
+        setRallyDataToIndex(rallyData)
       }
 
       const startAt = getUnixTime(new Date(values.rally_start_at))
@@ -249,6 +309,7 @@ export function useSmartContract(stateTxUi: TxUi) {
         metadata,
         creatorWalletAddress,
         isIndexed,
+        rallyDataToIndex,
       }
     } catch (e) {
       console.error(e)
@@ -268,7 +329,7 @@ export function useSmartContract(stateTxUi: TxUi) {
     try {
       const args = await prepareRallyData(values, false)
       //@ts-ignore
-      const { startAt, metadata, creatorWalletAddress, isIndexed } = args
+      const { startAt, metadata, creatorWalletAddress, isIndexed, rallyData } = args
       await contractWriteNewAudioChat?.writeAsync?.({
         //@ts-ignore
         recklesslySetUnpreparedArgs: [
@@ -302,12 +363,13 @@ export function useSmartContract(stateTxUi: TxUi) {
     contractWriteEditAudioChat.reset()
     mutationUploadImageFile.reset()
     mutationUploadJsonFile.reset()
-    const { id, values } = args
+    const { id, values, created_at, current_state } = args
     stateTxUi.setDialogVisibility(true)
     try {
       const args = await prepareRallyData(values, true)
       //@ts-ignore
       const { startAt, metadata } = args
+      console.log(id, metadata, startAt, values.rally_is_indexed, '', '')
 
       await contractWriteEditAudioChat?.writeAsync?.({
         //@ts-ignore
@@ -319,6 +381,7 @@ export function useSmartContract(stateTxUi: TxUi) {
             is_indexed (bool)
             recording_arweave_transaction_id (string)
             lens_publication_id (string) 
+            
           */
           id,
           metadata,
@@ -328,6 +391,20 @@ export function useSmartContract(stateTxUi: TxUi) {
           '',
         ],
       })
+      console.log(rallyDataToIndex)
+      await mutationIndexAudioChat.mutateAsync(
+        //@ts-ignore
+        {
+          audio_event_id: id,
+          creator: account?.address,
+          is_indexed: values.rally_is_indexed,
+          start_at: startAt,
+          created_at,
+          cid_metadata: metadata,
+          current_state,
+          ...rallyDataToIndex,
+        },
+      )
     } catch (e) {
       console.error(e)
     }
