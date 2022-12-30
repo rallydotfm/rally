@@ -1,7 +1,7 @@
 schema: 'https://api.lens.dev'
-documents: './src/graphql/*.graphql'
+documents: './src/graphql/lens/*.graphql'
 generates:
-  ./src/graphql/generated.ts:
+  ./src/graphql/lens/generated.ts:
     plugins:
       - typescript
       - typescript-operations

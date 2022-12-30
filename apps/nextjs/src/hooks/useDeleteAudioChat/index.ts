@@ -4,6 +4,7 @@ import create from 'zustand'
 import { audioChatABI } from '@rally/abi'
 import { CONTRACT_AUDIO_CHATS } from '@config/contracts'
 import { chainId } from '@config/wagmi'
+import useDeleteAudioChatSupabase, { useUnindexAudioChat } from '@hooks/useUnindexAudioChat'
 
 export interface TxUiDeleteRally {
   isDialogVisible: boolean
@@ -33,6 +34,8 @@ export const useStoreTxUiDeleteRally = create<TxUiDeleteRally>((set) => ({
 }))
 
 export function useDeleteAudioChat(stateTxUiDeleteRally: TxUiDeleteRally, refetch: any) {
+  const mutationUnindexAudioChat = useUnindexAudioChat()
+
   // Query to delete an audio chat
   const contractWriteDeleteAudioChat = useContractWrite({
     mode: 'recklesslyUnprepared',
@@ -55,6 +58,7 @@ export function useDeleteAudioChat(stateTxUiDeleteRally: TxUiDeleteRally, refetc
         await refetch()
 
         stateTxUiDeleteRally.resetState()
+        await mutationUnindexAudioChat.mutateAsync(stateTxUiDeleteRally.rallyId as string)
         toast.success('Your rally was deleted successfully !')
       } catch (e) {
         console.error(e)

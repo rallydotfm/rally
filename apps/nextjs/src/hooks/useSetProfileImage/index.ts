@@ -70,7 +70,7 @@ export function useSetProfileImage(profile: any) {
       }
       const result = await createSetProfileImageUriTypedData(setProfileImageUriRequest)
 
-      const typedData = result.createSetProfileImageURITypedData.typedData
+      const typedData = result?.createSetProfileImageURITypedData?.typedData
       const signedResult = await signTypedDataSetImageProfile.signTypedDataAsync({
         domain: omit(typedData?.domain, '__typename'),
         //@ts-ignore
@@ -79,7 +79,7 @@ export function useSetProfileImage(profile: any) {
         value: omit(typedData?.value, '__typename'),
       })
 
-      const typedDataSignedResult = result.createSetProfileImageURITypedData.typedData
+      const typedDataSignedResult = result?.createSetProfileImageURITypedData?.typedData
 
       const { v, r, s } = splitSignature(signedResult)
       //@ts-ignore
@@ -99,34 +99,13 @@ export function useSetProfileImage(profile: any) {
       })
       //@ts-ignore
       mutationPollTransaction.mutate(tx.hash)
-      await queryClient.invalidateQueries({ queryKey: ['lens-profile-by-wallet-address', profile.ownedBy] })
-      await queryClient.invalidateQueries({ queryKey: ['lens-profile-by-handle', profile.handle] })
-
-      queryClient.setQueryData(['lens-profile-by-handle', profile.handle], () => {
-        return {
-          //@ts-ignore
-          ...profile,
-          picture: {
-            ...profile.picture,
-            original: {
-              ...profile.picture,
-              url: `https://${cid}.ipfs.w3s.link/${file.name}`,
-            },
-          },
-        }
+      await queryClient.invalidateQueries({
+        queryKey: ['lens-profile-by-handle', profile.handle],
+        refetchType: 'active',
       })
-      queryClient.setQueryData(['lens-profile-by-wallet-address', profile.ownedBy], () => {
-        return {
-          //@ts-ignore
-          ...profile,
-          picture: {
-            ...profile.picture,
-            original: {
-              ...profile.picture,
-              url: `https://${cid}.ipfs.w3s.link/${file.name}`,
-            },
-          },
-        }
+      await queryClient.invalidateQueries({
+        queryKey: ['lens-profile-by-wallet-address', profile.ownedBy],
+        refetchType: 'active',
       })
     } catch (e) {
       console.error(e)

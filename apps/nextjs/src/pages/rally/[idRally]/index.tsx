@@ -3,12 +3,12 @@ import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { useGetAudioChatById } from '@hooks/useGetAudioChatById'
 import { IconSpinner } from '@components/Icons'
-import { ROUTE_HOME } from '@config/routes'
+import { ROUTE_HOME, ROUTE_RALLY_PUBLISH_RECORDING } from '@config/routes'
 import { useConnectModal, useChainModal } from '@rainbow-me/rainbowkit'
-import { signOut, useSession } from 'next-auth/react'
+import { useSession } from 'next-auth/react'
 import Link from 'next/link'
 import button from '@components/Button/styles'
-import { ArrowLeftIcon } from '@heroicons/react/20/solid'
+import { ArrowLeftIcon, PlayIcon } from '@heroicons/react/20/solid'
 import Button from '@components/Button'
 import { useAccount, useDisconnect, useNetwork } from 'wagmi'
 import { DICTIONARY_STATES_AUDIO_CHATS } from '@helpers/mappingAudioChatState'
@@ -23,6 +23,12 @@ import CardGuild from '@components/pages/rally/[idRally]/CardGuild'
 import HostProfile from '@components/pages/rally/[idRally]/HostProfile'
 import FormJoinRoomAs from '@components/pages/rally/[idRally]/FormJoinRoomAs'
 import { useStoreHasSignedInWithLens } from '@hooks/useSignInWithLens'
+import { DICTIONARY_LOCALES, DICTIONARY_LOCALES_SIMPLIFIED } from '@helpers/mappingLocales'
+import { DICTIONARY_PROFILE_INTERESTS, DICTIONARY_PROFILE_INTERESTS_CATEGORIES } from '@helpers/mappingProfileInterests'
+import useGetAudioChatPublishedRecording from '@hooks/useGetAudioChatPublishedRecording'
+import useAudioPlayer from '@hooks/usePersistedAudioPlayer'
+import PublishedRecordingLensPublication from '@components/pages/rally/[idRally]/PublishedRecordingLensPublication'
+import PublishedRecordingAbout from '@components/pages/rally/[idRally]/PublishedRecordingAbout'
 
 const Page: NextPage = () => {
   const {
@@ -38,19 +44,24 @@ const Page: NextPage = () => {
   const queryCurrentUserGuildMemberships = useGetGuildMembershipsByWalletAddress(address as `0x${string}`, {
     enabled: address && queryAudioChatMetadata?.data?.access_control?.guilds?.length > 0 ? true : false,
   })
+  const queryPublishedRecording = useGetAudioChatPublishedRecording(
+    idRally as `0x${string}`,
+    queryAudioChatMetadata?.data?.recording,
+  )
   const stateTxUiRallyGoLive = useStoreTxUiGoLiveRally()
   const { onClickGoLive, stateGoLive } = useGoLiveAudioChat(stateTxUiRallyGoLive)
-
+  const setAudioPlayer = useAudioPlayer((state: any) => state.setAudioPlayer)
+  const playedRally = useAudioPlayer((state: any) => state.rally)
   const stateVoiceChat: any = useStoreLiveVoiceChat()
   const rally = useStoreCurrentLiveRally((state: any) => state.rally)
   const setIsSignedIn = useStoreHasSignedInWithLens((state) => state.setIsSignedIn)
   const { disconnect } = useDisconnect()
-
   return (
     <>
       <Head>
         <title>
           {' '}
+          {/* @ts-ignore */}
           {queryAudioChatByIdRawData?.data?.audio_event_id ===
           '0x0000000000000000000000000000000000000000000000000000000000000000'
             ? 'Not found'
@@ -78,6 +89,7 @@ const Page: NextPage = () => {
             {!isReady ||
               queryAudioChatByIdRawData?.status === 'loading' ||
               (queryAudioChatMetadata?.status === 'loading' &&
+                //@ts-ignore
                 queryAudioChatByIdRawData?.data?.audio_event_id !==
                   '0x0000000000000000000000000000000000000000000000000000000000000000' && (
                   <main className="mx-auto pt-8 px-6 animate-appear flex items-center space-i-1ex">
@@ -85,6 +97,7 @@ const Page: NextPage = () => {
                     <p className="font-medium animate-pulse">Loading rally...</p>
                   </main>
                 ))}
+            {/* @ts-ignore */}
             {queryAudioChatByIdRawData?.data?.audio_event_id ===
               '0x0000000000000000000000000000000000000000000000000000000000000000' && (
               <main className="animate-appear">
@@ -100,6 +113,7 @@ const Page: NextPage = () => {
           <>
             {stateVoiceChat?.room?.state && rally?.id === idRally && stateVoiceChat?.room?.state === 'connected' ? (
               <div className="animate-appear h-full">
+                {/* @ts-ignore */}
                 <div className="pb-8 flex gap-4 flex-col 2xs:flex-row leading-loose -mis-8 -mie-6 pis-8 pie-6 border-neutral-4 border-b">
                   {queryAudioChatMetadata?.data?.image && (
                     <div className="relative overflow-hidden w-full 2xs:w-36 aspect-twitter-banner 2xs:aspect-square rounded-md">
@@ -134,11 +148,27 @@ const Page: NextPage = () => {
                 <main className="h-full flex flex-col animate-appear items-center justify-center">
                   <article className="w-full max-w-[24rem]">
                     <header>
-                      <h1 className="text-center text-lg flex flex-col-reverse pb-6 leading-relaxed items-center justify-center font-bold">
-                        <span>{queryAudioChatMetadata?.data?.name}</span>
-                        <span className="text-xs text-neutral-12 uppercase font-semibold">
+                      <h1 className="text-center text-lg flex flex-col pb-4 leading-relaxed items-center justify-center font-bold">
+                        <span className="order-[2]">{queryAudioChatMetadata?.data?.name}</span>
+                        <span className="order-[1] text-xs text-neutral-12 uppercase font-semibold">
                           {queryAudioChatMetadata?.data?.state}
                         </span>
+                        <div className="flex flex-col items-center mt-2 gap-1 text-2xs order-[3]">
+                          {queryAudioChatMetadata?.data?.language && (
+                            <mark className="bg-transparent text-neutral-11 order-[3]">
+                              {/* @ts-ignore */}
+                              {DICTIONARY_LOCALES_SIMPLIFIED?.[queryAudioChatMetadata?.data?.language]}
+                            </mark>
+                          )}
+                          {queryAudioChatMetadata?.data?.category && (
+                            <mark className="bg-neutral-1 text-2xs text-neutral-12 py-0.5 px-2 rounded-md font-medium">
+                              {/* @ts-ignore */}
+                              {DICTIONARY_PROFILE_INTERESTS?.[queryAudioChatMetadata?.data?.category]?.label ??
+                                // @ts-ignore
+                                DICTIONARY_PROFILE_INTERESTS_CATEGORIES?.[queryAudioChatMetadata?.data?.category]}
+                            </mark>
+                          )}
+                        </div>
                       </h1>
                     </header>
                     <div className="bg-neutral-1 pb-6 border rounded-md border-neutral-4">
@@ -204,8 +234,15 @@ const Page: NextPage = () => {
                             </p>
                             <ul className="space-y-10">
                               {queryAudioChatMetadata?.data?.access_control?.guilds?.map((guild: any) => (
-                                <li className="animate-appear" key={`guild-${guild.id}`}>
+                                <li className="animate-appear relative" key={`guild-${guild.guild_id}`}>
                                   <CardGuild guild={guild} />
+                                  <a
+                                    className="absolute inset-0 block w-full h-full z-10 opacity-0"
+                                    target="_blank"
+                                    href={`https://guild.xyz/${guild.guild_id}`}
+                                  >
+                                    View guild page
+                                  </a>
                                 </li>
                               ))}
                             </ul>
@@ -216,13 +253,24 @@ const Page: NextPage = () => {
                         {([
                           DICTIONARY_STATES_AUDIO_CHATS.READY.label,
                           DICTIONARY_STATES_AUDIO_CHATS.PLANNED.label,
+                          DICTIONARY_STATES_AUDIO_CHATS.FINISHED.label,
                         ].includes(queryAudioChatMetadata.data?.state) ||
                           (queryAudioChatMetadata?.data?.state === DICTIONARY_STATES_AUDIO_CHATS.LIVE.label &&
                             stateVoiceChat?.room?.state === 'disconnected')) && (
-                          <div className="mt-4 pt-6 border-t border-neutral-4 px-6 xs:px-8 flex flex-col">
+                          <div
+                            className={`${
+                              [
+                                DICTIONARY_STATES_AUDIO_CHATS.LIVE.label,
+                                DICTIONARY_STATES_AUDIO_CHATS.PLANNED.label,
+                              ].includes(queryAudioChatMetadata.data.state)
+                                ? 'pt-6'
+                                : ''
+                            } mt-4 border-t border-neutral-4 px-6 xs:px-8 flex flex-col`}
+                          >
                             {[
                               DICTIONARY_STATES_AUDIO_CHATS.READY.label,
                               DICTIONARY_STATES_AUDIO_CHATS.PLANNED.label,
+                              DICTIONARY_STATES_AUDIO_CHATS.FINISHED.label,
                             ].includes(queryAudioChatMetadata.data?.state) && (
                               <>
                                 {queryAudioChatMetadata?.data?.state === DICTIONARY_STATES_AUDIO_CHATS.PLANNED.label &&
@@ -242,21 +290,118 @@ const Page: NextPage = () => {
                                       )}
                                     </>
                                   )}
+
                                 {address === queryAudioChatMetadata?.data?.creator && (
                                   <div className="animate-appear mt-5 flex flex-col justify-center">
-                                    <Button
-                                      disabled={rally && rally?.id !== idRally}
-                                      onClick={async () => {
-                                        stateTxUiRallyGoLive.setDialogVisibility(true)
-                                        await onClickGoLive(queryAudioChatMetadata.data?.id)
-                                      }}
-                                    >
-                                      Start live
-                                    </Button>
-                                    {rally && rally?.id !== idRally && (
-                                      <p className="animate-appear text-center text-2xs text-neutral-11 pt-4">
-                                        You're already in a rally - finish/leave it first!
-                                      </p>
+                                    {DICTIONARY_STATES_AUDIO_CHATS.PLANNED.label ===
+                                      queryAudioChatMetadata.data.state && (
+                                      <>
+                                        <Button
+                                          disabled={rally && rally?.id !== idRally}
+                                          onClick={async () => {
+                                            stateTxUiRallyGoLive.setDialogVisibility(true)
+                                            await onClickGoLive(queryAudioChatMetadata.data?.id)
+                                          }}
+                                        >
+                                          Start live
+                                        </Button>
+                                        {rally && rally?.id !== idRally && (
+                                          <p className="animate-appear text-center text-2xs text-neutral-11 pt-4">
+                                            You're already in a rally - finish/leave it first!
+                                          </p>
+                                        )}
+                                      </>
+                                    )}
+                                  </div>
+                                )}
+                                {DICTIONARY_STATES_AUDIO_CHATS.FINISHED.label === queryAudioChatMetadata.data.state && (
+                                  <div className="pt-4  gap-3 flex flex-col justify-center items-center">
+                                    {queryAudioChatMetadata.data.will_be_recorded === false ? (
+                                      <p className="italic text-neutral-11 text-sm">No recordings available.</p>
+                                    ) : (
+                                      <>
+                                        {queryAudioChatMetadata?.data?.creator === address ? (
+                                          <>
+                                            <Link
+                                              href={ROUTE_RALLY_PUBLISH_RECORDING.replace(
+                                                '[idRally]',
+                                                queryAudioChatMetadata.data.id,
+                                              )}
+                                            >
+                                              <a
+                                                className={button({
+                                                  intent: 'primary-ghost',
+                                                  scale: 'sm',
+                                                })}
+                                              >
+                                                Update recording
+                                              </a>
+                                            </Link>
+                                          </>
+                                        ) : (
+                                          <>
+                                            {queryPublishedRecording?.isSuccess &&
+                                              !queryPublishedRecording?.data?.recording_file && (
+                                                <p className="italic text-neutral-11 text-sm">
+                                                  The creator didn't publish any recording yet.
+                                                </p>
+                                              )}
+                                          </>
+                                        )}
+
+                                        {queryPublishedRecording?.isLoading && (
+                                          <div className="mb-6 flex items-center justify-center space-i-1ex">
+                                            <IconSpinner className="text-xs animate-spin" />
+                                            <p className="font-bold animate-pulse">Loading recording...</p>
+                                          </div>
+                                        )}
+
+                                        {queryPublishedRecording?.isSuccess &&
+                                          queryPublishedRecording?.data?.recording_file && (
+                                            <>
+                                              <Button
+                                                disabled={
+                                                  stateVoiceChat?.room.state === 'connected' ||
+                                                  playedRally?.id === idRally
+                                                }
+                                                intent={
+                                                  stateVoiceChat?.room.state === 'connected' ||
+                                                  playedRally?.id === idRally
+                                                    ? 'neutral-ghost'
+                                                    : 'interactive-outline'
+                                                }
+                                                onClick={() => {
+                                                  setAudioPlayer({
+                                                    isOpen: true,
+                                                    trackSrc: queryPublishedRecording?.data?.recording_file,
+                                                    rally: {
+                                                      clickedAt: new Date(),
+                                                      timestamp: 0,
+                                                      name: queryPublishedRecording?.data?.name,
+                                                      imageSrc: queryPublishedRecording?.data?.image,
+                                                      id: idRally,
+                                                      //@ts-ignore
+                                                      lensPublicationId:
+                                                        queryAudioChatMetadata?.data?.lens_publication_id,
+                                                      metadata: queryPublishedRecording?.data,
+                                                    },
+                                                  })
+                                                }}
+                                                scale="sm"
+                                                className="!pis-2 !pie-3"
+                                              >
+                                                {playedRally?.id === idRally ? (
+                                                  <>Playing</>
+                                                ) : (
+                                                  <>
+                                                    <PlayIcon className="w-5 mie-1ex" />
+                                                    Play recording
+                                                  </>
+                                                )}
+                                              </Button>
+                                            </>
+                                          )}
+                                      </>
                                     )}
                                   </div>
                                 )}
@@ -268,7 +413,7 @@ const Page: NextPage = () => {
                                   <>
                                     <Button onClick={openConnectModal}>Connect first</Button>
                                   </>
-                                ) : chain?.unsupported ? (
+                                ) : chain?.unsupported || chain?.id === 1 ? (
                                   <Button onClick={openChainModal}>Switch chain first</Button>
                                 ) : !session ? (
                                   <>
@@ -320,7 +465,10 @@ const Page: NextPage = () => {
                                                     ),
                                                   )
                                                   .filter((role) =>
-                                                    queryCurrentUserGuildMemberships?.data?.roles.includes(role),
+                                                    queryCurrentUserGuildMemberships?.data?.roles.includes(
+                                                      //@ts-ignore
+                                                      parseInt(role),
+                                                    ),
                                                   )?.length > 0 ? (
                                                   <>
                                                     <FormJoinRoomAs
@@ -369,12 +517,33 @@ const Page: NextPage = () => {
                         )}
                       </section>
                     </div>
-                    <footer className="pt-4">
-                      <p className="text-2xs text-center text-neutral-9">
-                        Max. {queryAudioChatMetadata?.data?.max_attendees ?? 100} attendees
-                      </p>
-                    </footer>
+                    {![
+                      DICTIONARY_STATES_AUDIO_CHATS.CANCELLED.label,
+                      DICTIONARY_STATES_AUDIO_CHATS?.FINISHED.label,
+                    ].includes(queryAudioChatMetadata?.data?.state) && (
+                      <footer className="pt-4 animate-appear">
+                        <p className="text-2xs text-center text-neutral-9">
+                          Max. {queryAudioChatMetadata?.data?.max_attendees ?? 100} attendees
+                        </p>
+                      </footer>
+                    )}
                   </article>
+                  {/* @ts-ignore */}
+                  {queryAudioChatMetadata?.isSuccess &&
+                    //@ts-ignore
+                    queryAudioChatByIdRawData?.data?.lens_publication_id === '' &&
+                    queryPublishedRecording?.data?.metadata && (
+                      <PublishedRecordingAbout publication={queryPublishedRecording?.data} />
+                    )}
+                  {/* @ts-ignore */}
+                  {queryAudioChatMetadata?.isSuccess && queryAudioChatByIdRawData?.data?.lens_publication_id !== '' && (
+                    <PublishedRecordingLensPublication
+                      initialContent={queryAudioChatMetadata?.data?.description}
+                      //@ts-ignore
+                      idLensPublication={queryAudioChatByIdRawData?.data?.lens_publication_id}
+                      idRally={idRally as string}
+                    />
+                  )}
                 </main>
               </>
             )}

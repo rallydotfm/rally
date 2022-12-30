@@ -9,6 +9,7 @@ import { utils } from 'ethers'
 import { ROUTE_RALLY_VIEW } from '@config/routes'
 import { useRouter } from 'next/router'
 import { chainId } from '@config/wagmi'
+import useAudioChatChangeState from '@hooks/useAudioChatChangeState'
 
 export interface TxUiGoLiveRally {
   isDialogVisible: boolean
@@ -29,6 +30,8 @@ export const useStoreTxUiGoLiveRally = create<TxUiGoLiveRally>((set) => ({
 }))
 
 export function useGoLiveAudioChat(stateTxUiRallyGoLive: TxUiGoLiveRally) {
+  const mutationChangeStateAudioChat = useAudioChatChangeState()
+
   const { push } = useRouter()
   // Query to create a new audio chat
   const contractWriteAudioChatGoLive = useContractWrite({
@@ -64,7 +67,9 @@ export function useGoLiveAudioChat(stateTxUiRallyGoLive: TxUiGoLiveRally) {
           ...rallyData,
           state: DICTIONARY_STATES_AUDIO_CHATS.LIVE.label,
         }))
-
+        let newState = DICTIONARY_STATES_AUDIO_CHATS.LIVE.label
+        //@ts-ignore
+        await mutationChangeStateAudioChat.mutateAsync({ chatId: audio_event_id, state: newState })
         stateTxUiRallyGoLive.resetState()
         toast.success('Your rally is live !')
         push(ROUTE_RALLY_VIEW.replace('[idRally]', audio_event_id))

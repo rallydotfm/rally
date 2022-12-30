@@ -1,3 +1,4 @@
+import useAudioPlayer from '@hooks/usePersistedAudioPlayer'
 import { trpc } from '@utils/trpc'
 import { createContext, useContext } from 'react'
 import toast from 'react-hot-toast'
@@ -28,9 +29,17 @@ export const useStoreCurrentLiveRally = create((set) => ({
 //@ts-ignore
 export function useConnectToVoiceChat(rally) {
   const state = useStoreLiveVoiceChat()
+  const setAudioPlayer = useAudioPlayer((state) => state.setAudioPlayer)
   const setLiveRally = useStoreCurrentLiveRally((currentLiveRallyState: any) => currentLiveRallyState.setLiveRally)
   const resetState = useStoreCurrentLiveRally((currentLiveRallyState: any) => currentLiveRallyState.resetState)
   const mutationJoinRoom = trpc.credentials.getRoomCredential.useMutation({
+    onMutate() {
+      setAudioPlayer({
+        isOpen: false,
+        rally: undefined,
+        trackSrc: undefined,
+      })
+    },
     async onSuccess(data) {
       try {
         //@ts-ignore

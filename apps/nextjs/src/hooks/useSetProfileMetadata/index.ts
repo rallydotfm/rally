@@ -62,12 +62,13 @@ export function useSetProfileMetadata(profile: any) {
   })
 
   async function updateProfiledMetadata(values: {
-    lens_banner_image_file: { name: any }
-    lens_name: any
-    lens_bio: any
-    lens_location: any
-    lens_twitter_handle: any
-    lens_website: any
+    lens_banner_image_file: { name: string | undefined }
+    lens_banner_image_src: string | undefined
+    lens_name: string | undefined
+    lens_bio: string | undefined
+    lens_location: string | undefined
+    lens_twitter_handle: string | undefined
+    lens_website: string | undefined
   }) {
     mutationPollTransaction.reset()
     try {
@@ -77,15 +78,20 @@ export function useSetProfileMetadata(profile: any) {
         cidBanner = await mutationUploadBannerFile.mutateAsync(values?.lens_banner_image_file)
       }
 
+      const previousProfileAttributes = profile.attributes.filter(
+        (attr: { key: string }) => !['location', 'twitter', 'website'].includes(attr.key),
+      )
       const profileMetadata: any = {
         name: values?.lens_name ?? profile.name,
         bio: values?.lens_bio ?? profile.bio,
         cover_picture:
           cidBanner && values?.lens_banner_image_file?.name
             ? `https://${cidBanner}.ipfs.w3s.link/${values?.lens_banner_image_file?.name}`
-            : profile?.cover_picture ?? '',
+            : values?.lens_banner_image_src && profile?.coverPicture?.original?.url
+            ? profile?.coverPicture?.original?.url
+            : null,
         attributes: [
-          ...profile.attributes,
+          ...previousProfileAttributes,
           {
             traitType: 'string',
             key: 'location',
@@ -152,35 +158,13 @@ export function useSetProfileMetadata(profile: any) {
       })
       //@ts-ignore
       mutationPollTransaction.mutate(tx.hash)
-      await queryClient.invalidateQueries({ queryKey: ['lens-profile-by-wallet-address', profile.ownedBy] })
-      await queryClient.invalidateQueries({ queryKey: ['lens-profile-by-handle', profile.handle] })
-      queryClient.setQueryData(['lens-profile-by-handle', profile.handle], () => {
-        return {
-          //@ts-ignore
-          ...profile,
-          picture: {
-            ...profile.picture,
-            original: {
-              ...profile.picture,
-              url: profileMetadata.cover_picture,
-            },
-          },
-        }
+      await queryClient.invalidateQueries({
+        queryKey: ['lens-profile-by-handle', profile.handle],
+        refetchType: 'active',
       })
-      queryClient.setQueryData(['lens-profile-by-wallet-address', profile.ownedBy], () => {
-        return {
-          //@ts-ignore
-          ...profile,
-          name: profileMetadata.name,
-          bio: profileMetadata.bio,
-          coverPicture: {
-            original: {
-              url: profileMetadata.cover_picture,
-            },
-          },
-          attributes: profileMetadata.attributes,
-          metadata: `https://${metadataCID}.ipfs.w3s.link/data.json`,
-        }
+      await queryClient.invalidateQueries({
+        queryKey: ['lens-profile-by-wallet-address', profile.ownedBy],
+        refetchType: 'active',
       })
     } catch (e) {
       console.error(e)

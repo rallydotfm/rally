@@ -13,7 +13,9 @@ import { usePollTransaction } from '@hooks/usePollTransaction'
 export function useFollowTypedData() {
   const account = useAccount()
   const queryClient = useQueryClient()
-  const queryLensProfile: any = useWalletAddressDefaultLensProfile(account?.address as `0x${string}`, true)
+  const queryLensProfile: any = useWalletAddressDefaultLensProfile(account?.address as `0x${string}`, {
+    enabled: account?.address ? true : false,
+  })
   const signTypedDataFollow = useSignTypedData()
   const contractWriteFollow = useContractWrite({
     mode: 'recklesslyUnprepared',
@@ -164,12 +166,12 @@ export function useFollowTypedData() {
         )
       } else {
         //@ts-ignore
-        toast.error(`Something went wrong: ${result?.error}`)
+        toast.error(`Something went wrong, please try again.`)
       }
     } catch (e) {
       console.error(e)
       //@ts-ignore
-      toast.error(`Something went wrong: ${e?.cause ?? e}`)
+      toast.error(`Something went wrong, please try again.`)
     }
   }
 

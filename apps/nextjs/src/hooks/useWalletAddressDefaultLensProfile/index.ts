@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { getDefaultProfile } from '@services/lens/profile/getDefaultProfile'
 
-export function useWalletAddressDefaultLensProfile(address: string, enabled?: boolean) {
+export function useWalletAddressDefaultLensProfile(address: string, options?: any) {
   const queryLensProfile = useQuery(
     ['lens-profile-by-wallet-address', address],
     async () => {
@@ -17,7 +17,7 @@ export function useWalletAddressDefaultLensProfile(address: string, enabled?: bo
       }
     },
     {
-      enabled: enabled ? enabled : true,
+      ...options,
     },
   )
 

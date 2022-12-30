@@ -1,13 +1,13 @@
 import { Switch } from '@headlessui/react'
 
 export const InputCheckboxToggle = (props: any) => {
-  const { label, helpText, ...rest } = props
+  const { label, helpText, classNameLabel, classNameHelpText, ...rest } = props
   const { checked } = rest
   return (
     <Switch.Group>
       <div className="flex flex-col">
         <div className="flex items-center">
-          <Switch.Label className="order-2 pis-1ex flex flex-col font-bold text-sm">
+          <Switch.Label className={`order-2 pis-1ex flex flex-col font-bold ${classNameLabel ?? 'text-sm'}`}>
             <span className="pie-2">{label}</span>
           </Switch.Label>
           <Switch
@@ -25,7 +25,7 @@ export const InputCheckboxToggle = (props: any) => {
             />
           </Switch>
         </div>
-        {helpText && <span className="text-neutral-11 pt-1 text-2xs">{helpText}</span>}
+        {helpText && <span className={`text-neutral-11 pt-1 ${classNameHelpText ?? 'text-2xs'}`}>{helpText}</span>}
       </div>
     </Switch.Group>
   )

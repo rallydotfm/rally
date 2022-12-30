@@ -1,8 +1,8 @@
-import { HasTxHashBeenIndexedDocument, HasTxHashBeenIndexedRequest } from '@graphql/generated'
-import { client } from '@config/graphql-request'
+import { HasTxHashBeenIndexedDocument, HasTxHashBeenIndexedRequest } from '@graphql/lens/generated'
+import { clientLens } from '@config/graphql-request'
 
 export async function hasTxHashBeenIndexed(request: HasTxHashBeenIndexedRequest) {
-  const result = await client.request(HasTxHashBeenIndexedDocument, {
+  const result = await clientLens.request(HasTxHashBeenIndexedDocument, {
     request: {
       ...request,
     },

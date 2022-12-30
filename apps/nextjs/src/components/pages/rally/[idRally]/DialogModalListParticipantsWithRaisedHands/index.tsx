@@ -3,7 +3,7 @@ import DialogModal from '@components/DialogModal'
 import { useStoreCurrentLiveRally, useStoreLiveVoiceChat } from '@hooks/useVoiceChat'
 import { useEffect, useState } from 'react'
 import { RoomEvent } from 'livekit-client'
-import { HandRaisedIcon } from '@heroicons/react/24/outline'
+import { HandRaisedIcon } from '@heroicons/react/24/solid'
 import type { Participant } from 'livekit-client'
 import useLiveVoiceChatInteractions from '@hooks/useLiveVoiceChatInteractions'
 import { MicrophoneIcon } from '@heroicons/react/20/solid'
@@ -28,7 +28,12 @@ export const DialogModalListParticipantsWithRaisedHands = () => {
   useEffect(() => {
     stateVoiceChat.room?.on(RoomEvent.ParticipantMetadataChanged, (prevMetadata: string, participant: Participant) => {
       const metadata = participant?.metadata !== '' ? JSON.parse(participant?.metadata ?? '') : ''
-      if (metadata?.is_hand_raised) {
+      if (
+        metadata?.is_hand_raised &&
+        listParticipantsWithRaisedHand.filter((p: Participant) => {
+          return p.identity === participant.identity
+        })?.length === 0
+      ) {
         setListParticipantsWithRaisedHand([...listParticipantsWithRaisedHand, participant])
       } else {
         const updatedList = listParticipantsWithRaisedHand.filter((p: Participant) => {
@@ -45,12 +50,18 @@ export const DialogModalListParticipantsWithRaisedHands = () => {
         scale="sm"
         disabled={listParticipantsWithRaisedHand?.length === 0}
         onClick={() => setDialogVisibility(true)}
-        className="pointer-events-auto relative aspect-square w-fit-content"
-        intent="neutral-outline"
+        className="pointer-events-auto relative aspect-square w-14 items-center justify-center !p-0"
+        intent="neutral-outline-solid"
       >
-        <HandRaisedIcon className="w-6" />
+        <HandRaisedIcon
+          className={`${
+            listParticipantsWithRaisedHand?.length > 0 ? '-translate-y-2' : 'translate-y-0'
+          } transition-all w-6`}
+        />
         {listParticipantsWithRaisedHand?.length > 0 && (
-          <span className="text-[0.75rem] font-bold self-end">{listParticipantsWithRaisedHand?.length}</span>
+          <span className="text-[0.725rem] animate-appear absolute font-bold bottom-1 left-0 w-full text-center">
+            {listParticipantsWithRaisedHand?.length}
+          </span>
         )}
       </Button>
       <DialogModal
@@ -58,6 +69,7 @@ export const DialogModalListParticipantsWithRaisedHands = () => {
         isOpen={isDialogVisible}
         setIsOpen={setDialogVisibility}
       >
+        <p className="pt-4 text-xs text-neutral-12 font-medium">The following participants have their hand raised:</p>
         {listParticipantsWithRaisedHand?.length > 0 && (
           <ul className="space-y-6  pt-8">
             {listParticipantsWithRaisedHand?.map((participantWithHandRaised: Participant) => (

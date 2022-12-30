@@ -83,7 +83,9 @@ export const credentialsRouter = router({
             const user_roles = [].concat(...result.map((guild) => guild.roleIds))
             //@ts-ignore
             const guild_allowed_roles = [].concat(...guilds.map((guild) => guild.roles))
-            const is_user_allowed = guild_allowed_roles.filter((role) => user_roles.includes(role))?.length > 0
+            const is_user_allowed =
+              //@ts-ignore
+              guild_allowed_roles.filter((role) => user_roles.includes(parseInt(role)))?.length > 0
             // if the user has the roles
             // they are a listener
             if (is_user_allowed) {

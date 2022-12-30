@@ -1,0 +1,21 @@
+query publications($request: PublicationsQueryRequest!, $profileId: ProfileId) {
+  publications(request: $request) {
+    items {
+      __typename
+      ... on Post {
+        ...PostFields
+        mirrors(by: $profileId)
+      }
+      ... on Comment {
+        ...CommentFields
+        mirrors(by: $profileId)
+      }
+      ... on Mirror {
+        ...MirrorFields
+      }
+    }
+    pageInfo {
+      ...CommonPaginatedResultInfoFields
+    }
+  }
+}

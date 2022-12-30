@@ -9,6 +9,13 @@ import { useStoreLiveVoiceChat } from '@hooks/useVoiceChat'
 import DialogModalListParticipantsWithRaisedHands from '@components/pages/rally/[idRally]/DialogModalListParticipantsWithRaisedHands'
 import useWalletAddressDefaultLensProfile from '@hooks/useWalletAddressDefaultLensProfile'
 import { useStoreHasSignedInWithLens } from '@hooks/useSignInWithLens'
+import DialogModalStageGuide from '@components/pages/rally/[idRally]/DialogModalStageGuide'
+import dynamic from 'next/dynamic'
+import useAudioPlayer from '@hooks/usePersistedAudioPlayer'
+
+const NoSSRToolbarAudioPlayer = dynamic(() => import('./ToolbarAudioPlayer'), {
+  ssr: false,
+})
 
 // The feature below will be disabled until the `updateRoomMetadata` feature is fixed on Livekit server
 // import DialogModalPinItem from '@components/pages/rally/[idRally]/DialogModalPinItem'
@@ -19,18 +26,19 @@ interface LayoutProps {
 export const LayoutBase = (props: LayoutProps) => {
   const { children } = props
   const stateVoiceChat: any = useStoreLiveVoiceChat()
-
   const { address, isConnecting } = useAccount({
     async onDisconnect() {
       await stateVoiceChat?.room?.disconnect()
     },
   })
 
-  const queryCurrentUserLensProfile = useWalletAddressDefaultLensProfile(
-    address as `0x${string}`,
-    address ? true : false,
-  )
+  const queryCurrentUserLensProfile = useWalletAddressDefaultLensProfile(address as `0x${string}`, {
+    enabled: address ? true : false,
+  })
   const isSignedIn = useStoreHasSignedInWithLens((state) => state.isSignedIn)
+  const isPlayerOpen = useAudioPlayer((state) => state.isOpen)
+  const isPlayerReady = useAudioPlayer((state) => state.isReady)
+
   return (
     <div className="relative flex-grow flex flex-col">
       {!isConnecting && !address && <BannerConnectWallet />}
@@ -40,34 +48,58 @@ export const LayoutBase = (props: LayoutProps) => {
         <MobileTopMenu address={address} />
         <div
           className={`pt-5  ${
-            stateVoiceChat?.room.state === 'connected' && !isSignedIn && queryCurrentUserLensProfile?.data?.handle
-              ? 'pb-20 md:pb-56'
+            ((stateVoiceChat?.room.state === 'connected' || isPlayerReady) &&
+              !isSignedIn &&
+              queryCurrentUserLensProfile?.data?.handle) ||
+            isPlayerReady
+              ? 'pb-64'
               : stateVoiceChat?.room.state === 'connected'
-              ? 'pb-20 md:pb-48'
-              : 'pb-12 md:pb-32'
+              ? 'pb-48'
+              : 'pb-32'
           } md:border-x flex flex-col md:border-neutral-4 md:border-solid md:col-span-8 px-3 md:px-6 flex-grow`}
         >
           <p className="w-full text-center text-[0.775rem] pb-8 text-neutral-9">
-            Rally is under heavy development. Bugs may occur - proceed with caution !
+            Rally is under heavy development. Bugs may occur - proceed with caution ! <br />
+            Rally uses WebRTC. Make sure your browser supports this to use Rally !
+            <br />
+            For the best experience on mobile, we recommend using Brave.
           </p>
           {children}
         </div>
         <div
           className={`transition-all ${
-            stateVoiceChat?.room?.localParticipant ? 'z-20 translate-y-0' : 'z-[-1] translate-y-full'
-          } fixed bottom-12 md:bottom-0 w-full pointer-events-none z-20`}
+            isPlayerReady === true ? 'z-30 translate-y-0' : 'z-[-1] translate-y-full'
+          } fixed bottom-12 md:bottom-0 w-full`}
         >
-          {stateVoiceChat?.room?.localParticipant?.permissions?.canPublishData === true && (
-            <div className="grid md:grid-cols-12 px-3 lg:px-6 mb-3 pointer-events-none">
+          <div className="transition-all pointer-events-auto min-h-[6.895rem] border-transparent flex pb-1 pt-2 bg-neutral-1 md:bg-black border-y-neutral-4 border">
+            {isPlayerOpen && <NoSSRToolbarAudioPlayer />}
+          </div>
+        </div>
+        <div
+          className={`transition-all ${
+            stateVoiceChat?.room?.localParticipant ? 'z-30 translate-y-0' : 'z-[-1] translate-y-full'
+          } fixed bottom-12 md:bottom-0 w-full pointer-events-none`}
+        >
+          {stateVoiceChat?.room?.sid !== '' && stateVoiceChat?.room?.state !== 'disconnected' && (
+            <div
+              className={`grid md:grid-cols-12 px-3 lg:px-6 pointer-events-none ${
+                !isSignedIn ? 'mb-3 md:mb-32' : 'mb-3'
+              }`}
+            >
               <div className="flex flex-col md:col-start-2 lg:col-start-3 md:col-end-10 lg:col-end-11 w-fit-content mis-auto items-end space-y-3 ">
-                <DialogModalListParticipantsWithRaisedHands />
-                {/* <DialogModalPinItem /> */}
+                <DialogModalStageGuide />
+                {stateVoiceChat?.room?.localParticipant?.permissions?.canPublishData === true && (
+                  <>
+                    <DialogModalListParticipantsWithRaisedHands />
+                    {/* <DialogModalPinItem /> */}
+                  </>
+                )}
               </div>
             </div>
           )}
           {stateVoiceChat?.room.state === 'connected' && stateVoiceChat?.room?.sid !== '' && (
             <div
-              className={`transition-all pointer-events-auto border-transparent flex py-1 bg-neutral-1 md:bg-black border-y-neutral-4 border`}
+              className={`transition-all pointer-events-auto border-transparent flex pt-1 bg-neutral-1 md:bg-black border-y-neutral-4 border`}
             >
               <ToolbarAudioRoom />
             </div>
@@ -75,8 +107,10 @@ export const LayoutBase = (props: LayoutProps) => {
         </div>
         <div className="hidden md:block md:col-span-1 lg:col-span-2 md:pis-6 pb-6">
           <footer className="flex flex-col md:pt-6 space-y-3 text-2xs text-neutral-11">
-            <a href="https://twitter.com/rallydotfm">Twitter</a>
-            <a rel="noreferrer noopener" href="https://github.com/rallydotfm/rally/">
+            <a target="_blank" rel="noreferrer noopener" href="https://twitter.com/rallydotfm">
+              Twitter
+            </a>
+            <a target="_blank" rel="noreferrer noopener" href="https://github.com/rallydotfm/rally/">
               Github
             </a>
           </footer>

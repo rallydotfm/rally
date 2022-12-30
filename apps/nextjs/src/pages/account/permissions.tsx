@@ -6,10 +6,9 @@ import { useAccount } from 'wagmi'
 import { PermissionsDispatcher } from '@components/pages/account/permissions/PermissionsDispatcher'
 const Page: NextPage = () => {
   const account = useAccount()
-  const queryLensProfile = useWalletAddressDefaultLensProfile(
-    account?.address as `0x${string}`,
-    account?.address ? true : false,
-  )
+  const queryLensProfile = useWalletAddressDefaultLensProfile(account?.address as `0x${string}`, {
+    enabled: account?.address ? true : false,
+  })
   return (
     <>
       <Head>

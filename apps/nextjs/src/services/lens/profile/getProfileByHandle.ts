@@ -1,6 +1,6 @@
-import { client } from '@config/graphql-request'
-import { ProfileDocument } from '@graphql/generated'
-import type { SingleProfileQueryRequest } from '@graphql/generated'
+import { clientLens } from '@config/graphql-request'
+import { ProfileDocument } from '@graphql/lens/generated'
+import type { SingleProfileQueryRequest } from '@graphql/lens/generated'
 
 /**
  * Get Lens profile by handle
@@ -8,7 +8,7 @@ import type { SingleProfileQueryRequest } from '@graphql/generated'
  * @returns Lens profile Profile or `undefined`
  */
 export async function getProfileByHandleRequest(profileRequest: SingleProfileQueryRequest) {
-  const result = await client.request(ProfileDocument, {
+  const result = await clientLens.request(ProfileDocument, {
     request: {
       ...profileRequest,
     },

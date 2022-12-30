@@ -8,11 +8,12 @@ import { useAccount, useNetwork } from 'wagmi'
 
 export const schema = object({
   rally_name: string().trim().min(1),
+  rally_language: string().trim().min(1),
   rally_description: string().trim(),
   rally_max_attendees: number().positive().optional(),
   rally_image_file: any(),
   rally_image_src: string().optional(),
-  rally_category: string(),
+  rally_category: string().trim().min(1),
   rally_start_at: string().refine((value) => value !== '' && !isPast(new Date(value))),
   rally_tags: array(string()),
   rally_has_cohosts: boolean(),
@@ -27,6 +28,7 @@ export const schema = object({
     }),
   ).optional(),
   rally_is_recorded: boolean(),
+  rally_clips_allowed: boolean(),
   rally_is_gated: boolean(),
   rally_is_indexed: boolean(),
   rally_access_control_guilds: array(
@@ -52,7 +54,7 @@ export function useForm(config: { initialValues: any; onSubmit: any }) {
     tagsInput.machine({
       id: 'rally-tags-input',
       addOnPaste: true,
-      disabled: !account?.address || chain?.unsupported ? true : false,
+      disabled: !account?.address || chain?.unsupported || chain?.id === 1 ? true : false,
       value: initialValues?.rally_tags ?? [],
       onChange: (tags: { values: Array<string> }) => {
         //@ts-ignore

@@ -1,10 +1,15 @@
-import { RoomServiceClient } from 'livekit-server-sdk'
+import { EgressClient, EncodedFileType, RoomServiceClient } from 'livekit-server-sdk'
 import { public_procedure, router } from '../trpc'
 import { getToken } from 'next-auth/jwt'
 import { boolean, object, string } from 'zod'
 
 const secret = process.env.NEXTAUTH_SECRET
 const client = new RoomServiceClient(
+  `wss://${process.env.NEXT_PUBLIC_LIVEKIT_URL}`,
+  process.env.LIVEKIT_API_KEY,
+  process.env.LIVEKIT_SECRET_KEY,
+)
+const egressClient = new EgressClient(
   `wss://${process.env.NEXT_PUBLIC_LIVEKIT_URL}`,
   process.env.LIVEKIT_API_KEY,
   process.env.LIVEKIT_SECRET_KEY,
@@ -241,6 +246,84 @@ export const roomRouter = router({
 
         return {
           ok: true,
+        }
+      } catch (e) {
+        console.error(e)
+        return {
+          err: e,
+        }
+      }
+    }),
+
+  start_recording: public_procedure
+    .input(
+      object({
+        id_rally: string(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { id_rally } = input
+
+      try {
+        // get current user wallet address from the session
+        //@ts-ignore
+        const { sub } = await getToken({ req: ctx.req, secret })
+
+        // if not connected, throw an error
+        if (!sub) throw Error('Not connected')
+        const output = {
+          fileType: EncodedFileType.OGG,
+          filepath: `${process.env.S3_RECORDINGS_BASE_KEY as string}/${sub}/${id_rally}/${Math.round(
+            new Date().getTime() / 1000,
+          )}.ogg`,
+          disableManifest: false,
+          s3: {
+            region: 'eu-central-1', // configure this in user preferences later
+            accessKey: process.env.S3_ACCESS_KEY as string,
+            secret: process.env.S3_SECRET_KEY as string,
+            bucket: process.env.S3_BUCKET_NAME as string,
+            endpoint: process.env.S3_ENDPOINT as string,
+          },
+        }
+
+        const response = await egressClient.startRoomCompositeEgress(id_rally, output, {
+          audioOnly: true,
+          layout: 'speaker',
+        })
+
+        return {
+          ok: true,
+          egressID: response?.egressId,
+        }
+      } catch (e) {
+        console.error(e)
+        return {
+          err: e,
+        }
+      }
+    }),
+  stop_recording: public_procedure
+    .input(
+      object({
+        id_egress: string(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { id_egress } = input
+
+      try {
+        // get current user wallet address from the session
+        //@ts-ignore
+        const { sub } = await getToken({ req: ctx.req, secret })
+
+        // if not connected, throw an error
+        if (!sub) throw Error('Not connected')
+
+        const data = await egressClient.stopEgress(id_egress)
+
+        return {
+          ok: true,
+          data,
         }
       } catch (e) {
         console.error(e)

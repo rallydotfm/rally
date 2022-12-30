@@ -6,6 +6,9 @@ import type { RoomState } from '@livekit/react-core'
 import { RadioGroup } from '@headlessui/react'
 import FormRadioGroup from '@components/FormRadioGroup'
 import FormRadioOption from '@components/FormRadioOption'
+import { useEnsIdentity } from '@hooks/useEnsIdentity'
+import { useAccount } from 'wagmi'
+import { IconSpinner } from '@components/Icons'
 
 interface FormJoinRoomAsProps {
   dataAudioChat: any
@@ -20,6 +23,9 @@ export const FormJoinRoomAs = (props: FormJoinRoomAsProps) => {
     queryLensProfile,
     storeForm: { form, errors, isValid, data, setFields, setData },
   }: any = useJoinRoomAs(dataAudioChat)
+  const account = useAccount()
+  const queryEnsIdentity = useEnsIdentity(account?.address as `0x${string}`, {})
+
   return (
     <div className="animate-appear">
       <p className="font-bold text-xs mb-4 text-center">Setup your profile for this rally</p>
@@ -40,10 +46,28 @@ export const FormJoinRoomAs = (props: FormJoinRoomAsProps) => {
                   ),
                 )
               }
+              if (value === 'ens') {
+                setFields('displayName', queryEnsIdentity?.data?.name)
+                if (queryEnsIdentity?.data?.avatar && queryEnsIdentity?.data?.avatar !== null)
+                  setFields(
+                    'avatarUrl',
+                    queryEnsIdentity?.data?.avatar?.replace('ipfs://', 'https://infura-ipfs.io/ipfs/'),
+                  )
+              }
             }}
           >
             <RadioGroup.Label className="sr-only">How should we call you ?</RadioGroup.Label>
             <FormRadioOption value="custom">Use a custom profile</FormRadioOption>
+            <FormRadioOption
+              disabled={
+                queryEnsIdentity?.isLoading || !queryEnsIdentity?.data?.name || queryEnsIdentity?.data?.name === null
+              }
+              value="ens"
+            >
+              Use my ENS identity {queryEnsIdentity?.data && `(${queryEnsIdentity?.data?.name})`}{' '}
+              {queryEnsIdentity?.isLoading && <IconSpinner className="mx-2 animate-spin text-sm" />}
+            </FormRadioOption>
+
             <FormRadioOption disabled={queryLensProfile?.isLoading || !queryLensProfile?.data?.name} value="lens">
               Use my Lens profile
             </FormRadioOption>
@@ -105,7 +129,7 @@ export const FormJoinRoomAs = (props: FormJoinRoomAsProps) => {
           </FormField>
         </fieldset>
         {data()?.avatarUrl !== '' && data()?.displayName !== '' && (
-          <div className="mb-2 ">
+          <div className="mb-6 ">
             <p className="text-center text-neutral-11 text-[0.75rem] pb-2">Your profile</p>
             <div className="animate-appear items-center justify-center flex flex-col">
               <div className="w-20 h-20 rounded-full relative overflow-hidden">

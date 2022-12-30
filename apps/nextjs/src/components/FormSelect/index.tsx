@@ -5,10 +5,11 @@ import styles from './styles.module.css'
 
 interface FormSelectProps extends SelectProps, SystemUiInputProps {
   hasError: boolean
+  classNameInput?: string
 }
 
 export const FormSelect = (props: FormSelectProps) => {
-  const { className, hasError, scale, appearance, children, ...rest } = props
+  const { className, classNameInput, hasError, scale, appearance, children, ...rest } = props
   return (
     <div className={`${className ?? ''} relative`}>
       <select
@@ -17,7 +18,8 @@ export const FormSelect = (props: FormSelectProps) => {
           scale: scale ?? 'default',
           //@ts-ignore
           variant: hasError === true ? 'error' : 'default',
-        })}`}
+          class: `pie-10 ${classNameInput ?? ''}`,
+        })} [&>option]:bg-neutral-5 &[>option]:p-2 `}
         {...rest}
       >
         {children}

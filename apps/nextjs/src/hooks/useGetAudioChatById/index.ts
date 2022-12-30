@@ -1,7 +1,7 @@
 import { useContractRead } from 'wagmi'
 import { contractConfigAudioChat } from '@config/contracts'
 import { useQuery } from '@tanstack/react-query'
-import getAudioChatMetadata from '@services/rally/audioChat/getAudioChatMetadata'
+import getAudioChatMetadata from '@services/rally/ipfs/audioChat/getAudioChatMetadata'
 import toast from 'react-hot-toast'
 import { chainId } from '@config/wagmi'
 
@@ -19,6 +19,7 @@ export function useGetAudioChatById(idAudioChat?: `0x${string}`) {
     },
   })
   const queryAudioChatMetadata = useQuery(
+    //@ts-ignore
     ['audio-chat-metadata', queryAudioChatByIdRawData?.data?.audio_event_id],
     async () => {
       const audioChat = queryAudioChatByIdRawData?.data
@@ -27,8 +28,10 @@ export function useGetAudioChatById(idAudioChat?: `0x${string}`) {
       return metadata
     },
     {
+      refetchOnWindowFocus: false,
       enabled:
         queryAudioChatByIdRawData.status === 'success' &&
+        //@ts-ignore
         queryAudioChatByIdRawData?.data?.audio_event_id !==
           '0x0000000000000000000000000000000000000000000000000000000000000000'
           ? true

@@ -1,6 +1,6 @@
-import { client } from '@config/graphql-request'
-import { AuthenticateDocument } from '@graphql/generated'
-import type { SignedAuthChallenge } from '@graphql/generated'
+import { clientLens } from '@config/graphql-request'
+import { AuthenticateDocument } from '@graphql/lens/generated'
+import type { SignedAuthChallenge } from '@graphql/lens/generated'
 
 /**
  * Allow us to authenticate the user on Lens by generating a JWT token accountToken and a refreshToken.
@@ -10,7 +10,7 @@ import type { SignedAuthChallenge } from '@graphql/generated'
  */
 
 export async function authenticate(signAuthChallengeRequest: SignedAuthChallenge) {
-  const result = await client.request(AuthenticateDocument, {
+  const result = await clientLens.request(AuthenticateDocument, {
     request: {
       ...signAuthChallengeRequest,
     },

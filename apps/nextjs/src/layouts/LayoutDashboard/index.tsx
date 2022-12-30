@@ -19,7 +19,7 @@ export const LayoutDashboard = (props: LayoutProps) => {
             href: ROUTE_DASHBOARD_RALLIES,
           },
           {
-            label: 'Recordings',
+            label: 'Published recordings',
             href: ROUTE_DASHBOARD_RECORDINGS,
           },
         ]}

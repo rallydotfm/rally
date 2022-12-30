@@ -1,8 +1,9 @@
 import { GraphQLClient, request as graphqlRequest } from 'graphql-request'
 import Cookies from 'js-cookie'
-import { API_URL } from './lens'
+import { API_URL as LENS_API_URL } from './lens'
 import { COOKIE_LENS_ACCESS_TOKEN, COOKIE_LENS_REFRESH_TOKEN } from './storage'
-import { RefreshDocument } from '@graphql/generated'
+import { RefreshDocument } from '@graphql/lens/generated'
+import { API_URL_SUBGRAPH_RALLY } from './subgraph'
 
 async function middleware(request: RequestInit) {
   const token = Cookies.get(COOKIE_LENS_ACCESS_TOKEN)
@@ -14,7 +15,7 @@ async function middleware(request: RequestInit) {
   } else {
     const refreshToken = Cookies.get(COOKIE_LENS_REFRESH_TOKEN)
     if (refreshToken) {
-      const refreshResult = await graphqlRequest(API_URL as string, RefreshDocument, {
+      const refreshResult = await graphqlRequest(LENS_API_URL as string, RefreshDocument, {
         request: {
           refreshToken,
         },
@@ -44,4 +45,5 @@ async function middleware(request: RequestInit) {
   }
 }
 //@ts-ignore
-export const client = new GraphQLClient(API_URL as string, { requestMiddleware: middleware })
+export const clientLens = new GraphQLClient(LENS_API_URL as string, { requestMiddleware: middleware })
+export const clientSubgraphRally = new GraphQLClient(API_URL_SUBGRAPH_RALLY as string)

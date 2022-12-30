@@ -18,8 +18,11 @@ const Profile = (props: ProfileProps) => {
         <img
           className="w-full h-full object-cover"
           src={
-            queryLens?.data?.picture?.original?.url?.replace('ipfs://', 'https://lens.infura-ipfs.io/ipfs/') ??
-            `https://avatars.dicebear.com/api/identicon/${address}.svg`
+            queryLens?.data?.picture?.original?.url
+              ? queryLens?.data?.picture?.original?.url.replace('ipfs://', 'https://lens.infura-ipfs.io/ipfs/')
+              : queryEns?.data?.avatar && queryEns?.data?.avatar !== null
+              ? queryEns?.data?.avatar
+              : `https://avatars.dicebear.com/api/identicon/${address}.svg`
           }
           alt=""
         />
@@ -34,7 +37,9 @@ const Profile = (props: ProfileProps) => {
         )}
         <span className="text-[0.9em] font-mono opacity-75 text-ellipsis flex items-center overflow-hidden">
           {queryLens?.status === 'loading' && <IconSpinner className="text-sm text-primary-11 mie-1 animate-spin" />}
-          {queryEns?.data && queryEns?.data !== null ? queryEns?.data : shortenEthereumAddress(address)}
+          {queryEns?.data?.name && queryEns?.data?.name !== null
+            ? queryEns?.data?.name
+            : shortenEthereumAddress(address)}
         </span>
         {status !== 'authenticated' && (
           <>

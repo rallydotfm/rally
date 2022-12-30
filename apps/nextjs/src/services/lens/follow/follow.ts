@@ -1,9 +1,9 @@
-import { CreateFollowTypedDataDocument } from '@graphql/generated'
-import { client } from '@config/graphql-request'
-import type { FollowRequest } from '@graphql/generated'
+import { CreateFollowTypedDataDocument } from '@graphql/lens/generated'
+import { clientLens } from '@config/graphql-request'
+import type { FollowRequest } from '@graphql/lens/generated'
 
-export const createFollowTypedData = async (request: FollowRequest) => {
-  const result = await client.request(CreateFollowTypedDataDocument, {
+export async function createFollowTypedData(request: FollowRequest) {
+  const result = await clientLens.request(CreateFollowTypedDataDocument, {
     request,
   })
 

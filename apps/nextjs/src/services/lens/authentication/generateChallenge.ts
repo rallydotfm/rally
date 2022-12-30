@@ -1,6 +1,6 @@
-import { client } from '@config/graphql-request'
-import { ChallengeDocument } from '@graphql/generated'
-import type { ChallengeRequest } from '@graphql/generated'
+import { clientLens } from '@config/graphql-request'
+import { ChallengeDocument } from '@graphql/lens/generated'
+import type { ChallengeRequest } from '@graphql/lens/generated'
 
 /**
  * Generate a challenge (some text the user has to sign with their wallet to prove their ownership.)
@@ -10,7 +10,7 @@ import type { ChallengeRequest } from '@graphql/generated'
  */
 
 export async function generateChallenge(challengeRequest: ChallengeRequest) {
-  const result = await client.request(ChallengeDocument, {
+  const result = await clientLens.request(ChallengeDocument, {
     request: {
       ...challengeRequest,
     },

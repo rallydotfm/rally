@@ -2,10 +2,10 @@ import type { NextPage } from 'next'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
 import useGetLensProfileByHandle from '@hooks/useGetLensProfileByHandle'
-import Profile from '@components/pages/profile/[handleLensProfile]/Profile'
+import AboutProfile from '@components/pages/profile/[handleLensProfile]/AboutProfile'
 import { useAccount } from 'wagmi'
 import { useStoreHasSignedInWithLens } from '@hooks/useSignInWithLens'
-
+import { getLayout } from '@layouts/LayoutProfile'
 const Page: NextPage = () => {
   const {
     query: { handleLensProfile },
@@ -23,7 +23,9 @@ const Page: NextPage = () => {
         <title>
           {' '}
           {queryLensProfile?.data?.handle
-            ? `${queryLensProfile?.data?.name} (${handleLensProfile}) `
+            ? `${
+                queryLensProfile?.data?.name ?? queryLensProfile?.data?.onChainIdentity?.ens?.name ?? handleLensProfile
+              } (@${handleLensProfile}) `
             : handleLensProfile ?? 'Profile '}
           - Rally
         </title>
@@ -33,27 +35,17 @@ const Page: NextPage = () => {
         />
       </Head>
 
-      {queryLensProfile?.data ? (
+      {queryLensProfile?.data && (
         <>
           {/* @ts-ignore */}
-          <Profile data={queryLensProfile?.data} />
+          <AboutProfile data={queryLensProfile?.data} />
         </>
-      ) : queryLensProfile?.isLoading ? (
-        <>
-          <div className=" w-full h-[30vh] bg-neutral-5 animate-pulse block" />
-          <div className="relative z-10 bg-neutral-5 block -mt-12 rounded-full ring-8 ring-black overflow-hidden w-32 h-32 xs:w-40 xs:h-40" />
-        </>
-      ) : (
-        queryLensProfile?.isError && (
-          <div className="flex flex-col text-center">
-            <p className="text-xs text-neutral-11">
-              Something went wrong and we couldn't fetch the profile associated to {queryLensProfile?.data?.handle}.
-            </p>
-          </div>
-        )
       )}
     </>
   )
 }
+
+//@ts-ignore
+Page.getLayout = getLayout
 
 export default Page

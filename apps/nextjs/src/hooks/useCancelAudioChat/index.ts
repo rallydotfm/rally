@@ -6,6 +6,7 @@ import { CONTRACT_AUDIO_CHATS } from '@config/contracts'
 import { DICTIONARY_STATES_AUDIO_CHATS } from '@helpers/mappingAudioChatState'
 import { useQueryClient } from '@tanstack/react-query'
 import { chainId } from '@config/wagmi'
+import useAudioChatChangeState from '@hooks/useAudioChatChangeState'
 
 export interface TxUiCancelRally {
   isDialogVisible: boolean
@@ -36,6 +37,8 @@ export const useStoreTxUiCancelRally = create<TxUiCancelRally>((set) => ({
 
 export function useCancelAudioChat(stateTxUiCancelRally: TxUiCancelRally) {
   const queryClient = useQueryClient()
+  const mutationChangeStateAudioChat = useAudioChatChangeState()
+
   // Query to create a new audio chat
   const contractWriteCancelAudioChat = useContractWrite({
     mode: 'recklesslyUnprepared',
@@ -66,6 +69,10 @@ export function useCancelAudioChat(stateTxUiCancelRally: TxUiCancelRally) {
           state: DICTIONARY_STATES_AUDIO_CHATS.CANCELLED.label,
         }))
         stateTxUiCancelRally.resetState()
+        let newState = DICTIONARY_STATES_AUDIO_CHATS.CANCELLED.label
+        //@ts-ignore
+        await mutationChangeStateAudioChat.mutateAsync({ chatId: stateTxUiCancelRally.rallyId, state: newState })
+
         toast.success('Your rally was cancelled successfully !')
       } catch (e) {
         console.error(e)

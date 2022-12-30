@@ -1,9 +1,9 @@
-import { client } from '@config/graphql-request'
-import { CreateSetDispatcherTypedDataDocument } from '@graphql/generated'
-import type { SetDispatcherRequest } from '@graphql/generated'
+import { clientLens } from '@config/graphql-request'
+import { CreateSetDispatcherTypedDataDocument } from '@graphql/lens/generated'
+import type { SetDispatcherRequest } from '@graphql/lens/generated'
 
 export async function enableDispatcherWithTypedData(request: SetDispatcherRequest) {
-  const result = await client.request(CreateSetDispatcherTypedDataDocument, {
+  const result = await clientLens.request(CreateSetDispatcherTypedDataDocument, {
     request,
   })
 

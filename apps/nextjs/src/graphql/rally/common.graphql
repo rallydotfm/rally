@@ -1,0 +1,17 @@
+fragment AudioChatFields on AudioChat {
+  id
+  name
+  state
+  category
+  start_at
+  creator
+  cid_metadata
+  is_nsfw
+  is_gated
+  created_at
+  will_be_recorded
+  has_cohosts
+  max_attendees
+  image
+  description
+}

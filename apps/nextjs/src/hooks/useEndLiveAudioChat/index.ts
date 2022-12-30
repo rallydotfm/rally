@@ -11,6 +11,7 @@ import { useRouter } from 'next/router'
 import { chainId } from '@config/wagmi'
 import { useStoreCurrentLiveRally } from '@hooks/useVoiceChat'
 import { trpc } from '@utils/trpc'
+import useAudioChatChangeState from '@hooks/useAudioChatChangeState'
 
 export interface TxUiEndLiveRally {
   isDialogVisible: boolean
@@ -31,6 +32,8 @@ export const useStoreTxUiEndLiveRally = create<TxUiEndLiveRally>((set) => ({
 }))
 
 export function useEndLiveAudioChat(stateTxUiEndLiveRally: TxUiEndLiveRally) {
+  const mutationChangeStateAudioChat = useAudioChatChangeState()
+
   const rally = useStoreCurrentLiveRally((currentLiveRallyState: any) => currentLiveRallyState.rally)
   const resetState = useStoreCurrentLiveRally((currentLiveRallyState: any) => currentLiveRallyState.resetState)
   const mutationEndRoom = trpc.room.end_room.useMutation({
@@ -76,6 +79,9 @@ export function useEndLiveAudioChat(stateTxUiEndLiveRally: TxUiEndLiveRally) {
           ...rallyData,
           state: DICTIONARY_STATES_AUDIO_CHATS.FINISHED.label,
         }))
+        let newState = DICTIONARY_STATES_AUDIO_CHATS.FINISHED.label
+        //@ts-ignore
+        await mutationChangeStateAudioChat.mutateAsync({ chatId: audio_event_id, state: newState })
 
         stateTxUiEndLiveRally.resetState()
         toast.success('Your rally ended successfully !')
