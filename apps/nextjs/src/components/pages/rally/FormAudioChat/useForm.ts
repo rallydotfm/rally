@@ -54,7 +54,7 @@ export function useForm(config: { initialValues: any; onSubmit: any }) {
     tagsInput.machine({
       id: 'rally-tags-input',
       addOnPaste: true,
-      disabled: !account?.address || chain?.unsupported ? true : false,
+      disabled: !account?.address || chain?.unsupported || chain?.id === 1 ? true : false,
       value: initialValues?.rally_tags ?? [],
       onChange: (tags: { values: Array<string> }) => {
         //@ts-ignore

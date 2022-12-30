@@ -3,8 +3,7 @@ import EthereumAddress from '@components/EthereumAddress'
 import { ROUTE_RALLY_VIEW } from '@config/routes'
 import { DICTIONARY_LOCALES_SIMPLIFIED } from '@helpers/mappingLocales'
 import { DICTIONARY_PROFILE_INTERESTS, DICTIONARY_PROFILE_INTERESTS_CATEGORIES } from '@helpers/mappingProfileInterests'
-
-import { isPast, format, formatRelative } from 'date-fns'
+import { formatRelative } from 'date-fns'
 import Link from 'next/link'
 
 interface CardRallyProps {
@@ -22,7 +21,7 @@ interface CardRallyProps {
 export const CardRally = (props: CardRallyProps) => {
   const { data } = props
   return (
-    <article className={`${isPast(data.datetime_start_at) ? 'opacity-50' : ''} relative`}>
+    <article className={`relative`}>
       <div className="flex flex-col space-y-4 xs:flex-row xs:space-y-0 xs:space-i-6">
         {data?.image && (
           <div className="shrink-0 relative w-full overflow-hidden xs:w-20 sm:w-28 aspect-twitter-card xs:aspect-auto xs:grow xs:max-w-56 rounded-t-md xs:rounded-b-md">

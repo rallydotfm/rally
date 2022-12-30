@@ -11,7 +11,14 @@ export function useGetAudioChatPublishedRecording(audioChatId: string, recording
     },
     {
       refetchOnWindowFocus: false,
-      enabled: !audioChatId || audioChatId === '' || recordingMetadataArweaveTxId === '' ? false : true,
+      enabled:
+        !audioChatId ||
+        audioChatId === '' ||
+        recordingMetadataArweaveTxId === null ||
+        !recordingMetadataArweaveTxId ||
+        recordingMetadataArweaveTxId === ''
+          ? false
+          : true,
     },
   )
 

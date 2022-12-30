@@ -8,7 +8,7 @@ import { useConnectModal, useChainModal } from '@rainbow-me/rainbowkit'
 import { useSession } from 'next-auth/react'
 import Link from 'next/link'
 import button from '@components/Button/styles'
-import { ArrowLeftIcon, PauseIcon, PlayIcon } from '@heroicons/react/20/solid'
+import { ArrowLeftIcon, PlayIcon } from '@heroicons/react/20/solid'
 import Button from '@components/Button'
 import { useAccount, useDisconnect, useNetwork } from 'wagmi'
 import { DICTIONARY_STATES_AUDIO_CHATS } from '@helpers/mappingAudioChatState'
@@ -23,10 +23,12 @@ import CardGuild from '@components/pages/rally/[idRally]/CardGuild'
 import HostProfile from '@components/pages/rally/[idRally]/HostProfile'
 import FormJoinRoomAs from '@components/pages/rally/[idRally]/FormJoinRoomAs'
 import { useStoreHasSignedInWithLens } from '@hooks/useSignInWithLens'
-import { DICTIONARY_LOCALES_SIMPLIFIED } from '@helpers/mappingLocales'
+import { DICTIONARY_LOCALES, DICTIONARY_LOCALES_SIMPLIFIED } from '@helpers/mappingLocales'
 import { DICTIONARY_PROFILE_INTERESTS, DICTIONARY_PROFILE_INTERESTS_CATEGORIES } from '@helpers/mappingProfileInterests'
 import useGetAudioChatPublishedRecording from '@hooks/useGetAudioChatPublishedRecording'
 import useAudioPlayer from '@hooks/usePersistedAudioPlayer'
+import PublishedRecordingLensPublication from '@components/pages/rally/[idRally]/PublishedRecordingLensPublication'
+import PublishedRecordingAbout from '@components/pages/rally/[idRally]/PublishedRecordingAbout'
 
 const Page: NextPage = () => {
   const {
@@ -50,12 +52,10 @@ const Page: NextPage = () => {
   const { onClickGoLive, stateGoLive } = useGoLiveAudioChat(stateTxUiRallyGoLive)
   const setAudioPlayer = useAudioPlayer((state: any) => state.setAudioPlayer)
   const playedRally = useAudioPlayer((state: any) => state.rally)
-
   const stateVoiceChat: any = useStoreLiveVoiceChat()
   const rally = useStoreCurrentLiveRally((state: any) => state.rally)
   const setIsSignedIn = useStoreHasSignedInWithLens((state) => state.setIsSignedIn)
   const { disconnect } = useDisconnect()
-
   return (
     <>
       <Head>
@@ -148,7 +148,7 @@ const Page: NextPage = () => {
                 <main className="h-full flex flex-col animate-appear items-center justify-center">
                   <article className="w-full max-w-[24rem]">
                     <header>
-                      <h1 className="text-center text-lg flex flex-col pb-6 leading-relaxed items-center justify-center font-bold">
+                      <h1 className="text-center text-lg flex flex-col pb-4 leading-relaxed items-center justify-center font-bold">
                         <span className="order-[2]">{queryAudioChatMetadata?.data?.name}</span>
                         <span className="order-[1] text-xs text-neutral-12 uppercase font-semibold">
                           {queryAudioChatMetadata?.data?.state}
@@ -375,9 +375,15 @@ const Page: NextPage = () => {
                                                     isOpen: true,
                                                     trackSrc: queryPublishedRecording?.data?.recording_file,
                                                     rally: {
+                                                      clickedAt: new Date(),
+                                                      timestamp: 0,
                                                       name: queryPublishedRecording?.data?.name,
                                                       imageSrc: queryPublishedRecording?.data?.image,
                                                       id: idRally,
+                                                      //@ts-ignore
+                                                      lensPublicationId:
+                                                        queryAudioChatMetadata?.data?.lens_publication_id,
+                                                      metadata: queryPublishedRecording?.data,
                                                     },
                                                   })
                                                 }}
@@ -407,7 +413,7 @@ const Page: NextPage = () => {
                                   <>
                                     <Button onClick={openConnectModal}>Connect first</Button>
                                   </>
-                                ) : chain?.unsupported ? (
+                                ) : chain?.unsupported || chain?.id === 1 ? (
                                   <Button onClick={openChainModal}>Switch chain first</Button>
                                 ) : !session ? (
                                   <>
@@ -511,12 +517,33 @@ const Page: NextPage = () => {
                         )}
                       </section>
                     </div>
-                    <footer className="pt-4">
-                      <p className="text-2xs text-center text-neutral-9">
-                        Max. {queryAudioChatMetadata?.data?.max_attendees ?? 100} attendees
-                      </p>
-                    </footer>
+                    {![
+                      DICTIONARY_STATES_AUDIO_CHATS.CANCELLED.label,
+                      DICTIONARY_STATES_AUDIO_CHATS?.FINISHED.label,
+                    ].includes(queryAudioChatMetadata?.data?.state) && (
+                      <footer className="pt-4 animate-appear">
+                        <p className="text-2xs text-center text-neutral-9">
+                          Max. {queryAudioChatMetadata?.data?.max_attendees ?? 100} attendees
+                        </p>
+                      </footer>
+                    )}
                   </article>
+                  {/* @ts-ignore */}
+                  {queryAudioChatMetadata?.isSuccess &&
+                    //@ts-ignore
+                    queryAudioChatByIdRawData?.data?.lens_publication_id === '' &&
+                    queryPublishedRecording?.data?.metadata && (
+                      <PublishedRecordingAbout publication={queryPublishedRecording?.data} />
+                    )}
+                  {/* @ts-ignore */}
+                  {queryAudioChatMetadata?.isSuccess && queryAudioChatByIdRawData?.data?.lens_publication_id !== '' && (
+                    <PublishedRecordingLensPublication
+                      initialContent={queryAudioChatMetadata?.data?.description}
+                      //@ts-ignore
+                      idLensPublication={queryAudioChatByIdRawData?.data?.lens_publication_id}
+                      idRally={idRally as string}
+                    />
+                  )}
                 </main>
               </>
             )}

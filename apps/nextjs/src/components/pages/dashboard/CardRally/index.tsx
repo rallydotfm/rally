@@ -62,6 +62,8 @@ export const CardRally = (props: CardRallyProps) => {
         isOpen: true,
         trackSrc: mutationData,
         rally: {
+          clickedAt: new Date(),
+          timestamp: 0,
           name: data?.name,
           imageSrc: data?.image,
           id: data?.id,
@@ -82,6 +84,7 @@ export const CardRally = (props: CardRallyProps) => {
       link.parentNode.removeChild(link)
     },
   })
+
   return (
     <div
       className={`focus-within:ring-4 focus-within:ring-interactive-11 xs:pt-2 pb-3 md:pb-4 xs:pis-2 xs:pie-4 rounded-md bg-neutral-1`}
@@ -181,9 +184,14 @@ export const CardRally = (props: CardRallyProps) => {
                                 isOpen: true,
                                 trackSrc: queryPublishedRecording?.data?.recording_file,
                                 rally: {
+                                  clickedAt: new Date(),
+                                  timestamp: 0,
                                   name: queryPublishedRecording?.data?.name,
                                   imageSrc: queryPublishedRecording?.data?.image,
                                   id: data?.id,
+                                  //@ts-ignore
+                                  lensPublicationId: data?.lens_publication_id,
+                                  metadata: queryPublishedRecording?.data,
                                 },
                               })
                             }}

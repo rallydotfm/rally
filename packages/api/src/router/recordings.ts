@@ -111,6 +111,7 @@ export const recordingsRouter = router({
             size: stored_file?.Size,
           }
         })?.filter((obj) => !obj?.name?.includes('.json'))
+
         return list
       } catch (e) {
         console.error(e)

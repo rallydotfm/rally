@@ -32,7 +32,7 @@ export const FormEditProfile = (props: FormEditProfileProps) => {
             </FormField.Label>
             <FormField.Description id="input-lens_name-description">Your display name.</FormField.Description>
             <FormInput
-              disabled={!account?.address || chain?.unsupported === true}
+              disabled={!account?.address || chain?.unsupported === true || chain?.id === 1}
               hasError={errors()?.lens_name?.length > 0 ? true : false}
               placeholder="Eg: Jean Doe"
               name="lens_name"
@@ -52,7 +52,7 @@ export const FormEditProfile = (props: FormEditProfileProps) => {
             </FormField.Label>
             <FormField.Description id="input-lens_bio-description">A few words about you.</FormField.Description>
             <FormTextarea
-              disabled={!account?.address || chain?.unsupported === true}
+              disabled={!account?.address || chain?.unsupported === true || chain?.id === 1}
               rows={7}
               hasError={errors()?.lens_bio?.length > 0 ? true : false}
               placeholder="Eg: Underslept developer."
@@ -73,7 +73,7 @@ export const FormEditProfile = (props: FormEditProfileProps) => {
             </FormField.Label>
             <FormField.Description id="input-lens_location-description">Where you hail from.</FormField.Description>
             <FormInput
-              disabled={!account?.address || chain?.unsupported === true}
+              disabled={!account?.address || chain?.unsupported === true || chain?.id === 1}
               hasError={errors()?.lens_location?.length > 0 ? true : false}
               placeholder="Eg: Planet Earth"
               name="lens_location"
@@ -97,7 +97,7 @@ export const FormEditProfile = (props: FormEditProfileProps) => {
             </FormField.Label>
             <FormField.Description id="input-lens_website-description">Your online hide-out.</FormField.Description>
             <FormInput
-              disabled={!account?.address || chain?.unsupported === true}
+              disabled={!account?.address || chain?.unsupported === true || chain?.id === 1}
               hasError={errors()?.lens_website?.length > 0 ? true : false}
               placeholder="https://..."
               name="lens_website"
@@ -127,7 +127,7 @@ export const FormEditProfile = (props: FormEditProfileProps) => {
               Your @ on the blue bird app.
             </FormField.Description>
             <FormInput
-              disabled={!account?.address || chain?.unsupported === true}
+              disabled={!account?.address || chain?.unsupported === true || chain?.id === 1}
               hasError={errors()?.lens_twitter_handle?.length > 0 ? true : false}
               placeholder="Eg: coolTwitterHandle999"
               name="lens_twitter_handle"
@@ -168,7 +168,7 @@ export const FormEditProfile = (props: FormEditProfileProps) => {
               <div className="mt-3 relative lg:mt-0">
                 <div className="w-full lg:w-96 aspect-twitter-card rounded-md overflow-hidden relative bg-neutral-1">
                   <input
-                    disabled={!account?.address || chain?.unsupported === true}
+                    disabled={!account?.address || chain?.unsupported === true || chain?.id === 1}
                     onChange={(e) => {
                       //@ts-ignore
                       const src = URL.createObjectURL(e.target.files[0])
@@ -200,7 +200,7 @@ export const FormEditProfile = (props: FormEditProfileProps) => {
 
                 {data()?.lens_banner_image_src && (
                   <Button
-                    disabled={!account?.address || chain?.unsupported === true}
+                    disabled={!account?.address || chain?.unsupported === true || chain?.id === 1}
                     type="button"
                     className="mt-2 w-full"
                     intent="negative-ghost"

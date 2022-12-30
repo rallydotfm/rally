@@ -1,11 +1,13 @@
-query publication($request: PublicationQueryRequest!) {
+query publication($request: PublicationQueryRequest!, $profileId: ProfileId) {
   publication(request: $request) {
     __typename
     ... on Post {
       ...PostFields
+      mirrors(by: $profileId)
     }
     ... on Comment {
       ...CommentFields
+      mirrors(by: $profileId)
     }
     ... on Mirror {
       ...MirrorFields

@@ -30,8 +30,13 @@ export function useLiveVoiceChatRecordRoom(options?: {
 
   const mutationStartRecording = trpc?.room.start_recording.useMutation({
     onSuccess(data) {
-      setOngoingRecordingId(data?.egressID?.egressId)
-      toast('Recording in progress...')
+      if (data?.egressID) {
+        setOngoingRecordingId(data?.egressID)
+        toast('Recording in progress...')
+      } else {
+        console.error(data)
+        toast.error("Something went wrong and we couldn't start the recording, please try again.")
+      }
     },
   })
   const mutationStopRecording = trpc?.room.stop_recording.useMutation({

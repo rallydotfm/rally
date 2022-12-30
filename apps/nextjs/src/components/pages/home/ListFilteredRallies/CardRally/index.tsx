@@ -1,10 +1,10 @@
-import BadgeRallyState from '@components/BadgeRallyState'
 import EthereumAddress from '@components/EthereumAddress'
 import { ROUTE_RALLY_VIEW } from '@config/routes'
+import { DICTIONARY_STATES_AUDIO_CHATS } from '@helpers/mappingAudioChatState'
 import { DICTIONARY_LOCALES_SIMPLIFIED } from '@helpers/mappingLocales'
 import { DICTIONARY_PROFILE_INTERESTS, DICTIONARY_PROFILE_INTERESTS_CATEGORIES } from '@helpers/mappingProfileInterests'
 
-import { isPast, format, formatRelative } from 'date-fns'
+import { formatRelative } from 'date-fns'
 import Link from 'next/link'
 
 interface CardRallyProps {
@@ -23,19 +23,21 @@ export const CardRally = (props: CardRallyProps) => {
   const { data } = props
   return (
     <article
-      className={`${
-        isPast(data.datetime_start_at) ? 'opacity-50' : ''
-      } bg-neutral-1 hover:bg-neutral-2 focus:bg-neutral-3 border-neutral-4 border p-6 rounded-xl h-full relative`}
+      className={`bg-neutral-1 hover:bg-neutral-2 focus:bg-neutral-3 border-neutral-4 border p-6 rounded-xl h-full relative`}
     >
       <div className="flex flex-col space-y-4 xs:flex-row xs:space-y-0 xs:space-i-6">
         <div className="px-4 flex-grow flex flex-col xs:px-0">
           <h1 className="font-bold flex flex-col-reverse">
             <span className="py-2">{data?.name}</span>
-            <div className="flex gap-3">
-              <span className="font-semibold text-neutral-11 text-2xs ">
-                {formatRelative(data.datetime_start_at, new Date())}
-              </span>
-            </div>
+            {[DICTIONARY_STATES_AUDIO_CHATS.PLANNED.label, DICTIONARY_STATES_AUDIO_CHATS.READY.label].includes(
+              data?.state,
+            ) && (
+              <div className="flex gap-3">
+                <span className="font-semibold text-neutral-11 text-2xs ">
+                  {formatRelative(data.datetime_start_at, new Date())}
+                </span>
+              </div>
+            )}
           </h1>
           <div className="flex flex-wrap items-center mt-2 gap-x-4 gap-y-2 text-2xs">
             {/* @ts-ignore */}

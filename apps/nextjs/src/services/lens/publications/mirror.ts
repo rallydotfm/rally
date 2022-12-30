@@ -9,3 +9,5 @@ export async function createMirrorTypedData(request: CreateMirrorRequest) {
 
   return result
 }
+
+export default createMirrorTypedData

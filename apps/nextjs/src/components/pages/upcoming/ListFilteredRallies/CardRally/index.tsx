@@ -1,6 +1,6 @@
 import BadgeRallyState from '@components/BadgeRallyState'
 import { ROUTE_RALLY_VIEW } from '@config/routes'
-import { isPast, format, formatRelative } from 'date-fns'
+import { formatRelative } from 'date-fns'
 import Link from 'next/link'
 
 interface CardRallyProps {
@@ -17,7 +17,7 @@ interface CardRallyProps {
 export const CardRally = (props: CardRallyProps) => {
   const { data } = props
   return (
-    <article className={`${isPast(data.datetime_start_at) ? 'opacity-50' : ''} relative`}>
+    <article className={`relative`}>
       <span className="font-bold block mb-2">{formatRelative(data.datetime_start_at, new Date())}</span>
       <div className="flex flex-col space-y-4 xs:flex-row xs:space-y-0 xs:space-i-6">
         {data?.image && (

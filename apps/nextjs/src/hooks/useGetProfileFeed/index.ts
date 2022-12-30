@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import { getProfileFeedRequest } from '@services/lens/feed/getProfileFeed'
 
 export function useGetProfileFeed(profileId: string, options: any) {
-  const getProfileFeed = useQuery(
+  const queryProfileFeed = useQuery(
     ['profile-feed', profileId],
     async () => {
       try {
@@ -22,7 +22,7 @@ export function useGetProfileFeed(profileId: string, options: any) {
     },
   )
 
-  return getProfileFeed
+  return queryProfileFeed
 }
 
 export default useGetProfileFeed

@@ -25,6 +25,9 @@ export const button = cva(
         'primary-ghost': [
           'border-transparent bg-primary-10 bg-opacity-0 text-primary-10 hover:bg-opacity-10 focus:border-transparent focus:bg-opacity-100 focus:text-primary-1',
         ],
+        'interactive-ghost': [
+          'border-transparent bg-interactive-10 bg-opacity-0 text-interactive-10 hover:bg-opacity-10 focus:border-transparent focus:bg-opacity-100 focus:text-interactive-1',
+        ],
         'interactive-outline': [
           'bg-transparent hover:bg-interactive-3 focus:bg-interactive-11 hover:focus:bg-opacity-95',
           'text-neutral-12 focus:text-interactive-3',

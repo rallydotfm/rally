@@ -128,6 +128,3 @@ export const createStoreIndexedAudioChatsFilters = () =>
     ...initialState,
     order: AUDIO_CHATS_SORT_ORDER[0]?.value.split('.') as [string, string],
   }))
-
-export const useStoreSortAndFilterQueryAllRallies = createStoreIndexedAudioChatsFilters()
-export const useStoreSortAndFilterQueryUpcomingRallies = createStoreIndexedAudioChatsFilters()

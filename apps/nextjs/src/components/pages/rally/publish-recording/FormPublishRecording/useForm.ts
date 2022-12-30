@@ -11,7 +11,7 @@ export const schema = object({
   recording_description: string().trim(),
   recording_image_src: string().optional(),
   recording_is_nsfw: boolean(),
-  recording_publish_on_lens: boolean(),
+  publish_on_lens: boolean(),
   recording_category: string().trim().min(1),
   recording_tags: array(string()),
 })
@@ -31,7 +31,7 @@ export function useForm(config: { initialValues: any; onSubmit: any }) {
     tagsInput.machine({
       id: 'recording-tags-input',
       addOnPaste: true,
-      disabled: !account?.address || chain?.unsupported ? true : false,
+      disabled: !account?.address || chain?.unsupported || chain?.id === 1 ? true : false,
       value: initialValues?.recording_tags ?? [],
       onChange: (tags: { values: Array<string> }) => {
         //@ts-ignore

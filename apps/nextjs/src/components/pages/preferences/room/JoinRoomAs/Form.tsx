@@ -5,12 +5,17 @@ import { RadioGroup } from '@headlessui/react'
 import FormRadioGroup from '@components/FormRadioGroup'
 import FormRadioOption from '@components/FormRadioOption'
 import useConfigureJoinRoomAs from './useConfigureJoinRoomAs'
+import { useAccount } from 'wagmi'
+import { useEnsIdentity } from '@hooks/useEnsIdentity'
+import { IconSpinner } from '@components/Icons'
 
 export const FormConfigureJoinRoomAs = () => {
   const {
     queryLensProfile,
     storeForm: { form, errors, isValid, data, setFields, setData },
   }: any = useConfigureJoinRoomAs()
+  const account = useAccount()
+  const queryEnsIdentity = useEnsIdentity(account?.address as `0x${string}`, {})
   return (
     <div>
       <form className="flex flex-col" ref={form}>
@@ -31,10 +36,28 @@ export const FormConfigureJoinRoomAs = () => {
                     ),
                   )
                 }
+                if (value === 'ens') {
+                  setFields('displayName', queryEnsIdentity?.data?.name)
+                  if (queryEnsIdentity?.data?.avatar && queryEnsIdentity?.data?.avatar !== null)
+                    setFields(
+                      'avatarUrl',
+                      queryEnsIdentity?.data?.avatar?.replace('ipfs://', 'https://infura-ipfs.io/ipfs/'),
+                    )
+                }
               }}
             >
               <RadioGroup.Label className="sr-only">How should we call you ?</RadioGroup.Label>
               <FormRadioOption value="custom">Use a custom profile</FormRadioOption>
+              <FormRadioOption
+                disabled={
+                  queryEnsIdentity?.isLoading || !queryEnsIdentity?.data?.name || queryEnsIdentity?.data?.name === null
+                }
+                value="ens"
+              >
+                Use my ENS identity {queryEnsIdentity?.data && `(${queryEnsIdentity?.data?.name})`}{' '}
+                {queryEnsIdentity?.isLoading && <IconSpinner className="mx-2 animate-spin text-sm" />}
+              </FormRadioOption>
+
               <FormRadioOption disabled={queryLensProfile?.isLoading || !queryLensProfile?.data?.name} value="lens">
                 Use my Lens profile
               </FormRadioOption>
@@ -53,7 +76,6 @@ export const FormConfigureJoinRoomAs = () => {
                 <FormInput
                   type="text"
                   required
-                  disabled={data()?.useLensProfile === true}
                   hasError={errors()?.displayName !== null ? true : false}
                   name="displayName"
                   scale="sm"
@@ -83,7 +105,6 @@ export const FormConfigureJoinRoomAs = () => {
 
                 <FormInput
                   type="url"
-                  disabled={data()?.useLensProfile === true}
                   hasError={errors()?.avatarUrl !== null ? true : false}
                   name="avatarUrl"
                   scale="sm"

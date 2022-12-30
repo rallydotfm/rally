@@ -5,7 +5,7 @@ import useIndexedAudioChats from '@hooks/useIndexedAudioChats'
 import { useStorePersistedInterests } from '@hooks/usePersistedInterests'
 import { createStoreIndexedAudioChatsFilters } from '@hooks/useStoreIndexedAudioChatsFilters'
 import useWalletAddressDefaultLensProfile from '@hooks/useWalletAddressDefaultLensProfile'
-import { endOfToday, getUnixTime, startOfToday, startOfWeek } from 'date-fns'
+import { addYears, endOfToday, getUnixTime, startOfToday } from 'date-fns'
 import { useAccount } from 'wagmi'
 
 const PER_PAGE = 16
@@ -143,7 +143,7 @@ export function useGetHomeAudioChatsSelectionFromRESTIndexer() {
       creator: '',
       name: '',
       nsfw: showNSFW === true ? [true, false] : [false],
-      gated: [false],
+      gated: [false, true],
       states: [DICTIONARY_STATES_AUDIO_CHATS.PLANNED.value],
       orderBy: order[0],
       orderDirection: order[1],
@@ -165,7 +165,7 @@ export function useGetHomeAudioChatsSelectionFromRESTIndexer() {
           ? queryLensProfile?.data?.interests
           : interests?.[account?.address as `0x${string}`]?.length > 0
           ? interests?.[account?.address as `0x${string}`]
-          : queryListInterests.data?.filter((data) => !data?.includes('__')),
+          : queryListInterests.data,
       creator: '',
       name: '',
       nsfw: showNSFW === true ? [true, false] : [false],
@@ -173,8 +173,9 @@ export function useGetHomeAudioChatsSelectionFromRESTIndexer() {
       states: [DICTIONARY_STATES_AUDIO_CHATS.LIVE.value],
       orderBy: order[0],
       orderDirection: order[1],
-      start_at_min: getUnixTime(startOfWeek(new Date())),
-      start_at_max: getUnixTime(endOfToday()),
+      //@ts-ignore
+      start_at_min: getUnixTime(new Date(null)),
+      start_at_max: getUnixTime(addYears(new Date(), 100)),
     },
     {
       enabled: queryListInterests?.data?.length ?? [].length > 0 ? true : false,

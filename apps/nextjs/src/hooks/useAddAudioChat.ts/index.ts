@@ -10,7 +10,7 @@ export function useIndexAudioChat() {
     {
       onError(e) {
         console.error(e)
-        toast.error('Your rally couldn"t be indexed.')
+        toast.error("Your rally couldn't be indexed.")
       },
     },
   )

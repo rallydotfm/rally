@@ -15,6 +15,8 @@ import { useStoreHasSignedInWithLens } from '@hooks/useSignInWithLens'
 import useGetFollowing from '@hooks/useGetFollowing'
 import { useAccount } from 'wagmi'
 import useDoesFollow from '@hooks/useDoesFollow'
+import { useEnsIdentity } from '@hooks/useEnsIdentity'
+import { CheckBadgeIcon } from '@heroicons/react/20/solid'
 
 export interface ParticipantToDisplay {
   isDialogVisible: boolean
@@ -47,6 +49,7 @@ export const DialogModalDisplayParticipant = () => {
   const isDialogVisible = useStoreDisplayParticipant((state) => state.isDialogVisible)
   const setDialogVisibility = useStoreDisplayParticipant((state) => state.setDialogVisibility)
   const pickedParticipant = useStoreDisplayParticipant((state) => state.participant)
+
   const account = useAccount()
   const {
     room: { localParticipant, ...dataRoom },
@@ -64,6 +67,9 @@ export const DialogModalDisplayParticipant = () => {
   const queryUserAddressFollowers = useGetFollowing(pickedParticipant?.identity as `0x${string}`, {
     enabled: pickedParticipant?.identity ? true : false,
   })
+  //@ts-ignore
+  const queryEnsIdentity = useEnsIdentity(pickedParticipant?.identity, {})
+
   const isSignedIn = useStoreHasSignedInWithLens((state) => state.isSignedIn)
   const doesFollow = useDoesFollow(queryPickedParticipantLensProfile?.data?.id)
 
@@ -87,9 +93,17 @@ export const DialogModalDisplayParticipant = () => {
                 identity={pickedParticipant?.identity as string}
               />
             </p>
-            {queryPickedParticipantLensProfile?.data?.handle && (
-              <p className="mt-1 text-2xs text-neutral-9">{queryPickedParticipantLensProfile?.data?.handle}</p>
-            )}
+            <div className="mt-1 flex items-center text-2xs flex-wrap gap-y-1 gap-x-3">
+              {queryPickedParticipantLensProfile?.data?.handle && (
+                <p className=" text-neutral-9">{queryPickedParticipantLensProfile?.data?.handle}</p>
+              )}
+              {queryEnsIdentity?.data?.name && (
+                <p className="w-fit-content flex items-center font-mono font-medium bg-primary-1  py-0.5 px-1.5 text-[0.85em] rounded-md text-primary-11">
+                  <CheckBadgeIcon className="w-[1.15rem] text-primary-10 mie-2" /> {queryEnsIdentity?.data?.name}
+                </p>
+              )}
+            </div>
+
             {/* @ts-ignore */}
             {pickedParticipant?.isLocal && (
               <mark className="font-bold bg-transparent w-fit-content bg-interactive-12 px-2 py-1 text-interactive-11 rounded-md mt-1.5 flex text-[0.75rem]">

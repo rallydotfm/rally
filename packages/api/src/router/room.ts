@@ -286,13 +286,14 @@ export const roomRouter = router({
           },
         }
 
-        const egressID = await egressClient.startRoomCompositeEgress(id_rally, output, {
+        const response = await egressClient.startRoomCompositeEgress(id_rally, output, {
           audioOnly: true,
           layout: 'speaker',
         })
 
         return {
-          egressID,
+          ok: true,
+          egressID: response?.egressId,
         }
       } catch (e) {
         console.error(e)

@@ -8,7 +8,6 @@ import ListMoreFilters from '@components/pages/search/rallies/ListMoreFilters'
 import DialogModalMoreFilters from '@components/pages/search/rallies/DialogModalMoreFilters'
 import { createStoreIndexedAudioChatsFilters } from '@hooks/useStoreIndexedAudioChatsFilters'
 import useGetProfilesInterests from '@hooks/useGetProfileInterests'
-import useIndexedAudioChats from '@hooks/useIndexedAudioChats'
 import { useState } from 'react'
 import { isAddress } from 'ethers/lib/utils'
 import useIndexedAudioChatsRest from '@hooks/useGetIndexedAudioChatREST'
@@ -69,7 +68,7 @@ const Page: NextPage = () => {
       </Head>
       <main className="pt-2 flex-grow flex flex-col">
         <h1 className="sr-only">Search rallies by...</h1>
-        <div className="relative pb-6 z-10">
+        <div className="relative pb-10 z-10">
           <Filters
             clearFilters={resetFilters}
             queryAudioChats={queryAudioChats}

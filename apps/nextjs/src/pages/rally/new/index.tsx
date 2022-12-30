@@ -13,7 +13,7 @@ import { useUnmountEffect } from '@react-hookz/web'
 import { DeploymentStep } from '@components/DeploymentStep'
 import { getLayout as getProtectedLayout } from '@layouts/LayoutWalletRequired'
 import { getLayout as getBaseLayout } from '@layouts/LayoutBase'
-import supabase from '../../../config/supabaseClient'
+
 const Page: NextPage = () => {
   const stateTxUi = useStoreTxUi()
   const { onSubmitNewAudioChat, stateNewAudioChat } = useSmartContract(stateTxUi)
@@ -130,7 +130,7 @@ const Page: NextPage = () => {
           stateNewAudioChat.contract,
           stateNewAudioChat.uploadImage,
           stateNewAudioChat.uploadData,
-        ].filter((slice) => slice.isError)?.length > 0 && (
+        ].find((slice) => slice.isError) && (
           <div className="mt-6 animate-appear">
             {[
               stateNewAudioChat.transaction,

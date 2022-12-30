@@ -18,12 +18,9 @@ import Link from 'next/link'
 import { ROUTE_DASHBOARD, ROUTE_RALLY_VIEW } from '@config/routes'
 import button from '@components/Button/styles'
 import { useState } from 'react'
-import useWalletAddressDefaultLensProfile from '@hooks/useWalletAddressDefaultLensProfile'
-import { useAccount } from 'wagmi'
 
 export const PublishRecording = (props: any) => {
   const { values, showSectionLens } = props
-  const account = useAccount()
   const [fileSize, setFileSize] = useState(undefined)
   const isSignedIn = useStoreHasSignedInWithLens((state: { isSignedIn: boolean }) => state.isSignedIn)
   const bundlr = useStoreBundlr((state: any) => state.bundlr)
@@ -51,7 +48,7 @@ export const PublishRecording = (props: any) => {
       recording_language: values?.language,
       recording_is_nsfw: values?.is_nsfw,
       recording_image_src: values?.image,
-      recording_publish_on_lens: false,
+      publish_on_lens: false,
     },
   })
 
@@ -216,7 +213,7 @@ export const PublishRecording = (props: any) => {
                 isError={statePublishRecording.uploadAudioFile.isError}
                 isSuccess={statePublishRecording.uploadAudioFile.isSuccess}
               >
-                Uploading recording audio file to Bundlr (transaction required)
+                Sign the 'Upload recording file to Bundlr' message and sign the transaction
               </DeploymentStep>
             </li>
 
@@ -230,9 +227,36 @@ export const PublishRecording = (props: any) => {
                 isError={statePublishRecording.uploadMetadata.isError}
                 isSuccess={statePublishRecording.uploadMetadata.isSuccess}
               >
-                Uploading recording metadata file to Bundlr (transaction required)
+                Sign the 'Upload recording metadata file to Bundlr' message
               </DeploymentStep>
             </li>
+            {formPublishRecording?.data()?.publish_on_lens === true && (
+              <>
+                <li
+                  className={`
+            flex items-center
+            ${
+              statePublishRecording.postToLens.isIdle || statePublishRecording.postToLensGasless
+                ? 'text-neutral-11'
+                : 'text-white'
+            }`}
+                >
+                  <DeploymentStep
+                    isLoading={
+                      statePublishRecording.postToLens.isLoading || statePublishRecording.postToLensGasless.isLoading
+                    }
+                    isError={
+                      statePublishRecording.postToLens.isError || statePublishRecording.postToLensGasless.isError
+                    }
+                    isSuccess={
+                      statePublishRecording.postToLens.isSuccess || statePublishRecording.postToLensGasless.isSuccess
+                    }
+                  >
+                    Publishing on Lens
+                  </DeploymentStep>
+                </li>
+              </>
+            )}
             <li
               className={`
             flex items-center 
@@ -256,7 +280,8 @@ export const PublishRecording = (props: any) => {
                 isError={statePublishRecording.transaction.isError}
                 isSuccess={statePublishRecording.transaction.isSuccess}
               >
-                Publishing recording
+                Linking recording {formPublishRecording?.data()?.publish_on_lens === true && 'and Lens publication'} to
+                your rally
               </DeploymentStep>
             </li>
           </ol>
@@ -265,13 +290,15 @@ export const PublishRecording = (props: any) => {
             statePublishRecording.contract,
             statePublishRecording.uploadAudioFile,
             statePublishRecording.uploadMetadata,
-          ].filter((slice) => slice.isError)?.length > 0 && (
+            statePublishRecording.postToLens,
+          ].find((slice) => slice.isError) && (
             <div className="mt-6 animate-appear">
               {[
                 statePublishRecording.transaction,
                 statePublishRecording.contract,
                 statePublishRecording.uploadAudioFile,
                 statePublishRecording.uploadMetadata,
+                statePublishRecording.postToLens,
               ]
                 .filter((slice) => slice.isError)
                 .map((slice, key) => (
@@ -310,6 +337,15 @@ export const PublishRecording = (props: any) => {
                   href={`https://arweave.net/${stateTxUi?.metadataArweaveTxId}`}
                 >
                   Metadata Arweave transaction id : <span className="link">{stateTxUi?.metadataArweaveTxId}</span>
+                </a>
+                <a
+                  className="block text-neutral-11"
+                  target="_blank"
+                  href={`https://${
+                    (process.env.NEXT_PUBLIC_CHAIN as string) === 'mumbai' ? 'testnet.' : ''
+                  }lenster.xyz/posts/${statePublishRecording?.postToLens?.data}`}
+                >
+                  View your linked Lens publication on <span className="link">Lenster</span>
                 </a>
               </p>
 

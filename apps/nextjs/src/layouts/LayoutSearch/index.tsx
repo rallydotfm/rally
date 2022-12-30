@@ -1,10 +1,4 @@
-import {
-  ROUTE_SEARCH,
-  ROUTE_SEARCH_POSTS,
-  ROUTE_SEARCH_PROFILES,
-  ROUTE_SEARCH_RALLIES,
-  ROUTE_SEARCH_RECORDINGS,
-} from '@config/routes'
+import { ROUTE_SEARCH, ROUTE_SEARCH_PUBLICATIONS, ROUTE_SEARCH_PROFILES, ROUTE_SEARCH_RECORDINGS } from '@config/routes'
 import NavMenu from '@components/NavMenu'
 import { getLayout as getBaseLayout } from '../LayoutBase'
 
@@ -28,8 +22,8 @@ export const LayoutSearch = (props: LayoutProps) => {
             href: ROUTE_SEARCH_RECORDINGS,
           },
           {
-            label: 'Posts',
-            href: ROUTE_SEARCH_POSTS,
+            label: 'Publications',
+            href: ROUTE_SEARCH_PUBLICATIONS,
           },
           {
             label: 'Profiles',

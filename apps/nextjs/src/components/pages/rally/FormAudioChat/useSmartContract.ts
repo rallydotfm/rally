@@ -24,6 +24,7 @@ export interface TxUi {
 }
 import useIndexAudioChat from '@hooks/useAddAudioChat.ts'
 import { useState } from 'react'
+import useUnindexAudioChat from '@hooks/useUnindexAudioChat'
 export const useStoreTxUi = create<TxUi>((set) => ({
   setDialogVisibility: (visibility: boolean) => set(() => ({ isDialogVisible: visibility })),
   setRallyId: (newId?: string) => set(() => ({ rallyId: newId })),
@@ -49,6 +50,7 @@ export function useSmartContract(stateTxUi: TxUi) {
   const account = useAccount()
   const queryClient = useQueryClient()
   const mutationIndexAudioChat = useIndexAudioChat()
+  const mutationUnindexAudioChat = useUnindexAudioChat()
   const [rallyDataToIndex, setRallyDataToIndex] = useState({})
   // Query to create a new audio chat
   const contractWriteNewAudioChat = useContractWrite({
@@ -76,19 +78,21 @@ export function useSmartContract(stateTxUi: TxUi) {
         log[0],
       ).args
 
-      await mutationIndexAudioChat.mutateAsync(
-        //@ts-ignore
-        {
-          audio_event_id,
-          creator: account?.address,
-          is_indexed,
-          start_at,
-          created_at,
-          cid_metadata,
-          current_state,
-          ...rallyDataToIndex,
-        },
-      )
+      if (is_indexed === true) {
+        await mutationIndexAudioChat.mutateAsync(
+          //@ts-ignore
+          {
+            audio_event_id,
+            creator: account?.address,
+            start_at,
+            created_at,
+            cid_metadata,
+            current_state,
+            ...rallyDataToIndex,
+          },
+        )
+      }
+
       setRallyDataToIndex({})
       stateTxUi.setRallyId(audio_event_id)
       queryClient.setQueryData(['audio-chat-metadata', stateTxUi.rallyId], {
@@ -135,9 +139,10 @@ export function useSmartContract(stateTxUi: TxUi) {
       const log = data.logs
       //@ts-ignore
       const { is_indexed, start_at, cid_metadata, current_state } = iface.parseLog(log[0]).args
-      queryClient.setQueryData(['audio-chat-metadata', stateTxUi.rallyId], (prev: any) => ({
+      const previousData = queryClient.getQueryData(['audio-chat-metadata', stateTxUi.rallyId])
+      const updatedData = {
         //@ts-ignore
-        ...prev,
+        ...previousData,
         cid: cid_metadata,
         is_indexed: is_indexed,
         //@ts-ignore
@@ -145,49 +150,55 @@ export function useSmartContract(stateTxUi: TxUi) {
         datetime_start_at: new Date(parseInt(`${start_at}`) * 1000),
         epoch_time_start_at: parseInt(`${start_at}`) * 1000,
         ...stateTxUi.primedRally,
-      }))
-      const updatedData = queryClient.getQueryData(['audio-chat-metadata', stateTxUi.rallyId])
-      await mutationIndexAudioChat.mutateAsync(
+      }
+
+      if (is_indexed === true) {
+        await mutationIndexAudioChat.mutateAsync(
+          //@ts-ignore
+          {
+            //@ts-ignore
+            audio_event_id: updatedData.id,
+            //@ts-ignore
+            creator: updatedData.creator,
+            //@ts-ignore
+            is_indexed: updatedData.is_indexed,
+            //@ts-ignore
+            start_at: updatedData.epoch_time_start_at,
+            //@ts-ignore
+            created_at: updatedData.epoch_time_created_at,
+            //@ts-ignore
+            cid_metadata: updatedData.cid,
+            //@ts-ignore
+            current_state: updatedData.state,
+            //@ts-ignore
+            category: updatedData.category,
+            //@ts-ignore
+            description: updatedData.description,
+            //@ts-ignore
+            name: updatedData.name,
+            //@ts-ignore
+            image: updatedData.image,
+            //@ts-ignore
+            is_gated: updatedData.is_gated,
+            //@ts-ignore
+            max_attendees: updatedData.max_attendees,
+            //@ts-ignore
+            language: updatedData.language,
+            //@ts-ignore
+            recording_arweave_transaction_id: updatedData.recording_arweave_transaction_id,
+            //@ts-ignore
+            will_be_recorded: updatedData.will_be_recorded,
+            //@ts-ignore
+            is_nsfw: updatedData.is_nsfw,
+            //@ts-ignore
+            recording_arweave_transaction_id: updatedData.recording_arweave_transaction_id,
+          },
+        )
+      } else {
+        // delete from db if it exists there
         //@ts-ignore
-        {
-          //@ts-ignore
-          audio_event_id: updatedData.id,
-          //@ts-ignore
-          creator: updatedData.creator,
-          //@ts-ignore
-          is_indexed: updatedData.is_indexed,
-          //@ts-ignore
-          start_at: updatedData.epoch_time_start_at,
-          //@ts-ignore
-          created_at: updatedData.epoch_time_created_at,
-          //@ts-ignore
-          cid_metadata: updatedData.cid,
-          //@ts-ignore
-          current_state: updatedData.state,
-          //@ts-ignore
-          category: updatedData.category,
-          //@ts-ignore
-          description: updatedData.description,
-          //@ts-ignore
-          name: updatedData.name,
-          //@ts-ignore
-          image: updatedData.image,
-          //@ts-ignore
-          is_gated: updatedData.is_gated,
-          //@ts-ignore
-          max_attendees: updatedData.max_attendees,
-          //@ts-ignore
-          language: updatedData.language,
-          //@ts-ignore
-          recording_arweave_transaction_id: updatedData.recording_arweave_transaction_id,
-          //@ts-ignore
-          will_be_recorded: updatedData.will_be_recorded,
-          //@ts-ignore
-          is_nsfw: updatedData.is_nsfw,
-          //@ts-ignore
-          recording_arweave_transaction_id: updatedData.recording_arweave_transaction_id,
-        },
-      )
+        await mutationUnindexAudioChat.mutateAsync(stateTxUi.rallyId)
+      }
 
       toast.success('Your rally was updated successfully !')
     },
@@ -389,19 +400,6 @@ export function useSmartContract(stateTxUi: TxUi) {
           '',
         ],
       })
-      await mutationIndexAudioChat.mutateAsync(
-        //@ts-ignore
-        {
-          audio_event_id: id,
-          creator: account?.address,
-          is_indexed: values.rally_is_indexed,
-          start_at: startAt,
-          created_at,
-          cid_metadata: metadata,
-          current_state,
-          ...rallyDataToIndex,
-        },
-      )
     } catch (e) {
       console.error(e)
     }

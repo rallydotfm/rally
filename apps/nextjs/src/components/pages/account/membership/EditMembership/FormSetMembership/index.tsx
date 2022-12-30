@@ -33,7 +33,7 @@ export const FormSetMembership = (props: FormSetMembershipProps) => {
           <FormRadioGroup
             className="!mt-0"
             name="type"
-            disabled={!account?.address || chain?.unsupported === true}
+            disabled={!account?.address || chain?.unsupported === true || chain?.id === 1}
             value={data()?.type}
             onChange={(value: string) => {
               setData('type', value)
@@ -115,7 +115,7 @@ export const FormSetMembership = (props: FormSetMembershipProps) => {
                       min="0.01"
                       step="0.01"
                       required={true}
-                      disabled={!account?.address || chain?.unsupported === true}
+                      disabled={!account?.address || chain?.unsupported === true || chain?.id === 1}
                       hasError={errors()?.fee_amount?.length ? true : false}
                       name="fee_amount"
                       id="fee_amount"
@@ -147,7 +147,7 @@ export const FormSetMembership = (props: FormSetMembershipProps) => {
                       type="text"
                       required={true}
                       defaultValue={account?.address}
-                      disabled={!account?.address || chain?.unsupported === true}
+                      disabled={!account?.address || chain?.unsupported === true || chain?.id === 1}
                       hasError={errors()?.recipient_address?.length ? true : false}
                       name="recipient_address"
                       id="recipient_address"
@@ -166,7 +166,7 @@ export const FormSetMembership = (props: FormSetMembershipProps) => {
           )}
         </div>
       </fieldset>
-      <Button isLoading={isLoading} disabled={!isValid() || chain?.unsupported || isLoading}>
+      <Button isLoading={isLoading} disabled={!isValid() || chain?.unsupported || chain?.id === 1 || isLoading}>
         {labelCta}
       </Button>
     </form>

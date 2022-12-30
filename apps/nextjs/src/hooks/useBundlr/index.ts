@@ -9,24 +9,30 @@ import { chain } from 'wagmi'
 export const useStoreBundlr = create((set) => ({
   bundlr: undefined,
   initialize: async () => {
-    //@ts-ignore
-    await window?.ethereum?.enable()
-    //@ts-ignore
-    const provider = new providers.Web3Provider(window?.ethereum)
-    await provider._ready()
+    try {
+      //@ts-ignore
+      await window?.ethereum?.enable()
+      //@ts-ignore
+      const provider = new providers.Web3Provider(window?.ethereum)
+      await provider._ready()
 
-    const bundlr = new WebBundlr(
-      chainId === chain.polygonMumbai.id ? 'https://devnet.bundlr.network' : 'https://node1.bundlr.network',
-      'matic',
-      provider,
-      {
-        providerUrl: process.env.NEXT_PUBLIC_RPC_URL,
-      },
-    )
-    await bundlr.ready()
-    set(() => ({
-      bundlr,
-    }))
+      const bundlr = new WebBundlr(
+        chainId === chain.polygonMumbai.id ? 'https://devnet.bundlr.network' : 'https://node1.bundlr.network',
+        'matic',
+        provider,
+        {
+          providerUrl: process.env.NEXT_PUBLIC_RPC_URL,
+        },
+      )
+      await bundlr.ready()
+      return set(() => ({
+        bundlr,
+      }))
+    } catch (e) {
+      return set(() => ({
+        bundlr: undefined,
+      }))
+    }
   },
   resetState: () =>
     set(() => ({

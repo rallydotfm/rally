@@ -42,10 +42,11 @@ const Page: NextPage = () => {
   const { onClickEndLive, stateEndLiveAudioChat } = useEndLiveAudioChat(stateTxUiEndLiveRally)
   const [sortOrder, setSortOrder] = useState(SORT_ORDER.START_CLOSEST)
   const queryAvailableRecordings = useDashboardGetUserAvailableRecordingsToDownload()
+
   return (
     <>
       <Head>
-        <title>Dashboard - Rally</title>
+        <title>Rallies / Dashboard - Rally</title>
         <meta
           name="description"
           content="Manage your audio rooms on Rally, the open-source alternative to Clubhouse and Twitter Space for Web3 communities."
@@ -53,7 +54,7 @@ const Page: NextPage = () => {
       </Head>
       <main className="pb-32 h-full">
         {(queryAudioChatsByAddressRawData.isLoading ||
-          queriesAudioChatsByAddressMetadata.filter((query) => query?.isLoading)?.length > 0) && (
+          queriesAudioChatsByAddressMetadata.find((query) => query?.isLoading === true)) && (
           <div className="mb-6 flex items-center justify-center space-i-1ex">
             <IconSpinner className="text-lg animate-spin" />
             <p className="font-bold animate-pulse">Loading your rallies...</p>

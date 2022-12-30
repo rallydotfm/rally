@@ -1,8 +1,8 @@
 import { shortenEthereumAddress } from '@helpers/shortenEthereumAddress'
-import { chain, useEnsName } from 'wagmi'
 import useWalletAddressDefaultLensProfile from '@hooks/useWalletAddressDefaultLensProfile'
 import { ROUTE_PROFILE } from '@config/routes'
 import Link from 'next/link'
+import { useEnsIdentity } from '@hooks/useEnsIdentity'
 
 interface EthereumAddressProps {
   address: string
@@ -15,9 +15,7 @@ export const EthereumAddress = (props: EthereumAddressProps) => {
     enabled: displayLensProfile,
   })
 
-  const queryEns = useEnsName({
-    chainId: chain.mainnet.id,
-    address: address as `0x${string}`,
+  const queryEnsIdentity = useEnsIdentity(address as `0x${string}`, {
     enabled:
       (queryUserProfileLens?.isSuccess && queryUserProfileLens?.data === null) || queryUserProfileLens?.isError
         ? true
@@ -25,7 +23,8 @@ export const EthereumAddress = (props: EthereumAddressProps) => {
   })
 
   if (!displayLensProfile || queryUserProfileLens?.status === 'error' || queryUserProfileLens?.data === null) {
-    if (queryEns?.status === 'success' && queryEns?.data !== null) return <>{queryEns?.data}</>
+    if (queryEnsIdentity?.status === 'success' && queryEnsIdentity?.data?.name !== null)
+      return <>{queryEnsIdentity?.data?.name}</>
     return <>{shortenOnFallback === true ? shortenEthereumAddress(address) : address}</>
   }
 
@@ -51,7 +50,9 @@ export const EthereumAddress = (props: EthereumAddressProps) => {
             )}
 
             <span className="flex flex-wrap whitespace-pre-line">
-              <span className="font-bold w-full">{queryUserProfileLens?.data?.name}&nbsp;</span>
+              {queryUserProfileLens?.data?.name && (
+                <span className="font-bold w-full">{queryUserProfileLens?.data?.name}&nbsp;</span>
+              )}
               <span className="text-[0.9em] opacity-50">@{queryUserProfileLens?.data?.handle}</span>
             </span>
           </a>

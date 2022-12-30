@@ -1,6 +1,6 @@
 import { Menu } from '@headlessui/react'
 import Link from 'next/link'
-import { useDisconnect, useEnsName, useNetwork } from 'wagmi'
+import { useDisconnect, useNetwork } from 'wagmi'
 import { EllipsisHorizontalIcon } from '@heroicons/react/24/outline'
 import { shortenEthereumAddress } from '@helpers/shortenEthereumAddress'
 import useWalletAddressDefaultLensProfile from '@hooks/useWalletAddressDefaultLensProfile'
@@ -11,6 +11,7 @@ import { ExclamationTriangleIcon, ShieldExclamationIcon } from '@heroicons/react
 import Button from '@components/Button'
 import { useSession } from 'next-auth/react'
 import { useStoreHasSignedInWithLens } from '@hooks/useSignInWithLens'
+import { useEnsIdentity } from '@hooks/useEnsIdentity'
 
 interface MenuCurrentUserProps {
   address: string
@@ -23,16 +24,20 @@ export const MenuCurrentUser = (props: MenuCurrentUserProps) => {
     enabled: address ? true : false,
   })
   const { chain } = useNetwork()
-  const queryEns = useEnsName({
-    chainId: 1,
-    address: address as `0x${string}`,
+
+  const queryEnsIdentity = useEnsIdentity(address as `0x${string}`, {
+    enabled:
+      (queryUserProfileLens?.isSuccess && queryUserProfileLens?.data === null) || queryUserProfileLens?.isError
+        ? true
+        : false,
   })
+
   const { status } = useSession()
   const setIsSignedIn = useStoreHasSignedInWithLens((state) => state.setIsSignedIn)
 
   return (
     <div className="flex items-center md:flex-col md:justify-center">
-      {address && openChainModal && chain?.unsupported && (
+      {address && openChainModal && (chain?.unsupported || chain?.id === 1) && (
         <Button intent="negative-ghost" scale="xs" onClick={openChainModal} type="button">
           <ExclamationTriangleIcon className="w-5" />
           <span className="sr-only">Switch chain</span>
@@ -52,10 +57,15 @@ export const MenuCurrentUser = (props: MenuCurrentUserProps) => {
               className="w-full rounded-full bg-neutral-5 text-primary-11 h-full absolute inset-0 z-10 object-cover"
               src={
                 /* @ts-ignore */
-                queryUserProfileLens?.data?.picture?.original?.url?.replace(
-                  'ipfs://',
-                  'https://lens.infura-ipfs.io/ipfs/',
-                ) ?? `https://avatars.dicebear.com/api/identicon/${address}.svg`
+                queryUserProfileLens?.data?.picture?.original?.url
+                  ? //@ts-ignore
+                    queryUserProfileLens?.data?.picture?.original?.url.replace(
+                      'ipfs://',
+                      'https://lens.infura-ipfs.io/ipfs/',
+                    )
+                  : queryEnsIdentity?.data?.avatar && queryEnsIdentity?.data?.avatar !== null
+                  ? queryEnsIdentity?.data?.avatar
+                  : `https://avatars.dicebear.com/api/identicon/${address}.svg`
               }
               alt=""
             />
@@ -91,7 +101,7 @@ export const MenuCurrentUser = (props: MenuCurrentUserProps) => {
         rounded-md`}
         >
           <Menu.Item as="div" className="px-3 py-2">
-            <Profile queryEns={queryEns} queryLens={queryUserProfileLens} address={address} />
+            <Profile queryEns={queryEnsIdentity} queryLens={queryUserProfileLens} address={address} />
           </Menu.Item>
           {queryUserProfileLens?.data?.id && (
             <Menu.Item

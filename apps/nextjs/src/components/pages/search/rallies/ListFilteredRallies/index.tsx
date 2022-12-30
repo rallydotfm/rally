@@ -1,6 +1,6 @@
 import Button from '@components/Button'
 import CardRally from './CardRally'
-import { isPast } from 'date-fns'
+import { DICTIONARY_STATES_AUDIO_CHATS } from '@helpers/mappingAudioChatState'
 
 interface ListFilteredRalliesProps {
   list: Array<any>
@@ -19,7 +19,13 @@ export const ListFilteredRallies = (props: ListFilteredRalliesProps) => {
         {list.map((audioChat: any, i: number) => {
           return (
             <li
-              className={`${isPast(audioChat.datetime_start_at) ? 'opacity-50' : ''} pt-10 animate-appear`}
+              className={`${
+                [DICTIONARY_STATES_AUDIO_CHATS.FINISHED.label, DICTIONARY_STATES_AUDIO_CHATS.CANCELLED.label].includes(
+                  audioChat.state,
+                )
+                  ? 'opacity-50'
+                  : ''
+              } pt-10 animate-appear`}
               key={`${audioChat.cid}`}
             >
               <CardRally data={audioChat} />

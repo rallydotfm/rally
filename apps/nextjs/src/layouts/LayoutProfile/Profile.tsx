@@ -1,20 +1,20 @@
 import { IconInstagram, IconTwitter, IconWebsite } from '@components/Icons'
-import { DICTIONARY_PROFILE_INTERESTS, DICTIONARY_PROFILE_INTERESTS_CATEGORIES } from '@helpers/mappingProfileInterests'
-import useGetGuildMembershipsByWalletAddress from '@hooks/useGetGuildMembershipsByWalletAddress'
-import CardGuildMembership from './CardGuildMembership'
 import { useAccount } from 'wagmi'
-import Link from 'next/link'
-import { ROUTE_ACCOUNT } from '@config/routes'
+import { ROUTE_ACCOUNT, ROUTE_PROFILE_RALLIES } from '@config/routes'
 import ButtonFollowOnLens from '@components/ButtonFollowOnLens'
 import ButtonUnfollowOnLens from '@components/ButtonUnfollowOnLens'
 import button from '@components/Button/styles'
-import type { Key } from 'react'
 import type { Profile as LensProfile } from '@graphql/lens/generated'
 import { useStoreHasSignedInWithLens } from '@hooks/useSignInWithLens'
 import useDoesFollow from '@hooks/useDoesFollow'
+import Link from 'next/link'
+import { ROUTE_PROFILE, ROUTE_PROFILE_ABOUT, ROUTE_PROFILE_POSTS } from '@config/routes'
+import NavMenu from '@components/NavMenu'
+import { CheckBadgeIcon } from '@heroicons/react/20/solid'
 
 interface ProfileProps {
   data: LensProfile
+  children: React.ReactNode
 }
 
 const attributeKeyToIcon = {
@@ -24,16 +24,12 @@ const attributeKeyToIcon = {
 }
 
 export const Profile = (props: ProfileProps) => {
-  const { data } = props
+  const { data, children } = props
   const account = useAccount()
   const isSignedIn = useStoreHasSignedInWithLens((state) => state.isSignedIn)
-  const queryListProfileGuilds = useGetGuildMembershipsByWalletAddress(data?.ownedBy as `0x${string}`, {
-    enabled: true,
-  })
   const doesFollow = useDoesFollow(data.id)
-
   return (
-    <article className="animate-appear">
+    <div className="animate-appear">
       <div>
         <header className="relative -mx-6">
           <img
@@ -59,11 +55,25 @@ export const Profile = (props: ProfileProps) => {
                 alt=""
               />
             </div>
+
             <section className="pb-4">
               <h1>
                 <span className="font-bold block text-xl">{data.name}</span>
-                <span className="font-medium text-neutral-11 block">@{data.handle}</span>
+                <span className="font-medium items-center text-neutral-11 w-auto flex flex-wrap gap-x-3">
+                  <span>@{data.handle} </span>
+
+                  {data?.onChainIdentity?.ens?.name && (
+                    <span
+                      title="Onchain identity: ENS"
+                      className="flex items-center font-mono font-medium bg-primary-1  py-0.5 px-1.5 text-[0.85em] rounded-md text-primary-11"
+                    >
+                      <CheckBadgeIcon className="w-[1.15rem] text-primary-10 mie-2" />{' '}
+                      {data?.onChainIdentity?.ens?.name}
+                    </span>
+                  )}
+                </span>
               </h1>
+
               <div className="grid grid-cols-2 w-max-content gap-6 pt-2">
                 <div>
                   <span className="font-bold text-white text-base">
@@ -155,46 +165,24 @@ export const Profile = (props: ProfileProps) => {
             ))}
         </ul>
       </section>
-      <section className="pt-6 -mx-3 px-3 md:-mx-6 md:px-6 mt-8 border-t border-neutral-1">
-        <h2 className="animate-appear font-semibold text-sm text-neutral-12">Interests</h2>
-
-        <div className="mt-2">
-          {(data?.interests?.length as number) > 0 ? (
-            <ul className="flex flex-wrap gap-1 text-2xs">
-              {data.interests?.map((interest) => (
-                <li className="animate-appear px-2 py-0.5 bg-neutral-1 rounded-md font-medium" key={interest}>
-                  {/* @ts-ignore */}
-                  <span className="pie-1ex">{DICTIONARY_PROFILE_INTERESTS[interest]?.emoji}</span>
-                  {/* @ts-ignore */}
-                  {DICTIONARY_PROFILE_INTERESTS[interest]?.label ?? DICTIONARY_PROFILE_INTERESTS_CATEGORIES[interest]}
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <>
-              <p className="animate-appear italic text-neutral-9 text-sm">
-                {account?.address === data?.ownedBy
-                  ? "You didn't set your profile interests yet."
-                  : `${data?.name} didn't set their interests yet.`}
-              </p>
-            </>
-          )}
-        </div>
-      </section>
-
-      <section className="animate-appear -mx-3 px-3 md:-mx-6 md:px-6 pt-6 mt-8 border-t border-neutral-1">
-        <h2 className="font-semibold text-sm text-neutral-12 mb-3">Guilds</h2>
-        <ul className="grid grid-cols-1 2xs:grid-cols-2 gap-3 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
-          {queryListProfileGuilds?.data?.guilds.map((guild: { guildId: Key | null | undefined }) => {
-            return (
-              <li className="animate-appear col-span-1" key={guild.guildId}>
-                <CardGuildMembership id={guild.guildId as string} />
-              </li>
-            )
-          })}
-        </ul>
-      </section>
-    </article>
+      <NavMenu
+        routes={[
+          {
+            label: 'About',
+            href: ROUTE_PROFILE.replace('[handleLensProfile]', data?.handle),
+          },
+          {
+            label: 'Rallies',
+            href: ROUTE_PROFILE_RALLIES.replace('[handleLensProfile]', data?.handle),
+          },
+          {
+            label: 'Posts',
+            href: ROUTE_PROFILE_POSTS.replace('[handleLensProfile]', data?.handle),
+          },
+        ]}
+      />
+      {children}
+    </div>
   )
 }
 export default Profile

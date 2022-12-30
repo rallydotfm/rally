@@ -4,6 +4,7 @@ import { ListFilteredRallies } from '@components/pages/home/ListFilteredRallies'
 import { ROUTE_PREFERENCES_BROWSING, ROUTE_RALLY_NEW, ROUTE_SEARCH_RALLIES } from '@config/routes'
 import { ArrowRightIcon } from '@heroicons/react/20/solid'
 import { useGetHomeAudioChatsSelectionFromRESTIndexer } from '@hooks/useGetHomeAudioChatsSelection'
+import useGetProfileFeed from '@hooks/useGetProfileFeed'
 import { useStorePersistedInterests } from '@hooks/usePersistedInterests'
 import useWalletAddressDefaultLensProfile from '@hooks/useWalletAddressDefaultLensProfile'
 import type { NextPage } from 'next'
@@ -131,7 +132,7 @@ const Page: NextPage = () => {
                 <>
                   {queryAudioChatsHappeningNow?.data?.length === 0 ? (
                     <>
-                      <section className="mt-6 p-6 bg-neutral-1 w-full rounded-lg  animate-appear min-w-max-content 2xs:max-w-72">
+                      <section className="max-w-[22rem] mt-6 p-6 bg-neutral-1 rounded-lg animate-appear w-full">
                         <p className="text-xs text-neutral-11 mb-3">
                           It seems there's currently no rally happening now that matches your interests.
                         </p>
@@ -149,7 +150,7 @@ const Page: NextPage = () => {
                         isLoading={queryAudioChatsHappeningNow?.isLoading}
                         isError={queryAudioChatsHappeningNow?.isError}
                         list={queryAudioChatsHappeningNow?.data}
-                        setSkip={() => console.log('')}
+                        setSkip={() => null}
                       />
 
                       <Link href={ROUTE_SEARCH_RALLIES}>
@@ -175,7 +176,7 @@ const Page: NextPage = () => {
                 <>
                   {queryAudioChatsHappeningSoon?.data?.length === 0 ? (
                     <>
-                      <section className="mt-6 p-6 bg-neutral-1 w-full rounded-lg animate-appear min-w-max-content 2xs:max-w-72">
+                      <section className="max-w-[22rem] mt-6 p-6 bg-neutral-1 rounded-lg animate-appear w-full">
                         <p className="text-xs text-neutral-11 mb-3">
                           It seems there's currently no rally happening soon that matches your interests.
                         </p>
@@ -207,7 +208,7 @@ const Page: NextPage = () => {
               )}
             </section>
 
-            <section>
+            <section className="pb-8 border-b border-neutral-4">
               <h2 className="text-md font-bold">⌛ Later today</h2>
               {queryAudioChatsHappeningLater?.isLoading && (
                 <div className="mb-6 pt-12 animate-appear flex items-center justify-center space-i-1ex">
@@ -219,7 +220,7 @@ const Page: NextPage = () => {
                 <>
                   {queryAudioChatsHappeningLater?.data?.length === 0 ? (
                     <>
-                      <section className="mt-6 p-6 bg-neutral-1 w-full rounded-lg  animate-appear min-w-max-content 2xs:max-w-72">
+                      <section className="max-w-[22rem] mt-6 p-6 bg-neutral-1 rounded-lg animate-appear w-full">
                         <p className="text-xs text-neutral-11 mb-3">
                           It seems there's currently no rally happening later today that matches your interests.
                         </p>
@@ -251,7 +252,7 @@ const Page: NextPage = () => {
               )}
             </section>
           </div>
-          <section className="mt-56 py-8 px-6 mx-auto text-start xs:text-center bg-neutral-3 w-full rounded-lg flex flex-col xs:items-center justify-center ">
+          <section className="mt-12 py-8 px-6 mx-auto text-start xs:text-center bg-neutral-3 w-full rounded-lg flex flex-col xs:items-center justify-center ">
             <p className="font-bold">Want to host live audio rooms ?</p>
             <p className="text-xs mt-2  text-neutral-11">
               Rally makes it easy to create and find interesting audio rooms without compromising your privacy or
@@ -265,6 +266,7 @@ const Page: NextPage = () => {
               <a className={button({ scale: 'sm', intent: 'primary-outline' })}>Create my rally now</a>
             </Link>
           </section>
+          <section></section>
         </main>
       </>
     </>

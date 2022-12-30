@@ -1,5 +1,7 @@
+import DialogCommentRecording from '@layouts/LayoutBase/ToolbarAudioPlayer/DialogCommentRecording'
 import { ROUTE_RALLY_VIEW } from '@config/routes'
 import {
+  ChatBubbleLeftRightIcon,
   PauseIcon,
   PlayIcon,
   PlayPauseIcon,
@@ -8,7 +10,6 @@ import {
   StopIcon,
 } from '@heroicons/react/20/solid'
 import useAudioPlayer from '@hooks/usePersistedAudioPlayer'
-import { MediaSeekedEvent, MediaSeekingEvent } from '@vidstack/player'
 import {
   Audio,
   Media,
@@ -17,30 +18,107 @@ import {
   Time,
   SliderValueText,
   TimeSlider,
-  VolumeSlider,
   useMediaContext,
-  useMediaRemote,
 } from '@vidstack/player-react'
 import Link from 'next/link'
 import { useRef } from 'react'
+import { useStoreTxUiCommentRecording } from '@hooks/useCommentRecording'
+import { useAccount } from 'wagmi'
+import { useStoreHasSignedInWithLens } from '@hooks/useSignInWithLens'
+import useWalletAddressDefaultLensProfile from '@hooks/useWalletAddressDefaultLensProfile'
+import { useStoreBundlr } from '@hooks/useBundlr'
+import { useMutation } from '@tanstack/react-query'
+import toast from 'react-hot-toast'
+import { useMountEffect, useUnmountEffect, useUpdateEffect } from '@react-hookz/web'
 
 export const ToolbarAudioPlayer = () => {
   const trackSrc = useAudioPlayer((state) => state.trackSrc)
-  const rally = useAudioPlayer((state) => state.rally)
+  const setIsReady = useAudioPlayer((state) => state.setIsReady)
+  const rally: any = useAudioPlayer((state) => state.rally)
   const setAudioPlayer = useAudioPlayer((state) => state.setAudioPlayer)
   const media = useRef(null)
+  const isCommentDialogVisible = useStoreTxUiCommentRecording((state) => state.isDialogVisible)
+  const setIsCommentDialogVisible = useStoreTxUiCommentRecording((state) => state.setDialogVisibility)
+  const lensPublicationId = useStoreTxUiCommentRecording((state) => state.lensPublicationId)
+  const selectPublicationToComment = useStoreTxUiCommentRecording((state) => state.selectPublicationToComment)
+  const timestamp = useStoreTxUiCommentRecording((state) => state.timestamp)
+  const account = useAccount()
+  const isSignedIn = useStoreHasSignedInWithLens((state) => state.isSignedIn)
+  const queryUserProfileLens = useWalletAddressDefaultLensProfile(account?.address as `0x${string}`, {
+    enabled: account?.address ? true : false,
+  })
+  const initialize = useStoreBundlr((state: any) => state.initialize)
+  const bundlr = useStoreBundlr((state: any) => state.bundlr)
+  const mutationPrepareBundlr = useMutation(async () => await initialize())
+  const audioPlayer = useMediaContext(media)
+  const goToTimestampRef = useRef(null)
 
+  useUpdateEffect(() => {
+    if (rally?.timestamp) {
+      //@ts-ignore
+      goToTimestampRef?.current?.click()
+    }
+  }, [rally?.timestamp, rally?.clickedAt])
+
+  useUnmountEffect(() => {
+    setIsReady(false)
+  })
+
+  useMountEffect(() => {
+    setIsReady(true)
+  })
   return (
     <>
-      <Media ref={media} className="w-full flex flex-col">
-        <Audio autoplay={true}>
+      <Media className="w-full flex flex-col">
+        <button
+          ref={goToTimestampRef}
+          className="sr-only"
+          onClick={() => {
+            //@ts-ignore
+            media?.current?.dispatchEvent(
+              new CustomEvent('vds-seek-request', { detail: rally?.timestamp, bubbles: true, composed: true }),
+            )
+          }}
+        >
+          Go to time: {rally?.timestamp}
+        </button>
+        <Audio
+          onVdsCanPlayThrough={() => {
+            if (rally?.timestamp !== 0) {
+              //@ts-ignore
+              media.current.dispatchEvent(
+                new CustomEvent('vds-seek-request', { detail: rally?.timestamp, bubbles: true, composed: true }),
+              )
+            }
+          }}
+          onVdsCanPlay={() => {
+            if (rally?.timestamp !== 0) {
+              //@ts-ignore
+              media.current.dispatchEvent(
+                new CustomEvent('vds-seek-request', { detail: rally?.timestamp, bubbles: true, composed: true }),
+              )
+            } else {
+              //@ts-ignore
+              media.current.dispatchEvent(
+                new CustomEvent('vds-play-request', { detail: rally?.timestamp, bubbles: true, composed: true }),
+              )
+            }
+          }}
+          onVdsSeeked={() => {
+            //@ts-ignore
+            media.current.dispatchEvent(
+              new CustomEvent('vds-play-request', { detail: rally?.timestamp, bubbles: true, composed: true }),
+            )
+          }}
+          ref={media}
+        >
           <audio src={trackSrc} preload="none" />
         </Audio>
 
         <div className="px-3 pb-3 gap-3 flex items-center flex-col">
           <div className="w-full max-w-screen-2xs mx-auto">
             <div className="flex justify-between items-center text-[0.725rem] gap-4">
-              <Time type="current" />
+              <Time className="text-interactive-11 font-medium" type="current" />
               <TimeSlider className="group transition-all w-full relative h-1.5">
                 <div className="rounded-full w-full h-full bg-interactive-3" />
                 <div
@@ -71,13 +149,36 @@ export const ToolbarAudioPlayer = () => {
               <StopIcon className="w-5 text-neutral-11 hover:text-neutral-12 focus:text-white" />
               <span className="sr-only">Stop and close audio player</span>
             </button>
+            <div className="flex items-baseline gap-6">
+              <PlayButton title="Toggle play">
+                <PlayPauseIcon className="w-6 media-playing:hidden media-can-play:block media-paused:hidden" />
+                <PlayIcon className="w-6 media-playing:hidden media-can-play:hidden media-paused:block" />
+                <PauseIcon className="w-6 media-playing:block media-can-play:hidden media-paused:hidden" />
+                <span className="sr-only">Toggle play</span>
+              </PlayButton>
+              <button
+                className="disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled={!isSignedIn || !account?.address || (isSignedIn && !queryUserProfileLens?.data?.id)}
+                onClick={async () => {
+                  try {
+                    if (!bundlr) {
+                      await mutationPrepareBundlr.mutateAsync()
+                    }
+                    selectPublicationToComment(
+                      //@ts-ignore
+                      rally?.lensPublicationId as string,
+                      new Date(audioPlayer.currentTime * 1000).toISOString().slice(11, 19),
+                    )
+                  } catch (e) {
+                    toast.error('Connect to Bundlr to post a comment on this recording.')
+                  }
+                }}
+                type="button"
+              >
+                <ChatBubbleLeftRightIcon className="w-5" />
+              </button>
+            </div>
 
-            <PlayButton title="Toggle play">
-              <PlayPauseIcon className="w-6 media-playing:hidden media-can-play:block media-paused:hidden" />
-              <PlayIcon className="w-6 media-playing:hidden media-can-play:hidden media-paused:block" />
-              <PauseIcon className="w-6 media-playing:block media-can-play:hidden media-paused:hidden" />
-              <span className="sr-only">Toggle play</span>
-            </PlayButton>
             <MuteButton className="text-neutral-11 hover:text-neutral-12 focus:text-white">
               <SpeakerWaveIcon className="w-5 hidden media-muted:block " />
               <SpeakerXMarkIcon className="w-5 media-muted:hidden block" />
@@ -92,6 +193,16 @@ export const ToolbarAudioPlayer = () => {
           </Link>
         </div>
       </Media>
+      {isCommentDialogVisible === true && (
+        <DialogCommentRecording
+          stateTxUi={{
+            timestamp,
+            idLensPublication: lensPublicationId,
+            isDialogVisible: isCommentDialogVisible,
+            setDialogVisibility: setIsCommentDialogVisible,
+          }}
+        />
+      )}
     </>
   )
 }

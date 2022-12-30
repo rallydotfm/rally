@@ -129,7 +129,7 @@ export const FormEditAudioChat = (props: any) => {
           stateEditAudioChat.contract,
           stateEditAudioChat.uploadImage,
           stateEditAudioChat.uploadData,
-        ].filter((slice) => slice.isError)?.length > 0 && (
+        ].find((slice) => slice.isError === true) && (
           <div className="mt-6 animate-appear">
             {[
               stateEditAudioChat.transaction,

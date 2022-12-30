@@ -13,7 +13,9 @@ import DialogModalStageGuide from '@components/pages/rally/[idRally]/DialogModal
 import dynamic from 'next/dynamic'
 import useAudioPlayer from '@hooks/usePersistedAudioPlayer'
 
-const NoSSRToolbarAudioPlayer = dynamic(() => import('./ToolbarAudioPlayer'), { ssr: false })
+const NoSSRToolbarAudioPlayer = dynamic(() => import('./ToolbarAudioPlayer'), {
+  ssr: false,
+})
 
 // The feature below will be disabled until the `updateRoomMetadata` feature is fixed on Livekit server
 // import DialogModalPinItem from '@components/pages/rally/[idRally]/DialogModalPinItem'
@@ -24,7 +26,6 @@ interface LayoutProps {
 export const LayoutBase = (props: LayoutProps) => {
   const { children } = props
   const stateVoiceChat: any = useStoreLiveVoiceChat()
-
   const { address, isConnecting } = useAccount({
     async onDisconnect() {
       await stateVoiceChat?.room?.disconnect()
@@ -36,6 +37,7 @@ export const LayoutBase = (props: LayoutProps) => {
   })
   const isSignedIn = useStoreHasSignedInWithLens((state) => state.isSignedIn)
   const isPlayerOpen = useAudioPlayer((state) => state.isOpen)
+  const isPlayerReady = useAudioPlayer((state) => state.isReady)
 
   return (
     <div className="relative flex-grow flex flex-col">
@@ -46,10 +48,10 @@ export const LayoutBase = (props: LayoutProps) => {
         <MobileTopMenu address={address} />
         <div
           className={`pt-5  ${
-            ((stateVoiceChat?.room.state === 'connected' || isPlayerOpen) &&
+            ((stateVoiceChat?.room.state === 'connected' || isPlayerReady) &&
               !isSignedIn &&
               queryCurrentUserLensProfile?.data?.handle) ||
-            isPlayerOpen
+            isPlayerReady
               ? 'pb-64'
               : stateVoiceChat?.room.state === 'connected'
               ? 'pb-48'
@@ -66,10 +68,10 @@ export const LayoutBase = (props: LayoutProps) => {
         </div>
         <div
           className={`transition-all ${
-            isPlayerOpen ? 'z-30 translate-y-0' : 'z-[-1] translate-y-full'
+            isPlayerReady === true ? 'z-30 translate-y-0' : 'z-[-1] translate-y-full'
           } fixed bottom-12 md:bottom-0 w-full`}
         >
-          <div className="transition-all pointer-events-auto border-transparent flex pb-1 pt-2 bg-neutral-1 md:bg-black border-y-neutral-4 border">
+          <div className="transition-all pointer-events-auto min-h-[6.895rem] border-transparent flex pb-1 pt-2 bg-neutral-1 md:bg-black border-y-neutral-4 border">
             {isPlayerOpen && <NoSSRToolbarAudioPlayer />}
           </div>
         </div>
@@ -78,7 +80,7 @@ export const LayoutBase = (props: LayoutProps) => {
             stateVoiceChat?.room?.localParticipant ? 'z-30 translate-y-0' : 'z-[-1] translate-y-full'
           } fixed bottom-12 md:bottom-0 w-full pointer-events-none`}
         >
-          {stateVoiceChat?.room?.sid !== '' && (
+          {stateVoiceChat?.room?.sid !== '' && stateVoiceChat?.room?.state !== 'disconnected' && (
             <div
               className={`grid md:grid-cols-12 px-3 lg:px-6 pointer-events-none ${
                 !isSignedIn ? 'mb-3 md:mb-32' : 'mb-3'

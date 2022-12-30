@@ -33,7 +33,7 @@ export function useSearchLensProfiles(options?: any) {
     },
     {
       ...options,
-      enabled: debouncedSearchQuery !== '' ? true : false,
+      enabled: debouncedSearchQuery.trim() !== '' ? true : false,
     },
   )
 

@@ -55,9 +55,19 @@
     @apply grow flex flex-col;
   }
 
-  .link {
-    @apply font-semibold text-primary-10 focus:text-primary-9 hover:text-primary-11;
+  .prose {
+    @apply font-normal text-base;
   }
+  .prose a:not([href*='/profile/']),
+  .link {
+    @apply font-semibold text-primary-10 focus:text-primary-9 hover:text-primary-11 hover:no-underline;
+  }
+
+  .prose a[href*='/profile/'] {
+    color: rgb(255, 142, 255);
+    @apply !no-underline font-medium  hover:text-interactive-11 focus:text-interactive-9;
+  }
+
   .navLink-desktop {
     @apply py-2 px-3 rounded-full font-semibold;
   }
