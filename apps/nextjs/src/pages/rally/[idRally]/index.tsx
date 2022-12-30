@@ -60,7 +60,6 @@ const Page: NextPage = () => {
   const rally = useStoreCurrentLiveRally((state: any) => state.rally)
   const setIsSignedIn = useStoreHasSignedInWithLens((state) => state.setIsSignedIn)
   const { disconnect } = useDisconnect()
-
   return (
     <>
       <Head>

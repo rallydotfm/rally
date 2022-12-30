@@ -13,7 +13,6 @@ export function useGetAudioChatsByWalletAddress(address?: string) {
     enabled: address ? true : false,
     args: [address as `0x${string}`],
     cacheOnBlock: true,
-
     onError(e) {
       console.error(e)
       toast.error(e?.message)

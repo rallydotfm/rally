@@ -554,15 +554,16 @@ export const FormAudioChat = (props: FormAudioChatProps) => {
                         </FormField.HelpBlock>
                       </FormField>
                     </div>
-                    {!errors()?.rally_guests[index]?.eth_address?.length && data()?.rally_guests[index]?.eth_address && (
-                      <div className="mt-4 pt-3 text-xs animate-appear">
-                        <EthereumAddress
-                          shortenOnFallback={true}
-                          displayLensProfile={true}
-                          address={data()?.rally_guests[index]?.eth_address}
-                        />
-                      </div>
-                    )}
+                    {!errors()?.rally_guests[index]?.eth_address?.length &&
+                      data()?.rally_guests[index]?.eth_address && (
+                        <div className="mt-4 pt-3 text-xs animate-appear">
+                          <EthereumAddress
+                            shortenOnFallback={true}
+                            displayLensProfile={true}
+                            address={data()?.rally_guests[index]?.eth_address}
+                          />
+                        </div>
+                      )}
                     <Button
                       intent="negative-ghost"
                       className="!mt-6 w-full"

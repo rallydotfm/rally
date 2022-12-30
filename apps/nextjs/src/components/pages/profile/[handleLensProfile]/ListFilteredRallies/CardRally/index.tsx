@@ -146,36 +146,37 @@ export const CardRally = (props: CardRallyProps) => {
                         </>
                       ) : (
                         <>
-                          {queryPublishedRecording?.data?.encrypted === true && !queryDecryptPublishedRecording?.data && (
-                            <>
-                              <div className="gap-2 flex flex-col w-full">
-                                <p className="text-neutral-11 text-[0.75rem]">This recording is gated.</p>
-                                <Button
-                                  disabled={!account?.address || mutationDecryptMetadata?.isLoading}
-                                  isLoading={mutationDecryptMetadata?.isLoading}
-                                  onClick={async () => await mutationDecryptMetadata.mutateAsync()}
-                                  scale="sm"
-                                  intent="interactive-outline"
-                                  className={'2xs:w-fit-content relative z-20 !pis-4 !pie-2 animate-appear'}
-                                >
-                                  {mutationDecryptMetadata?.isError || mutationSignDecryptMetadataMessage?.isError
-                                    ? 'Try again'
-                                    : mutationSignDecryptMetadataMessage
-                                    ? 'Decrypt'
-                                    : mutationDecryptMetadata?.isLoading
-                                    ? 'Decrypting...'
-                                    : mutationDecryptMetadata?.isSuccess &&
-                                      //@ts-ignore
-                                      mutationDecryptMetadata?.decryptedString &&
-                                      queryDecryptPublishedRecording?.isLoading &&
-                                      account?.address
-                                    ? 'Loading recording...'
-                                    : 'Decrypt'}
-                                  <LockOpenIcon className="mis-1ex w-4" />
-                                </Button>
-                              </div>
-                            </>
-                          )}
+                          {queryPublishedRecording?.data?.encrypted === true &&
+                            !queryDecryptPublishedRecording?.data && (
+                              <>
+                                <div className="gap-2 flex flex-col w-full">
+                                  <p className="text-neutral-11 text-[0.75rem]">This recording is gated.</p>
+                                  <Button
+                                    disabled={!account?.address || mutationDecryptMetadata?.isLoading}
+                                    isLoading={mutationDecryptMetadata?.isLoading}
+                                    onClick={async () => await mutationDecryptMetadata.mutateAsync()}
+                                    scale="sm"
+                                    intent="interactive-outline"
+                                    className={'2xs:w-fit-content relative z-20 !pis-4 !pie-2 animate-appear'}
+                                  >
+                                    {mutationDecryptMetadata?.isError || mutationSignDecryptMetadataMessage?.isError
+                                      ? 'Try again'
+                                      : mutationSignDecryptMetadataMessage
+                                      ? 'Decrypt'
+                                      : mutationDecryptMetadata?.isLoading
+                                      ? 'Decrypting...'
+                                      : mutationDecryptMetadata?.isSuccess &&
+                                        //@ts-ignore
+                                        mutationDecryptMetadata?.decryptedString &&
+                                        queryDecryptPublishedRecording?.isLoading &&
+                                        account?.address
+                                      ? 'Loading recording...'
+                                      : 'Decrypt'}
+                                    <LockOpenIcon className="mis-1ex w-4" />
+                                  </Button>
+                                </div>
+                              </>
+                            )}
                         </>
                       )}
                     </>

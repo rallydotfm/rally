@@ -19,7 +19,6 @@ export const LensPublicationFormFieldsCollectModule = (props: LensPublicationFor
   const { disabled, data, setData, errors, setFields } = props
   const account = useAccount()
   const { chain } = useNetwork()
-
   return (
     <>
       <FormField>
