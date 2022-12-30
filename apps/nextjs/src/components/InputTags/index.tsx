@@ -10,7 +10,6 @@ interface InputTagsProps extends SystemUiInputProps {
 
 export const InputTags = (props: InputTagsProps) => {
   const { api, disabled, className, intent, scale, appearance, placeholder } = props
-
   return (
     <div {...api?.rootProps}>
       <input

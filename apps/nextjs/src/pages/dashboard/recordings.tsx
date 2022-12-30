@@ -40,6 +40,7 @@ const Page: NextPage = () => {
           <>
             <div className="mb-6 animate-appear flex justify-between">
               <h2 className="font-medium text-xs text-neutral-11">
+<<<<<<< HEAD
                 {
                   //@ts-ignore
                   queriesAudioChatsByAddressMetadata.filter((query) => query?.data?.id && query?.data?.recording !== '')
@@ -51,6 +52,9 @@ const Page: NextPage = () => {
                   queriesAudioChatsByAddressMetadata.filter((query) => query?.data?.id && query?.data?.recording !== '')
                     ?.length > 1 && 's'
                 }
+=======
+                {queriesAudioChatsByAddressMetadata.filter((query) => query?.status === 'success')?.length} rallies
+>>>>>>> d3d8ced (MVP (#8))
               </h2>
             </div>
             <ul
@@ -60,10 +64,14 @@ const Page: NextPage = () => {
             >
               {queriesAudioChatsByAddressMetadata
                 //@ts-ignore
+<<<<<<< HEAD
                 .filter((query) => {
                   //@ts-ignore
                   return query?.data?.id && query?.data?.recording !== ''
                 })
+=======
+                .filter((query) => query?.data?.id)
+>>>>>>> d3d8ced (MVP (#8))
                 /* @ts-ignore */
                 .sort((a, b) => {
                   if (sortOrder === SORT_ORDER.START_CLOSEST)
@@ -83,11 +91,15 @@ const Page: NextPage = () => {
                 .map((audioChat) => {
                   return (
                     //@ts-ignore
+<<<<<<< HEAD
                     <li
                       className={`animate-appear focus-within:z-10 relative`}
                       //@ts-ignore
                       key={`dashboard-recordings-${audioChat.data.id}`}
                     >
+=======
+                    <li className={`animate-appear focus-within:z-10 relative`} key={audioChat.data.id}>
+>>>>>>> d3d8ced (MVP (#8))
                       <CardRecording
                         data={audioChat.data}
                         onClickGoLive={undefined}

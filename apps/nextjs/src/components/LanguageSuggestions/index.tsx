@@ -12,7 +12,6 @@ interface LanguageSuggestions {
 
 export const LanguageSuggestions = (props: LanguageSuggestions) => {
   const { onSelectValue, inputValue, setInputValue, className } = props
-
   return (
     <div className="relative">
       <Popover>

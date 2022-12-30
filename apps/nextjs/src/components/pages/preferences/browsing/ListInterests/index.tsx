@@ -4,7 +4,6 @@ import { CheckCircleIcon } from '@heroicons/react/20/solid'
 import useAddProfileInterest from '@hooks/useAddProfileInterest'
 import { useStorePersistedInterests } from '@hooks/usePersistedInterests'
 import useRemoveProfileInterest from '@hooks/useRemoveProfileInterest'
-
 import { useAccount } from 'wagmi'
 
 interface ListInterestsProps {
