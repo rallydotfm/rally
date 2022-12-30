@@ -1,4 +1,4 @@
 {
   "extends": "../../tsconfig.json",
-  "include": ["src", "index.ts", "transformer.ts"]
+  "include": ["src", "index.ts", "transformer.ts", "node_modules/@rally/auth/next-auth.d.ts"]
 }

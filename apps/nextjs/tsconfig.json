@@ -24,10 +24,11 @@
       "@helpers/*": ["helpers/*"],
       "@hooks/*": ["hooks/*"],
       "@layouts/*": ["layouts/*"],
+      "@services/*": ["services/*"],
       "@styles/*": ["styles/*"],
-      "@utils/*": ["utils/*"],
+      "@utils/*": ["utils/*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "**/*.cjs", "**/*.mjs"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "**/*.cjs", "**/*.mjs", "tailwind.config.js"],
   "exclude": ["node_modules"]
 }

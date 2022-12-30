@@ -1,14 +1,16 @@
 import { connectorsForWallets, getDefaultWallets } from '@rainbow-me/rainbowkit'
 import { chain, configureChains, createClient } from 'wagmi'
 import { publicProvider } from 'wagmi/providers/public'
+import { alchemyProvider } from 'wagmi/providers/alchemy'
 
+export const chainId = process?.env?.NEXT_PUBLIC_CHAIN === 'mumbai' ? chain.polygonMumbai?.id : chain?.polygon?.id
 export const { chains, provider } = configureChains(
   // for now we just want to support Mumbai testnet
-  [chain.polygonMumbai],
+  [process?.env?.NEXT_PUBLIC_CHAIN === 'mumbai' ? chain.polygonMumbai : chain?.polygon],
   // later on here we could add other providers
   // like Alchemy, Ankr, Infura...
   // eg: see https://wagmi.sh/docs/providers/alchemy
-  [publicProvider()],
+  [alchemyProvider({ apiKey: process.env.NEXT_PUBLIC_ALCHEMY_KEY }), publicProvider()],
 )
 
 const { wallets } = getDefaultWallets({
@@ -19,7 +21,7 @@ const { wallets } = getDefaultWallets({
 const connectors = connectorsForWallets([...wallets])
 
 export const wagmiClient = createClient({
-  autoConnect: true,
+  autoConnect: false,
   connectors,
   provider,
 })

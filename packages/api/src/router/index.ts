@@ -1,11 +1,13 @@
 // src/server/router/index.ts
-import { t } from '../trpc'
+import { router } from '../trpc'
 import { credentialsRouter } from './credentials'
-import { roomsRouter } from './rooms'
+import { roomRouter } from './room'
+import { recordingsRouter } from './recordings'
 
-export const appRouter = t.router({
+export const appRouter = router({
   credentials: credentialsRouter,
-  rooms: roomsRouter,
+  room: roomRouter,
+  recordings: recordingsRouter,
 })
 
 // export type definition of API
