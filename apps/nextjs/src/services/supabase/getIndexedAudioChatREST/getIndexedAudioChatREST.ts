@@ -4,6 +4,7 @@ export async function getIndexedAudioChatREST(filterParams: any) {
   const { data, error } = await supabase
     .from('AudioChat')
     .select('*')
+    .in('creator', [filterParams.creator])
     .in('is_gated', filterParams.gated)
     .in('is_nsfw', filterParams.nsfw)
     .in('category', filterParams.categories)

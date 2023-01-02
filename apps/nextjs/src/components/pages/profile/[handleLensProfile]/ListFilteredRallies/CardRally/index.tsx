@@ -33,9 +33,9 @@ export const CardRally = (props: CardRallyProps) => {
   const stateVoiceChat: any = useStoreLiveVoiceChat()
   return (
     <article
-      className={`bg-neutral-1 hover:bg-neutral-2 focus:bg-neutral-3 border-neutral-4 border p-6 rounded-xl h-full relative`}
+      className={`flex flex-col bg-neutral-1 hover:bg-neutral-2 focus:bg-neutral-3 border-neutral-4 border p-6 rounded-xl h-full relative`}
     >
-      <div className="flex flex-col space-y-4 xs:flex-row xs:space-y-0 xs:space-i-6">
+      <div className="flex-grow flex flex-col space-y-4 xs:flex-row xs:space-y-0 xs:space-i-6">
         <div className="px-4 flex-grow flex flex-col xs:px-0">
           <h1 className="font-bold flex flex-col-reverse">
             <span className="py-2">{data?.name}</span>

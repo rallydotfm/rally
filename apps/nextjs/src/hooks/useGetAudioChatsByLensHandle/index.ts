@@ -25,7 +25,7 @@ export function useGetAudioChatsByLensHandle(handle: string) {
       first: PER_PAGE,
       skip,
       categories: queryListInterests.data,
-      creator: '',
+      creator: queryLensProfile?.data?.ownedBy,
       name: '',
       nsfw: [true, false],
       gated: [false, true],
