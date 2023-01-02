@@ -6,6 +6,7 @@ import { ROUTE_PROFILE } from '@config/routes'
 import { useQueryClient } from '@tanstack/react-query'
 import { useRouter } from 'next/router'
 import dynamic from 'next/dynamic'
+import VideoPlayer from './VideoPlayer'
 
 const NoSSRAudioPlayer = dynamic(() => import('./AudioPlayer'), {
   ssr: false,
@@ -105,14 +106,8 @@ export const LensPublicationContent = (props: any) => {
         >
           {publication?.metadata?.media?.map((media: any, i: any) => {
             if (media?.original?.mimeType?.includes('video') && i <= 0)
-              return (
-                <video
-                  preload="none"
-                  className="w-full aspect-video max-w-prose mx-auto"
-                  width="300"
-                  controls
-                  src={media?.original?.url}
-                ></video>
+              return  <VideoPlayer url={media?.original?.url} /> (
+
               )
             else if (media?.original?.mimeType?.includes('audio'))
               return (
