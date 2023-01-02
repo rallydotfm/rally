@@ -1,45 +1,30 @@
-import { LivepeerConfig, ThemeConfig, createReactClient, studioProvider } from '@livepeer/react'
 import { Player } from '@livepeer/react'
-import { parseArweaveTxId, parseCid } from 'livepeer/media'
 import { useMemo } from 'react'
-
-const livepeerClient = createReactClient({
-  provider: studioProvider({
-    apiKey: process.env.NEXT_PUBLIC_LIVEPEER_STUDIO_API_KEY,
-  }),
-})
-
-const theme: ThemeConfig = {
-  colors: {
-    accent: 'rgb(0, 145, 255)',
-    containerBorderColor: 'rgba(0, 145, 255, 0.9)',
-  },
-  fonts: {
-    display: 'Inter',
-  },
+import { parseArweaveTxId, parseCid } from 'livepeer/media'
+import { IconSpinner } from '@components/Icons'
+interface VideoPlayerProps {
+  url: string
+  name: string
 }
-
-export const VideoPlayer = (props) => {
-  const { url } = props
+export const VideoPlayer = (props: VideoPlayerProps) => {
+  const { url, name } = props
   const idParsed = useMemo(() => parseCid(url) ?? parseArweaveTxId(url), [url])
-
+  if (idParsed)
+    return (
+      <div className="animate-appear max-w-prose">
+        <Player
+          title={name}
+          src={url}
+          autoPlay={false}
+          autoUrlUpload={{ fallback: true, ipfsGateway: 'https://w3s.link' }}
+        />
+      </div>
+    )
   return (
-    <LivepeerConfig client={livepeerClient} theme={theme}>
-      <Player
-        title="Waterfalls"
-        playbackId={idParsed}
-        showPipButton
-        showTitle={false}
-        aspectRatio="16to9"
-        controls={{
-          autohide: 3000,
-        }}
-        theme={{
-          borderStyles: { containerBorderStyle: 'hidden' },
-          radii: { containerBorderRadius: '10px' },
-        }}
-      />
-    </LivepeerConfig>
+    <div className="my-6 flex items-center justify-center space-i-1ex">
+      <IconSpinner className="text-lg animate-spin" />
+      <p className="font-bold animate-pulse">Loading video...</p>
+    </div>
   )
 }
 export default VideoPlayer

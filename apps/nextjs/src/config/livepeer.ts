@@ -1,4 +1,9 @@
-import { LivepeerConfig, ThemeConfig, createReactClient, studioProvider } from '@livepeer/react'
+import { ThemeConfig, createReactClient, studioProvider } from '@livepeer/react'
+import resolveConfig from 'tailwindcss/resolveConfig'
+import tailwindConfig from './../../tailwind.config.cjs'
+
+//@ts-ignore
+const tailwindTheme = resolveConfig(tailwindConfig).theme
 
 export const livepeerClient = createReactClient({
   provider: studioProvider({
@@ -6,12 +11,9 @@ export const livepeerClient = createReactClient({
   }),
 })
 
-export const theme: ThemeConfig = {
+export const livepeerTheme: ThemeConfig = {
   colors: {
-    accent: 'rgb(0, 145, 255)',
-    containerBorderColor: 'rgba(0, 145, 255, 0.9)',
-  },
-  fonts: {
-    display: 'Inter',
+    accent: tailwindTheme?.colors.interactive[10],
+    containerBorderColor: tailwindTheme?.colors.interactive[4],
   },
 }

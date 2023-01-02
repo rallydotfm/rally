@@ -7,6 +7,8 @@ import { useQueryClient } from '@tanstack/react-query'
 import { useRouter } from 'next/router'
 import dynamic from 'next/dynamic'
 import VideoPlayer from './VideoPlayer'
+import { livepeerClient, livepeerTheme } from '@config/livepeer'
+import { LivepeerConfig } from '@livepeer/react'
 
 const NoSSRAudioPlayer = dynamic(() => import('./AudioPlayer'), {
   ssr: false,
@@ -83,51 +85,56 @@ export const LensPublicationContent = (props: any) => {
   const { publication, ...rest } = props
   const { pathname } = useRouter()
   return (
-    <article>
-      <div className="prose w-full prose-invert">
-        <Interweave
-          {...rest}
-          content={publication?.metadata?.content}
-          matchers={[new UrlMatcher('url'), new MentionMatcher('mention'), timestampMatcher]}
-          mentionUrl={`${process.env.NEXT_PUBLIC_APP_URL}${ROUTE_PROFILE.replace(
-            '@[handleLensProfile]',
-            '{{mention}}',
-          )}${process.env.NEXT_PUBLIC_LENS_API_URL === 'https://api-mumbai.lens.dev' ? '.test' : '.lens'}`}
-          newWindow={true}
-        />
-      </div>
-      {publication?.metadata?.media?.length > 0 && (
-        <div
-          className={`grid ${
-            publication?.metadata?.media?.original?.mimeType?.includes('image') || publication?.metadata?.media === 1
-              ? 'grid-cols-1'
-              : 'flex'
-          } gap-3 mt-3 w-full`}
-        >
-          {publication?.metadata?.media?.map((media: any, i: any) => {
-            if (media?.original?.mimeType?.includes('video') && i <= 0)
-              return  <VideoPlayer url={media?.original?.url} /> (
-
-              )
-            else if (media?.original?.mimeType?.includes('audio'))
-              return (
-                <div className="aspect-square 2xs:aspect-auto max-w-screen-xs">
-                  <NoSSRAudioPlayer publication={publication} />
-                </div>
-              )
-            else if (media?.original?.mimeType?.includes('image'))
-              return (
-                <img
-                  loading="lazy"
-                  width="300"
-                  className="w-full aspect-contain"
-                  src={media?.original?.url?.replace('ipfs://', 'https://lens.infura-ipfs.io/ipfs/')}
-                />
-              )
-          })}
+    <LivepeerConfig theme={livepeerTheme} client={livepeerClient}>
+      <article>
+        <div className="prose w-full prose-invert">
+          <Interweave
+            {...rest}
+            content={publication?.metadata?.content}
+            matchers={[new UrlMatcher('url'), new MentionMatcher('mention'), timestampMatcher]}
+            mentionUrl={`${process.env.NEXT_PUBLIC_APP_URL}${ROUTE_PROFILE.replace(
+              '@[handleLensProfile]',
+              '{{mention}}',
+            )}${process.env.NEXT_PUBLIC_LENS_API_URL === 'https://api-mumbai.lens.dev' ? '.test' : '.lens'}`}
+            newWindow={true}
+          />
         </div>
-      )}
-    </article>
+        {publication?.metadata?.media?.length > 0 && (
+          <div
+            className={`grid ${
+              publication?.metadata?.media?.original?.mimeType?.includes('image') || publication?.metadata?.media === 1
+                ? 'grid-cols-1'
+                : 'flex'
+            } gap-3 mt-3 w-full`}
+          >
+            {publication?.metadata?.media?.map((media: any, i: any) => {
+              if (media?.original?.mimeType?.includes('video') && i <= 0) {
+                return (
+                  <VideoPlayer
+                    name={publication?.metadata?.name}
+                    url={media?.original?.url?.replace('ipfs://', 'https://lens.infura-ipfs.io/ipfs/')}
+                  />
+                )
+              } else if (media?.original?.mimeType?.includes('audio'))
+                return (
+                  <div className="aspect-square 2xs:aspect-auto max-w-screen-xs">
+                    <NoSSRAudioPlayer publication={publication} />
+                  </div>
+                )
+              else if (media?.original?.mimeType?.includes('image'))
+                return (
+                  <img
+                    loading="lazy"
+                    width="300"
+                    className="w-full aspect-contain"
+                    src={media?.original?.url?.replace('ipfs://', 'https://lens.infura-ipfs.io/ipfs/')}
+                  />
+                )
+            })}
+          </div>
+        )}
+      </article>
+    </LivepeerConfig>
   )
 }
 
