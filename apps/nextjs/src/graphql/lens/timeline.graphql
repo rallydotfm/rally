@@ -1,4 +1,4 @@
-query timeline($request: TimelineRequest!) {
+query timeline($request: TimelineRequest!, $profileId: ProfileId) {
   timeline(request: $request) {
     items {
       __typename

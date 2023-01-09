@@ -1,4 +1,4 @@
-import { chain, useAccount, useContractWrite, useSignTypedData } from 'wagmi'
+import { chain, useAccount, useContractWrite, useProvider, useSigner, useSignTypedData } from 'wagmi'
 import omit from '@helpers/omit'
 import splitSignature from '@helpers/splitSignature'
 import { CONTRACT_LENS_HUB_PROXY } from '@config/contracts'
@@ -13,9 +13,12 @@ import { utils, BigNumber } from 'ethers'
 import createPostViaDispatcherRequest from '@services/lens/publications/postViaDispatcher'
 import { CreatePublicPostRequest } from '@graphql/lens/generated'
 import { useMutation } from '@tanstack/react-query'
+import { LensGatedSDK, LensEnvironment } from '@lens-protocol/sdk-gated'
 
 export function useCreateLensPost() {
   const account = useAccount()
+  const { data: signer } = useSigner()
+  const provider = useProvider()
   const queryLensProfile: any = useWalletAddressDefaultLensProfile(account?.address as `0x${string}`, {
     enabled: account?.address ? true : false,
   })
@@ -42,7 +45,7 @@ export function useCreateLensPost() {
     async (request: CreatePublicPostRequest) => await createPostViaDispatcherRequest(request),
   )
 
-  async function publishPost(contentURI: string, values: any) {
+  async function publishPost(contentURI: string, values: any, encrypted: any) {
     let collectModule: any = {}
     let referenceModule: any = {}
 
@@ -119,11 +122,24 @@ export function useCreateLensPost() {
         }
       }
 
-      const createPostRequest = {
+      let gated = {}
+      if (values.gated_module === true && values?.access_control_conditions?.length > 0) {
+        gated = {
+          encryptedSymmetricKey: encrypted.encryptedMetadata.encryptionParams.providerSpecificParams.encryptionKey,
+          ...encrypted.accessControl,
+        }
+      }
+
+      let createPostRequest = {
         profileId,
         contentURI,
         collectModule,
         referenceModule,
+      }
+
+      if (gated?.encryptedSymmetricKey) {
+        createPostRequest.gated = gated
+        createPostRequest.contentURI = encrypted?.contentURI
       }
 
       if (queryLensProfile?.data?.dispatcher && queryLensProfile?.data?.dispatcher !== null) {

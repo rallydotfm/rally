@@ -18,7 +18,7 @@ interface LensPublicationFormFieldsCollectModuleProps {
 export const LensPublicationFormFieldsCollectModule = (props: LensPublicationFormFieldsCollectModuleProps) => {
   const { disabled, data, setData, errors, setFields } = props
   const account = useAccount()
-  const { chain } = useNetwork()
+
   return (
     <>
       <FormField>
@@ -170,7 +170,7 @@ export const LensPublicationFormFieldsCollectModule = (props: LensPublicationFor
                           <option disabled={true}>Select a currency</option>
                           {/* @ts-ignore */}
                           {Object.keys(TOKENS_WHITELIST[process.env.NEXT_PUBLIC_CHAIN]).map((tokenAddress) => (
-                            <option value={tokenAddress} key={tokenAddress}>
+                            <option value={tokenAddress} key={`whitelisted-list${tokenAddress}`}>
                               {/* @ts-ignore */}
                               {TOKENS_WHITELIST[process.env.NEXT_PUBLIC_CHAIN][tokenAddress]}
                             </option>

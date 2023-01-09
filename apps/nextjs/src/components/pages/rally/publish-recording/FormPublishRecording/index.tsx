@@ -3,16 +3,12 @@ import FormField from '@components/FormField'
 import FormInput from '@components/FormInput'
 import FormTextarea from '@components/FormTextarea'
 import InputTags from '@components/InputTags'
-import FormRadioGroup from '@components/FormRadioGroup'
-import { RadioGroup } from '@headlessui/react'
-import FormRadioOption from '@components/FormRadioOption'
 import { useAccount, useNetwork } from 'wagmi'
 import { useStoreHasSignedInWithLens } from '@hooks/useSignInWithLens'
 import InputCheckboxToggle from '@components/InputCheckboxToggle'
-import FormSelect from '@components/FormSelect'
-import { TOKENS_WHITELIST } from '@config/lens'
 import LensPublicationFormFieldsReferenceModule from '@components/LensPublicationFormFieldsReferenceModule'
 import LensPublicationFormFieldsCollectModule from '@components/LensPublicationFormFieldsCollectModule'
+import LensPublicationFormFieldsGatedModule from '@components/LensPublicationFormFieldsGatedModule'
 
 interface FormPublishRecording {
   disabled: boolean
@@ -118,6 +114,24 @@ export const FormPublishRecording = (props: FormPublishRecording) => {
                 Please add at least 1 tag.
               </FormField.HelpBlock>
             </FormField>
+            <div className="relative focus-within:z-10 bg-neutral-1 p-6 rounded-md">
+              <h2 className="font-semibold text-sm mb-1.5">Configure access-control settings</h2>
+              <p className="mb-4 text-neutral-11 text-xs">
+                Define who can access your post with on-chain criteria.
+                <br /> Your wallet will be whitelisted by default.
+              </p>
+              <div className="space-y-6">
+                <LensPublicationFormFieldsGatedModule
+                  data={data}
+                  setData={setData}
+                  errors={errors}
+                  disabled={disabled || !showSectionLens}
+                  setFields={setFields}
+                  addField={addField}
+                  resetField={resetField}
+                />
+              </div>
+            </div>
           </fieldset>
 
           <fieldset disabled={!showSectionLens}>
@@ -141,7 +155,7 @@ export const FormPublishRecording = (props: FormPublishRecording) => {
               </FormField>
               {data()?.publish_on_lens === true && (
                 <>
-                  <div className="bg-neutral-1 p-6 rounded-md">
+                  <div className="relative focus-within:z-10 bg-neutral-1 p-6 rounded-md">
                     <h2 className="font-semibold text-sm mb-1.5">Configure collect settings</h2>
                     <p className="mb-4 text-neutral-11 text-xs">
                       Collects allow you to monetize your content. When sharing your recording, you can configure a
@@ -157,7 +171,7 @@ export const FormPublishRecording = (props: FormPublishRecording) => {
                       />
                     </div>
                   </div>
-                  <div className="bg-neutral-1 p-6 rounded-md">
+                  <div className="relative focus-within:z-10 bg-neutral-1 p-6 rounded-md">
                     <h2 className="font-semibold text-sm mb-1.5">Configure mirror and comments settings</h2>
                     <p className="mb-4 text-neutral-11 text-xs">Fine-tune who can comment and mirror your post.</p>
                     <div className="space-y-6">

@@ -9,6 +9,11 @@ import dynamic from 'next/dynamic'
 import VideoPlayer from './VideoPlayer'
 import { livepeerClient, livepeerTheme } from '@config/livepeer'
 import { LivepeerConfig } from '@livepeer/react'
+import { useGetDecryptedLensPublication, useStoreDecryptPublication } from '@hooks/useGetDecryptedLensPublication'
+import { useMountEffect, useUpdateEffect } from '@react-hookz/web'
+import Button from '@components/Button'
+import { useStoreHasSignedInWithLens } from '@hooks/useSignInWithLens'
+import { useAccount } from 'wagmi'
 
 const NoSSRAudioPlayer = dynamic(() => import('./AudioPlayer'), {
   ssr: false,
@@ -83,14 +88,65 @@ const timestampMatcher: MatcherInterface<any> = {
 
 export const LensPublicationContent = (props: any) => {
   const { publication, ...rest } = props
-  const { pathname } = useRouter()
+  const { mutationInitializeDecryptor, mutationDecryptPublication } = useGetDecryptedLensPublication()
+  const sdk = useStoreDecryptPublication((state: any) => state?.sdk)
+  const isSignedIn = useStoreHasSignedInWithLens((state) => state.isSignedIn)
+  const account = useAccount()
+  useMountEffect(() => {
+    if (
+      isSignedIn === true &&
+      account?.address &&
+      publication?.isGated === true &&
+      publication?.canDecrypt === true &&
+      sdk
+    ) {
+      mutationDecryptPublication.mutate(publication?.metadata)
+    }
+  })
+
+  useUpdateEffect(() => {
+    if (
+      isSignedIn === true &&
+      account?.address &&
+      sdk &&
+      publication.isGated === true &&
+      publication?.canDecrypt === true
+    ) {
+      mutationDecryptPublication.mutate(publication?.metadata)
+    }
+  }, [isSignedIn, sdk, account?.address, publication?.isGated, publication?.canDecrypt])
+
+  if (publication?.isGated && sdk) {
+    return (
+      <article className="flex flex-col">
+        This publication is gated.
+        <Button
+          scale="sm"
+          className="mt-3 w-fit-content mx-auto"
+          intent="primary-outline"
+          isLoading={mutationInitializeDecryptor?.isLoading}
+          disabled={mutationInitializeDecryptor?.isLoading}
+          onClick={async () => await mutationInitializeDecryptor.mutateAsync()}
+        >
+          Activate decryptor
+        </Button>
+      </article>
+    )
+  }
   return (
     <LivepeerConfig theme={livepeerTheme} client={livepeerClient}>
-      <article>
+      {publication?.isGated && mutationDecryptPublication?.isLoading && 'decrypting...'}
+      <article className="animate-appear">
         <div className="prose w-full prose-invert">
           <Interweave
             {...rest}
-            content={publication?.metadata?.content}
+            content={
+              publication?.isGated && mutationDecryptPublication?.data?.decrypted?.content
+                ? mutationDecryptPublication?.data?.decrypted?.content
+                : mutationDecryptPublication?.data?.error?.errorCode === 'not_authorized'
+                ? mutationDecryptPublication?.data?.error?.message
+                : publication?.metadata?.content
+            }
             matchers={[new UrlMatcher('url'), new MentionMatcher('mention'), timestampMatcher]}
             mentionUrl={`${process.env.NEXT_PUBLIC_APP_URL}${ROUTE_PROFILE.replace(
               '@[handleLensProfile]',

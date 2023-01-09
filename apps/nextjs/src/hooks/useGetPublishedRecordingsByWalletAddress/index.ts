@@ -19,6 +19,7 @@ export function useGetPublishedRecordingsByWalletAddress(address?: string) {
     },
   })
 
+  console.log(queryRecordingsByAddressRawData.data)
   const queriesAudioChatsByAddressMetadata = useQueries({
     //@ts-ignore
     enabled: queryRecordingsByAddressRawData?.data?.length > 0 ?? false,

@@ -10,7 +10,7 @@ import { createStoreIndexedAudioChatsFilters } from '@hooks/useStoreIndexedAudio
 import useGetProfilesInterests from '@hooks/useGetProfileInterests'
 import { useState } from 'react'
 import { isAddress } from 'ethers/lib/utils'
-import useIndexedRecordingsRest from '@hooks/useGetIndexedRecordingsREST '
+import useIndexedRecordings from '@hooks/useIndexedRecordings'
 
 const PER_PAGE = 30
 const useStoreFiltersAudioChatsRecordingsSearchPage = createStoreIndexedAudioChatsFilters()
@@ -30,7 +30,7 @@ const Page: NextPage = () => {
   const setOrder = useStoreFiltersAudioChatsRecordingsSearchPage((state: any) => state.setOrder)
   const resetFilters = useStoreFiltersAudioChatsRecordingsSearchPage((state: any) => state.resetFilters)
   const queryListInterests = useGetProfilesInterests()
-  const queryAudioChatsRecordings = useIndexedRecordingsRest(
+  const queryAudioChatsRecordings = useIndexedRecordings(
     {
       first: PER_PAGE,
       skip,
@@ -53,11 +53,11 @@ const Page: NextPage = () => {
         <title>Search recordings - Rally</title>
         <meta
           name="description"
-          content="Rally is an open-source alternative to Twitter Space/Clubhouse for web3 communities."
+          content="Search recordings of audio rooms published on Rally, an open-source alternative to Twitter Space/Clubhouse for web3 communities."
         />
       </Head>
       <main className="pt-2 flex-grow flex flex-col">
-        <h1 className="sr-only">Search rallies by...</h1>
+        <h1 className="sr-only">Search recordings by...</h1>
         <div className="relative pb-6 z-10">
           <Filters
             clearFilters={resetFilters}
@@ -89,7 +89,7 @@ const Page: NextPage = () => {
           queryAudioChatsRecordings?.isLoading && (
             <div className="mb-6 pt-12 animate-appear flex items-center justify-center space-i-1ex">
               <IconSpinner className="text-lg animate-spin" />
-              <p className="font-bold animate-pulse">Loading rallies...</p>
+              <p className="font-bold animate-pulse">Loading recordings...</p>
             </div>
           )
         )}

@@ -22,11 +22,18 @@ export const CardRecording = (props: CardRecordingProps) => {
   const { data, onSelectRallyToDelete } = props
   const playedRally = useAudioPlayer((state: any) => state.rally)
   const stateVoiceChat: any = useStoreLiveVoiceChat()
-  const queryPublishedRecording = useGetAudioChatPublishedRecording(data.id, data.recording)
-
+  const {
+    queryPublishedRecording,
+    queryDecryptPublishedRecording,
+    mutationDecryptMetadata,
+    mutationSignDecryptMetadataMessage,
+  } = useGetAudioChatPublishedRecording(data.id, data.recording)
   const setAudioPlayer = useAudioPlayer((state) => state.setAudioPlayer)
 
-  if (queryPublishedRecording?.isLoading)
+  if (
+    (queryPublishedRecording?.isLoading && queryPublishedRecording?.data?.encrypted !== true) ||
+    (queryPublishedRecording?.data?.encrypted === true && queryDecryptPublishedRecording?.isLoading)
+  )
     return <div className="w-full aspect-video bg-neutral-2 animate-pulse rounded-md"></div>
   return (
     <div

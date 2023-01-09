@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { CONTRACT_AUDIO_CHATS } from '@config/contracts'
-import { useContractWrite, useWaitForTransaction } from 'wagmi'
+import { useAccount, useContractWrite, useWaitForTransaction } from 'wagmi'
 import { audioChatABI } from '@rally/abi'
 import create from 'zustand'
 import toast from 'react-hot-toast'
@@ -11,6 +11,12 @@ import { v4 as uuidv4 } from 'uuid'
 import { useStoreBundlr } from '@hooks/useBundlr'
 import useCreateLensPost from '@hooks/useCreateLensPost'
 import useIndexAudioChat from '@hooks/useAddAudioChat.ts'
+import useWalletAddressDefaultLensProfile from '@hooks/useWalletAddressDefaultLensProfile'
+import jsonToBase64 from '@helpers/jsonToBase64'
+import base64ToJson from '@helpers/base64ToJson'
+import getEncryptionCriteria from '@helpers/getEncryptionCriteria'
+import useLit from '@hooks/useLit'
+import { LensEnvironment, LensGatedSDK } from '@lens-protocol/sdk-gated'
 export interface TxUi {
   isDialogVisible: boolean
   metadataArweaveTxId: string | undefined
@@ -43,7 +49,10 @@ export const useStoreTxUi = create<TxUi>((set) => ({
 }))
 
 export function useSmartContract(stateTxUi: TxUi) {
+  const account = useAccount()
+  const queryLensProfile = useWalletAddressDefaultLensProfile(account?.address as `0x${string}`, {})
   const { publishPost, mutationCreatePostViaDispatcher } = useCreateLensPost()
+  const { mutationEncryptText, mutationSignMessage } = useLit()
   const mutationIndexAudioChat = useIndexAudioChat()
   const audioFileArweaveTxId = useStoreTxUi((state) => state?.audioFileArweaveTxId)
   const metadataArweaveTxId = useStoreTxUi((state) => state?.metadataArweaveTxId)
@@ -78,10 +87,10 @@ export function useSmartContract(stateTxUi: TxUi) {
   /**
    * Create Lens Post
    */
-  const mutationPublishToLens = useMutation(async (args: { metadata: any; values: any }) => {
+  const mutationPublishToLens = useMutation(async (args: { arweaveTxId: any; values: any; encrypted?: any }) => {
     try {
-      const { metadata, values } = args
-      const lensPostId = await publishPost(`https://arweave.net/${metadata}`, values)
+      const { arweaveTxId, values, encrypted } = args
+      const lensPostId = await publishPost(`https://arweave.net/${arweaveTxId}`, values, encrypted)
       return lensPostId
     } catch (e) {
       toast.error("Something went wrong and your post couldn't be published on Lens.")
@@ -118,24 +127,24 @@ export function useSmartContract(stateTxUi: TxUi) {
   })
 
   /**
-   *  Upload audio file to Bundlr, publish metadata file
+   *  Upload audio file to Bundlr publish metadata file
    * @param values - values returned by our form
    */
   async function prepareRecordingData(values: any) {
     const previousData: any = queryClient.getQueryData(['audio-chat-metadata', values?.id])
+    let encrypted = {}
+    let lensPostId = ''
 
     try {
       let idTxUploadAudioFileToArweave = audioFileArweaveTxId
-      let lensPostId = ''
       if (!idTxUploadAudioFileToArweave) {
         idTxUploadAudioFileToArweave = await mutationUploadAudioFileToBundlr.mutateAsync(values.file)
       }
 
-      let metadata = metadataArweaveTxId
+      let _metadataArweaveTxId = metadataArweaveTxId
 
       if (!metadataArweaveTxId?.length) {
         // create JSON file with form values + uploaded recording
-
         const recordingData = {
           version: '2.0.0',
           mainContentFocus: PublicationMainFocus.Audio,
@@ -146,7 +155,7 @@ export function useSmartContract(stateTxUi: TxUi) {
           content: values.recording_description,
           external_url: `${process.env.NEXT_PUBLIC_APP_URL}/rally/${values?.id}`,
           image: values?.recording_image_src ?? '',
-          imageMimeType: 'image/*',
+          imageMimeType: values?.recording_image_src ? 'image/webp' : undefined,
           name: values.recording_title,
           attributes: [
             {
@@ -155,32 +164,32 @@ export function useSmartContract(stateTxUi: TxUi) {
               value: 'audio',
             },
             {
-              traiType: 'name',
+              traitType: 'name',
               displayType: 'string',
               value: values.recording_title,
             },
             {
-              traiType: 'title',
+              traitType: 'title',
               displayType: 'string',
               value: values.recording_title,
             },
             {
-              traiType: 'author',
+              traitType: 'author',
               displayType: 'string',
               value: values.recording_title,
             },
             {
-              traiType: 'thumbnail',
+              traitType: 'thumbnail',
               displayType: 'string',
-              value: values?.recording_image_src ?? null,
+              value: values?.recording_image_src ?? '',
             },
             {
-              traiType: 'category',
+              traitType: 'category',
               displayType: 'string',
               value: previousData?.category,
             },
             {
-              traiType: 'rally',
+              traitType: 'rally',
               displayType: 'string',
               value: values?.id,
             },
@@ -196,24 +205,112 @@ export function useSmartContract(stateTxUi: TxUi) {
           appId: 'Rally',
         }
 
-        const recordingDataJSON = JSON.stringify(recordingData)
+        const recordingDataAsString = JSON.stringify(recordingData)
 
         const tags = [
           { name: 'Content-Type', value: 'application/json' },
           { name: 'App-Name', value: 'Rally' },
         ]
+        // If the publication is gated
+        if (values.gated_module === true && values?.access_control_conditions?.length > 0) {
+          // Lens access controls condition are slightly different from Lit
+          // So we create 2 different objects that will have the same conditions but with a different syntax
 
-        //@ts-ignore
-        metadata = await mutationUploadMetadataToBundlr.mutateAsync({ data: recordingDataJSON, tags })
-        if (values?.publish_on_lens === true) {
-          //@ts-ignore
-          lensPostId = await mutationPublishToLens.mutateAsync({ metadata, values })
+          const { litCriteria, accessControl } = getEncryptionCriteria({
+            currentUserEthAddress: account?.address as `0x${string}`,
+            accessControlConditions: values.access_control_conditions,
+            conditionOperator: values.gated_module_condition_operator,
+          })
+
+          if (values?.publish_on_lens === true) {
+            const signer = await account?.connector?.getSigner()
+            const provider = await account?.connector?.getProvider()
+            // upload the metadata + encrypt them
+            const sdk = await LensGatedSDK.create({
+              provider,
+              signer,
+              env: process.env.NEXT_PUBLIC_ENVIRONMENT || LensEnvironment.Mumbai,
+            })
+            const { error, contentURI, encryptedMetadata } = await sdk.gated.encryptMetadata(
+              recordingData,
+              queryLensProfile?.data?.id,
+              accessControl, // or any other access condition object
+              async () => {
+                _metadataArweaveTxId = await mutationUploadMetadataToBundlr.mutateAsync({
+                  data: recordingDataAsString,
+                  tags,
+                })
+                setMetadataArweaveTxId(_metadataArweaveTxId)
+                console.log('metadata from upload handler when publication is gated', _metadataArweaveTxId)
+                return _metadataArweaveTxId
+              },
+            )
+
+            if (error) throw new Error(error?.message)
+
+            encrypted = {
+              contentURI,
+              encryptedMetadata,
+              accessControl,
+              _metadataArweaveTxId,
+              litCriteria,
+            }
+          } else {
+            // Otherwise, just upload the metadata
+            //@ts-ignore
+            _metadataArweaveTxId = await mutationUploadMetadataToBundlr.mutateAsync({
+              data: recordingDataAsString,
+              tags,
+            })
+
+            setMetadataArweaveTxId(_metadataArweaveTxId)
+
+            const litEncryptedMetadata = await mutationEncryptText.mutateAsync({
+              text: _metadataArweaveTxId,
+              accessControlConditions: litCriteria,
+            })
+
+            encrypted = {
+              litEncryptedMetadata,
+              litCriteria,
+            }
+          }
+        } else {
+          _metadataArweaveTxId = await mutationUploadMetadataToBundlr.mutateAsync({
+            data: recordingDataAsString,
+            tags,
+          })
+
+          setMetadataArweaveTxId(_metadataArweaveTxId)
+
+          // If the publication must be shared on lens
+          // Create a publication
+          if (values?.publish_on_lens === true) {
+            //@ts-ignore
+            lensPostId = await mutationPublishToLens.mutateAsync({
+              arweaveTxId: _metadataArweaveTxId,
+              values,
+              encrypted,
+            })
+          }
         }
-        setMetadataArweaveTxId(metadata)
       }
 
+      const recordingMetadataArweaveTxId =
+        values.gated_module === true
+          ? jsonToBase64({
+              access_control_conditions: encrypted?.litCriteria,
+              arweave_transaction_id: encrypted?.litEncryptedMetadata?.encryptedString,
+              encrypted_symmetric_key: encrypted?.litEncryptedMetadata?.encryptedSymmetricKey,
+            })
+          : jsonToBase64({
+              access_control_conditions: 'FREE',
+              arweave_transaction_id: _metadataArweaveTxId,
+              encrypted_symmetric_key: null,
+            })
+
       return {
-        recordingMetadataArweaveTxId: metadata,
+        recordingMetadataArweaveTxId,
         lensPostId,
       }
     } catch (e) {
@@ -231,6 +328,8 @@ export function useSmartContract(stateTxUi: TxUi) {
     mutationUploadAudioFileToBundlr.reset()
     mutationUploadMetadataToBundlr.reset()
     mutationPublishToLens.reset()
+    mutationSignMessage.reset()
+    mutationEncryptText.reset()
 
     const { id, is_indexed, start_at, metadata_cid, values, profileId } = args
     const previousData: any = queryClient.getQueryData(['audio-chat-metadata', id])
@@ -320,7 +419,9 @@ export function useSmartContract(stateTxUi: TxUi) {
   return {
     onSubmitRecording,
     statePublishRecording: {
+      signEncryptMessage: mutationSignMessage,
       contract: contractWriteUpdateAudioChat,
+      encrypt: mutationEncryptText,
       transaction: txUpdateAudioChat,
       uploadAudioFile: mutationUploadAudioFileToBundlr,
       uploadMetadata: mutationUploadMetadataToBundlr,

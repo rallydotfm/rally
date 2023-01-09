@@ -140,7 +140,10 @@ export const Profile = (props: ProfileProps) => {
       <section>
         <ul className="grid grid-cols-2 w-max-content gap-6">
           {data.attributes
-            ?.filter((attribute) => ['twitter', 'instagram', 'website'].includes(attribute.key) && attribute?.value)
+            ?.filter(
+              (attribute, i) =>
+                ['twitter', 'instagram', 'website'].includes(attribute.key) && attribute?.value && i <= 2,
+            )
             .map((attr) => (
               <li className="text-2xs" key={attr.key}>
                 <a

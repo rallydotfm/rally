@@ -1,4 +1,4 @@
-query PublicationRevenue($request: PublicationRevenueQueryRequest!) {
+query PublicationRevenue($request: PublicationRevenueQueryRequest!, $profileId: ProfileId) {
   publicationRevenue(request: $request) {
     publication {
       __typename

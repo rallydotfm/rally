@@ -27,7 +27,7 @@ interface CardRallyProps {
 }
 export const CardRally = (props: CardRallyProps) => {
   const { data } = props
-  const queryPublishedRecording = useGetAudioChatPublishedRecording(data.id, data.recording_arweave_transaction_id)
+  const { queryPublishedRecording } = useGetAudioChatPublishedRecording(data.id, data.recording_arweave_transaction_id)
   const setAudioPlayer = useAudioPlayer((state: any) => state.setAudioPlayer)
   const playedRally = useAudioPlayer((state: any) => state.rally)
   const stateVoiceChat: any = useStoreLiveVoiceChat()

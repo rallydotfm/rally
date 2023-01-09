@@ -12,6 +12,10 @@ import { useStoreHasSignedInWithLens } from '@hooks/useSignInWithLens'
 import DialogModalStageGuide from '@components/pages/rally/[idRally]/DialogModalStageGuide'
 import dynamic from 'next/dynamic'
 import useAudioPlayer from '@hooks/usePersistedAudioPlayer'
+import { useSession } from 'next-auth/react'
+import { useUpdateEffect } from '@react-hookz/web'
+import Cookies from 'js-cookie'
+import { COOKIE_LENS_ACCESS_TOKEN, COOKIE_LENS_REFRESH_TOKEN } from '@config/storage'
 
 const NoSSRToolbarAudioPlayer = dynamic(() => import('./ToolbarAudioPlayer'), {
   ssr: false,
@@ -25,20 +29,34 @@ interface LayoutProps {
 
 export const LayoutBase = (props: LayoutProps) => {
   const { children } = props
+  const isSignedIn = useStoreHasSignedInWithLens((state) => state.isSignedIn)
+  const setIsSignedIn = useStoreHasSignedInWithLens((state) => state.setIsSignedIn)
+
+  const session = useSession()
   const stateVoiceChat: any = useStoreLiveVoiceChat()
   const { address, isConnecting } = useAccount({
     async onDisconnect() {
       await stateVoiceChat?.room?.disconnect()
+      setIsSignedIn(false)
     },
   })
 
   const queryCurrentUserLensProfile = useWalletAddressDefaultLensProfile(address as `0x${string}`, {
     enabled: address ? true : false,
   })
-  const isSignedIn = useStoreHasSignedInWithLens((state) => state.isSignedIn)
   const isPlayerOpen = useAudioPlayer((state) => state.isOpen)
   const isPlayerReady = useAudioPlayer((state) => state.isReady)
 
+  useUpdateEffect(() => {
+    setIsSignedIn(false)
+    Cookies.remove(COOKIE_LENS_ACCESS_TOKEN)
+    Cookies.remove(COOKIE_LENS_REFRESH_TOKEN)
+
+    if (session?.data?.user !== address) {
+      if (stateVoiceChat?.room.state === 'connected' && stateVoiceChat?.room?.sid !== '')
+        stateVoiceChat.room.disconnect()
+    }
+  }, [session?.data?.user, address])
   return (
     <div className="relative flex-grow flex flex-col">
       {!isConnecting && !address && <BannerConnectWallet />}

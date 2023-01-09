@@ -49,6 +49,8 @@ export const PublishRecording = (props: any) => {
       recording_is_nsfw: values?.is_nsfw,
       recording_image_src: values?.image,
       publish_on_lens: false,
+      gated_module: false,
+      gated_module_condition_operator: 'and',
     },
   })
 
@@ -137,7 +139,7 @@ export const PublishRecording = (props: any) => {
       <section className="mt-6 animate-appear p-6 text-start xs:text-center bg-neutral-1 w-full rounded-lg flex flex-col xs:items-center justify-center">
         <p className="font-bold">Your recording file</p>
 
-        <p className="pt-4 text-2xs text-neutral-11 mb-3">Upload your file below :</p>
+        <p className="pt-4 text-2xs text-neutral-11 mb-3">Upload your .ogg file below :</p>
         <div className="relative">
           <input
             className="w-full"
@@ -157,7 +159,7 @@ export const PublishRecording = (props: any) => {
               }
             }}
             type="file"
-            accept="audio/*"
+            accept="audio/ogg"
           />
         </div>
 
@@ -230,6 +232,43 @@ export const PublishRecording = (props: any) => {
                 Sign the 'Upload recording metadata file to Bundlr' message
               </DeploymentStep>
             </li>
+            {formPublishRecording?.data()?.gated_module === true && (
+              <>
+                <li
+                  className={`
+            flex items-center
+            ${statePublishRecording.signEncryptMessage.isIdle ? 'text-neutral-11' : 'text-white'}`}
+                >
+                  <DeploymentStep
+                    isLoading={statePublishRecording.signEncryptMessage.isLoading}
+                    isError={statePublishRecording.signEncryptMessage.isError}
+                    isSuccess={statePublishRecording.signEncryptMessage.isSuccess}
+                  >
+                    Sign 'Encrypt/decrypt data with Lit Protocol' message
+                  </DeploymentStep>
+                </li>
+
+                <li
+                  className={`
+            flex items-center
+            ${
+              statePublishRecording.encrypt.isIdle && !statePublishRecording.signEncryptMessage.isSuccess
+                ? 'text-neutral-11'
+                : 'text-white'
+            }`}
+                >
+                  <DeploymentStep
+                    isLoading={
+                      statePublishRecording.signEncryptMessage.isSuccess && statePublishRecording.encrypt.isLoading
+                    }
+                    isError={statePublishRecording.encrypt.isError}
+                    isSuccess={statePublishRecording.encrypt.isSuccess}
+                  >
+                    Encrypting recording metadata...
+                  </DeploymentStep>
+                </li>
+              </>
+            )}
             {formPublishRecording?.data()?.publish_on_lens === true && (
               <>
                 <li
@@ -324,7 +363,7 @@ export const PublishRecording = (props: any) => {
               </Notice>
               <p className="flex flex-col gap-4 text-2xs mt-6">
                 <a
-                  className="block text-neutral-11"
+                  className="block text-neutral-11 overflow-hidden text-ellipsis"
                   target="_blank"
                   href={`https://arweave.net/${stateTxUi?.audioFileArweaveTxId}`}
                 >
@@ -332,21 +371,23 @@ export const PublishRecording = (props: any) => {
                   <span className="link">{stateTxUi?.audioFileArweaveTxId}</span>
                 </a>
                 <a
-                  className="block text-neutral-11"
+                  className="block text-neutral-11 overflow-hidden text-ellipsis"
                   target="_blank"
                   href={`https://arweave.net/${stateTxUi?.metadataArweaveTxId}`}
                 >
                   Metadata Arweave transaction id : <span className="link">{stateTxUi?.metadataArweaveTxId}</span>
                 </a>
-                <a
-                  className="block text-neutral-11"
-                  target="_blank"
-                  href={`https://${
-                    (process.env.NEXT_PUBLIC_CHAIN as string) === 'mumbai' ? 'testnet.' : ''
-                  }lenster.xyz/posts/${statePublishRecording?.postToLens?.data}`}
-                >
-                  View your linked Lens publication on <span className="link">Lenster</span>
-                </a>
+                {statePublishRecording?.postToLens?.data && (
+                  <a
+                    className="block text-neutral-11 overflow-hidden text-ellipsis"
+                    target="_blank"
+                    href={`https://${
+                      (process.env.NEXT_PUBLIC_CHAIN as string) === 'mumbai' ? 'testnet.' : ''
+                    }lenster.xyz/posts/${statePublishRecording?.postToLens?.data}`}
+                  >
+                    View your linked Lens publication on <span className="link">Lenster</span>
+                  </a>
+                )}
               </p>
 
               <div className="flex flex-col space-y-3 xs:space-y-0 xs:space-i-3 xs:flex-row ">

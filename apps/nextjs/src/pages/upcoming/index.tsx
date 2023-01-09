@@ -7,7 +7,7 @@ import ListFilters from '@components/pages/upcoming/ListFilters'
 import DialogModalFilters from '@components/pages/upcoming/DialogModalFilters'
 import { createStoreIndexedAudioChatsFilters } from '@hooks/useStoreIndexedAudioChatsFilters'
 import useGetProfilesInterests from '@hooks/useGetProfileInterests'
-import useIndexedAudioChatsRest from '@hooks/useGetIndexedAudioChatREST'
+import useIndexedAudioChats from '@hooks/useIndexedAudioChats'
 import { useState } from 'react'
 import { isAddress } from 'ethers/lib/utils'
 import Button from '@components/Button'
@@ -51,7 +51,7 @@ const Page: NextPage = () => {
   const order = useStoreFiltersAudioChatsUpcomingPage((state: any) => state.order)
   const resetFilters = useStoreFiltersAudioChatsUpcomingPage((state: any) => state.resetFilters)
   const queryListInterests = useGetProfilesInterests()
-  const queryAudioChats = useIndexedAudioChatsRest(
+  const queryAudioChats = useIndexedAudioChats(
     {
       first: PER_PAGE,
       skip,

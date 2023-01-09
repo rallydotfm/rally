@@ -25,7 +25,10 @@ export const AboutProfile = (props: AboutProfileProps) => {
           {(data?.interests?.length as number) > 0 ? (
             <ul className="flex flex-wrap gap-1 text-2xs">
               {data.interests?.map((interest) => (
-                <li className="animate-appear px-2 py-0.5 bg-neutral-1 rounded-md font-medium" key={interest}>
+                <li
+                  className="animate-appear px-2 py-0.5 bg-neutral-1 rounded-md font-medium"
+                  key={`about-profilelist-interests-${interest}`}
+                >
                   {/* @ts-ignore */}
                   <span className="pie-1ex">{DICTIONARY_PROFILE_INTERESTS[interest]?.emoji}</span>
                   {/* @ts-ignore */}
@@ -50,7 +53,7 @@ export const AboutProfile = (props: AboutProfileProps) => {
         <ul className="grid grid-cols-1 2xs:grid-cols-2 gap-3 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
           {queryListProfileGuilds?.data?.guilds.map((guild: { guildId: Key | null | undefined }) => {
             return (
-              <li className="animate-appear col-span-1" key={guild.guildId}>
+              <li className="animate-appear col-span-1" key={`about-profileguild-${guild.guildId}`}>
                 <CardGuildMembership id={guild.guildId as string} />
               </li>
             )

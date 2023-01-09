@@ -1,5 +1,4 @@
 import { DICTIONARY_STATES_AUDIO_CHATS } from '@helpers/mappingAudioChatState'
-import useIndexedAudioChatsRest from '@hooks/useGetIndexedAudioChatREST'
 import useGetProfilesInterests from '@hooks/useGetProfileInterests'
 import useIndexedAudioChats from '@hooks/useIndexedAudioChats'
 import { useStorePersistedInterests } from '@hooks/usePersistedInterests'
@@ -128,7 +127,7 @@ export function useGetHomeAudioChatsSelectionFromRESTIndexer() {
   const order = useStoreFiltersAudioChatsHomePage((state: any) => state.order)
   const queryListInterests = useGetProfilesInterests()
 
-  const queryAudioChatsHappeningLater = useIndexedAudioChatsRest(
+  const queryAudioChatsHappeningLater = useIndexedAudioChats(
     {
       address: account?.address ?? '',
       first: PER_PAGE,
@@ -154,7 +153,7 @@ export function useGetHomeAudioChatsSelectionFromRESTIndexer() {
       enabled: queryListInterests?.data?.length ?? [].length > 0 ? true : false,
     },
   )
-  const queryAudioChatsHappeningNow = useIndexedAudioChatsRest(
+  const queryAudioChatsHappeningNow = useIndexedAudioChats(
     {
       address: account?.address ?? '',
       first: PER_PAGE,
@@ -181,7 +180,7 @@ export function useGetHomeAudioChatsSelectionFromRESTIndexer() {
       enabled: queryListInterests?.data?.length ?? [].length > 0 ? true : false,
     },
   )
-  const queryAudioChatsHappeningSoon = useIndexedAudioChatsRest(
+  const queryAudioChatsHappeningSoon = useIndexedAudioChats(
     {
       address: account?.address ?? '',
       first: PER_PAGE,
@@ -208,7 +207,7 @@ export function useGetHomeAudioChatsSelectionFromRESTIndexer() {
     },
   )
 
-  const queryAudioChatsHostedByCurrentUserToday = useIndexedAudioChatsRest(
+  const queryAudioChatsHostedByCurrentUserToday = useIndexedAudioChats(
     {
       address: account?.address ?? '',
       first: PER_PAGE,

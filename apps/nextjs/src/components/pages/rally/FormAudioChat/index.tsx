@@ -17,7 +17,7 @@ import { DICTIONARY_PROFILE_INTERESTS, DICTIONARY_PROFILE_INTERESTS_CATEGORIES }
 import LensProfileSuggestions from '@components/LensProfileSuggestions'
 import { useState } from 'react'
 import LanguageSuggestions from '@components/LanguageSuggestions'
-
+import { compressImage } from '@helpers/compressImage'
 interface FormAudioChatProps {
   state: any
   apiInputRallyTags: any
@@ -229,9 +229,34 @@ export const FormAudioChat = (props: FormAudioChatProps) => {
                     <div className="w-full lg:w-56 aspect-square rounded-md overflow-hidden relative bg-neutral-1">
                       <input
                         disabled={!account?.address || chain?.unsupported === true || chain?.id === 1}
-                        onChange={(e) => {
+                        onChange={async (e) => {
+                          //@ts-ignore
+                          const { files } = e.target
+                          const dataTransfer = new DataTransfer()
+                          // For every file in the files list
+                          //@ts-ignore
+                          for (const file of files) {
+                            // We don't have to compress files that aren't images
+                            if (!file.type.startsWith('image')) {
+                              // Ignore this file, but do add it to our result
+                              dataTransfer.items.add(file)
+                              continue
+                            }
+
+                            const compressedFile = await compressImage(file, {
+                              quality: 0.82,
+                              type: 'image/webp',
+                            })
+
+                            // Save back the compressed file instead of the original file
+                            dataTransfer.items.add(compressedFile)
+                          }
+
+                          // Set value of the file input to our new files list
+                          e.target.files = dataTransfer.files
                           //@ts-ignore
                           const src = URL.createObjectURL(e.target.files[0])
+                          setData('rally_image_file', e.target.files[0])
                           setData('rally_image_src', src)
                         }}
                         className="absolute w-full h-full block inset-0 z-30 cursor-pointer opacity-0"
@@ -405,6 +430,7 @@ export const FormAudioChat = (props: FormAudioChatProps) => {
                             </FormField.Description>
                             <div className="relative z-10">
                               <LensProfileSuggestions
+                                shouldSearchEns={true}
                                 onSelectValue={(value: string) => {
                                   setFields(`rally_cohosts.${index}.eth_address`, value)
                                 }}
@@ -502,6 +528,7 @@ export const FormAudioChat = (props: FormAudioChatProps) => {
                           </FormField.Description>
                           <div className="relative z-10">
                             <LensProfileSuggestions
+                              shouldSearchEns={true}
                               onSelectValue={(value: string) => {
                                 setFields(`rally_guests.${index}.eth_address`, value)
                               }}

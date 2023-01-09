@@ -25,3 +25,21 @@ export const wagmiClient = createClient({
   connectors,
   provider,
 })
+
+export const chainRPC = {
+  [1]: 'https://1rpc.io/eth',
+  [56]: 'https://1rpc.io/bnb',
+  [137]: 'https://1rpc.io/matic',
+  [43114]: 'https://1rpc.io/avax/c',
+  [42161]: 'https://1rpc.io/arb',
+  [1284]: 'https://1rpc.io/glmr',
+  [1285]: 'https://rpc.api.moonriver.moonbeam.network',
+  [10]: 'https://1rpc.io/op',
+  [250]: 'https://1rpc.io/ftm',
+  [42220]: 'https://1rpc.io/celo',
+  [100]: 'https://rpc.ankr.com/gnosis',
+  [288]: 'https://mainnet.boba.network',
+  [25]: 'https://evm.cronos.org',
+  [1313161554]: 'https://mainnet.aurora.dev',
+  [1088]: 'https://andromeda.metis.io/?owner=1088',
+}

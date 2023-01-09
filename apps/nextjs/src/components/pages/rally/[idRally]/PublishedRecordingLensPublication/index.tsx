@@ -1,4 +1,5 @@
-import Button from '@components/Button'
+import { Disclosure, Transition } from '@headlessui/react'
+import { ChatBubbleLeftRightIcon } from '@heroicons/react/20/solid'
 import ButtonCollectPublication from '@components/ButtonCollectPublication'
 import ButtonMirrorPublication from '@components/ButtonMirrorPublication'
 import { IconSpinner } from '@components/Icons'
@@ -6,18 +7,16 @@ import LensPublicationContent from '@components/LensPublicationContent'
 import { ROUTE_PROFILE } from '@config/routes'
 import { Square2StackIcon } from '@heroicons/react/24/outline'
 import { ArrowsRightLeftIcon, Square2StackIcon as SolidSquare2StackIcon } from '@heroicons/react/20/solid'
-import { useStoreBundlr } from '@hooks/useBundlr'
 import { useGetLinkedLensPublicationById } from '@hooks/useGetLinkedLensPublicationById'
 import { useStoreHasSignedInWithLens } from '@hooks/useSignInWithLens'
 import useWalletAddressDefaultLensProfile from '@hooks/useWalletAddressDefaultLensProfile'
 import getPublicationsRequest from '@services/lens/publications/getPublications'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { formatRelative } from 'date-fns'
 import Link from 'next/link'
 import { useAccount } from 'wagmi'
 import PublishedRecordingAbout from '../PublishedRecordingAbout'
 import PostComment from './PostComment'
-import useAudioPlayer from '@hooks/usePersistedAudioPlayer'
 
 interface PublishedRecordingLensPublicationProps {
   idLensPublication: string
@@ -27,9 +26,6 @@ interface PublishedRecordingLensPublicationProps {
 export const PublishedRecordingLensPublication = (props: PublishedRecordingLensPublicationProps) => {
   const { idLensPublication, idRally } = props
   const queryClient = useQueryClient()
-  const initialize = useStoreBundlr((state: any) => state.initialize)
-  const mutationPrepareBundlr = useMutation(async () => await initialize())
-  const bundlr = useStoreBundlr((state: any) => state.bundlr)
   const account = useAccount()
   const isSignedIn = useStoreHasSignedInWithLens((state) => state.isSignedIn)
   const queryLensProfile = useWalletAddressDefaultLensProfile(account?.address as `0x${string}`, {
@@ -44,12 +40,15 @@ export const PublishedRecordingLensPublication = (props: PublishedRecordingLensP
     },
   })
   const queryCommentFeed = useQuery(
-    ['publication-comment-feed', idLensPublication],
+    ['publication-comment-feed', idLensPublication, queryLensProfile?.data?.id ?? null],
     async () => {
-      const result = await getPublicationsRequest({
-        commentsOf: idLensPublication,
-        limit: 50,
-      })
+      const result = await getPublicationsRequest(
+        {
+          commentsOf: idLensPublication,
+          limit: 50,
+        },
+        queryLensProfile?.data?.id,
+      )
       return result
     },
     {
@@ -150,46 +149,33 @@ export const PublishedRecordingLensPublication = (props: PublishedRecordingLensP
             <section className="w-full border-neutral-4 border-t mt-4 pt-4 text-start">
               <div className="px-3 md:px-6">
                 <div className="flex pb-8">
-                  {account?.address && isSignedIn ? (
-                    <>
-                      {!bundlr ? (
-                        <>
-                          <section className="animate-appear mx-auto pt-8 gap-3 flex flex-col justify-center items-center">
-                            <span className="font-bold">Want to post a comment ?</span>
-                            <Button
-                              disabled={mutationPrepareBundlr?.isLoading}
-                              isLoading={mutationPrepareBundlr?.isLoading}
-                              onClick={async () => await mutationPrepareBundlr.mutateAsync()}
-                            >
-                              {mutationPrepareBundlr?.isLoading
-                                ? 'Connecting, sign the message in your wallet...'
-                                : mutationPrepareBundlr?.isError
-                                ? 'Try connecting again'
-                                : 'Connect to Bundlr first'}
-                            </Button>
-                            <div className="flex flex-wrap gap-3">
-                              <a
-                                className="text-neutral-11 text-2xs"
-                                target="_blank "
-                                href="https://docs.bundlr.network/docs/overview?utm_source=website&utm_campaign=footer_cta/"
-                              >
-                                Curious about Bundlr ?{' '}
-                                <span className="underline hover:no-underline">
-                                  Learn more on Bundlr's documentation.
-                                </span>
-                              </a>
-                            </div>
-                          </section>
-                        </>
-                      ) : (
-                        <div className="animate-appear border-neutral-4 bg-neutral-1 border w-full rounded-md p-3">
-                          <PostComment idLensPublication={idLensPublication} />
-                        </div>
-                      )}
-                    </>
+                  {account?.address &&
+                  isSignedIn &&
+                  queryLensProfile?.data?.id &&
+                  queryLensProfile?.data?.ownedBy === account?.address ? (
+                    <div className="animate-appear border-neutral-4 bg-neutral-1 border w-full rounded-md p-3">
+                      <Disclosure>
+                        <Disclosure.Button className="flex items-center text-sm font-bold text-neutral-12">
+                          <ChatBubbleLeftRightIcon className="mis-2 w-5 text-neutral-11 mie-1ex" />
+                          Comment
+                        </Disclosure.Button>
+                        <Transition
+                          enter="transition duration-100 ease-out"
+                          enterFrom="transform scale-95 opacity-0"
+                          enterTo="transform scale-100 opacity-100"
+                          leave="transition duration-75 ease-out"
+                          leaveFrom="transform scale-100 opacity-100"
+                          leaveTo="transform scale-95 opacity-0"
+                        >
+                          <Disclosure.Panel className="pt-4">
+                            <PostComment idLensPublication={idLensPublication} />
+                          </Disclosure.Panel>
+                        </Transition>
+                      </Disclosure>
+                    </div>
                   ) : (
                     <p className="text-xs italic text-neutral-11">
-                      Connect your wallet and sign-in with Lens to comment.
+                      Connect your wallet and sign-in with your Lens to comment.
                     </p>
                   )}
                 </div>

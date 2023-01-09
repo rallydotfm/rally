@@ -1,7 +1,7 @@
 # Rally
 
 Rally is an open-source alternative to Twitter Space/Clubhouse for web3 communities.
-Built with Polygon, Livekit, Lens Protocol, Storj, Bundlr and Guild.
+Built with Polygon, Livekit, Lens Protocol, Lit Protocol, The Graph, Storj, Bundlr and Guild.
 
 ## Overview
 
@@ -168,13 +168,14 @@ Root directory: apps/nextjs
 ## Tech Stack
 
 - Solidity: Smart contracts for audio chat creation.
+- IPFS: Storage ; Used to store audio chats metadata
+- Lit Protocol: Access control protocol ; used to gate access to published recordings ;
+- Guild API : Access control and interoperability ; Platformless membership ; used to gate access to audio rooms ;
+- Bundlr: Storage ; used to store recordings
 - Livekit: Open-source and scalable WebRTC stack ; used for real-time audio chats
 - Lens Protocol: Decentralized social graph ; used to publish recordings, highlights and other publication related to audio chats ; display user profiles (for Lens users)
-- Lit Protocol: Access control protocol ; used to gate access to rooms and publications ;
-- Guild API : Access control and interoperability ; Platformless membership
-- Web3 storage: Storage ; Used to store audio chats metadata
-- Bundlr: Storage ; used to store recordings
-- The Graph: Indexer
+- ENS
+- The Graph: Indexer ; used to display indexed audio chats and recordings ;
 - Polygon/Mumbai: blockchain we will build on
 - NextJS: Meta framework
 - Rainbowkit: Wallet UI built on React/wagmi

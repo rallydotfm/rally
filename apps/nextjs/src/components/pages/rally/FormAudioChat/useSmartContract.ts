@@ -9,6 +9,7 @@ import create from 'zustand'
 import toast from 'react-hot-toast'
 import { DICTIONARY_STATES_AUDIO_CHATS } from '@helpers/mappingAudioChatState'
 import { chainId } from '@config/wagmi'
+import { ipfsClient } from '@config/ipfs'
 export interface TxUi {
   isDialogVisible: boolean
   rallyId: string | undefined
@@ -207,12 +208,10 @@ export function useSmartContract(stateTxUi: TxUi) {
   /**
    * Upload our image file to IPFS (using web3 storage)
    */
-  const mutationUploadImageFile = useMutation(async (file) => {
+  const mutationUploadImageFile = useMutation(async (file: any) => {
     try {
-      const client = makeStorageClient()
-      //@ts-ignore
-      const cid = await client.put([file])
-      //@ts-ignore
+      const result = await ipfsClient.add(file)
+      const cid = result.path
       stateTxUi.setImageRallyCID(cid)
       return cid
     } catch (e) {
@@ -225,12 +224,11 @@ export function useSmartContract(stateTxUi: TxUi) {
   /**
    * Upload our JSON file to IPFS (using web3 storage)
    */
-  const mutationUploadJsonFile = useMutation(async (file) => {
+  const mutationUploadJsonFile = useMutation(async (args: { rallyData: any }) => {
+    const { rallyData } = args
     try {
-      const client = makeStorageClient()
-      //@ts-ignore
-      const cid = await client.put([file])
-      //@ts-ignore
+      const result = await ipfsClient.add(JSON.stringify(rallyData))
+      const cid = result.path
       stateTxUi.setFileRallyCID(cid)
       return cid
     } catch (e) {
@@ -292,20 +290,16 @@ export function useSmartContract(stateTxUi: TxUi) {
 
         if (image && values.rally_image_file) {
           //@ts-ignore
-          rallyData.image = `${image}/${values?.rally_image_file.name}`
+          rallyData.image = image
         } else {
           //@ts-ignore
           if (values.rally_image_src) rallyData.image = values.rally_image_src
         }
 
-        const rallyDataJSON = new File([JSON.stringify(rallyData)], 'data.json', {
-          type: 'application/json',
-        })
-
         // upload JSON file to IPFS
         stateTxUi.setPrimedRally(rallyData)
         //@ts-ignore
-        metadata = await mutationUploadJsonFile.mutateAsync(rallyDataJSON)
+        metadata = await mutationUploadJsonFile.mutateAsync({ rallyData })
         stateTxUi.setFileRallyCID(metadata)
         setRallyDataToIndex(rallyData)
       }

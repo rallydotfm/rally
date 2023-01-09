@@ -15,6 +15,7 @@ export const VideoPlayer = (props: VideoPlayerProps) => {
         <Player
           title={name}
           src={url}
+          playbackId={idParsed?.id}
           autoPlay={false}
           autoUrlUpload={{ fallback: true, ipfsGateway: 'https://w3s.link' }}
         />

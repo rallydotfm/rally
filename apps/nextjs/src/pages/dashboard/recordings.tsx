@@ -40,7 +40,8 @@ const Page: NextPage = () => {
           <>
             <div className="mb-6 animate-appear flex justify-between">
               <h2 className="font-medium text-xs text-neutral-11">
-                {queriesAudioChatsByAddressMetadata.filter((query) => query?.status === 'success')?.length} rallies
+                {queriesAudioChatsByAddressMetadata.filter((query) => query?.status === 'success')?.length} recording
+                {queriesAudioChatsByAddressMetadata.filter((query) => query?.status === 'success')?.length > 1 && 's'}
               </h2>
             </div>
             <ul
@@ -70,7 +71,10 @@ const Page: NextPage = () => {
                 .map((audioChat) => {
                   return (
                     //@ts-ignore
-                    <li className={`animate-appear focus-within:z-10 relative`} key={audioChat.data.id}>
+                    <li
+                      className={`animate-appear focus-within:z-10 relative`}
+                      key={`dashboard-recordings-${audioChat.data.id}`}
+                    >
                       <CardRecording
                         data={audioChat.data}
                         onClickGoLive={undefined}

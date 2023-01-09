@@ -8,7 +8,7 @@ import { useConnectModal, useChainModal } from '@rainbow-me/rainbowkit'
 import { useSession } from 'next-auth/react'
 import Link from 'next/link'
 import button from '@components/Button/styles'
-import { ArrowLeftIcon, PlayIcon } from '@heroicons/react/20/solid'
+import { ArrowLeftIcon, LockOpenIcon, PlayIcon } from '@heroicons/react/20/solid'
 import Button from '@components/Button'
 import { useAccount, useDisconnect, useNetwork } from 'wagmi'
 import { DICTIONARY_STATES_AUDIO_CHATS } from '@helpers/mappingAudioChatState'
@@ -23,12 +23,13 @@ import CardGuild from '@components/pages/rally/[idRally]/CardGuild'
 import HostProfile from '@components/pages/rally/[idRally]/HostProfile'
 import FormJoinRoomAs from '@components/pages/rally/[idRally]/FormJoinRoomAs'
 import { useStoreHasSignedInWithLens } from '@hooks/useSignInWithLens'
-import { DICTIONARY_LOCALES, DICTIONARY_LOCALES_SIMPLIFIED } from '@helpers/mappingLocales'
+import { DICTIONARY_LOCALES_SIMPLIFIED } from '@helpers/mappingLocales'
 import { DICTIONARY_PROFILE_INTERESTS, DICTIONARY_PROFILE_INTERESTS_CATEGORIES } from '@helpers/mappingProfileInterests'
 import useGetAudioChatPublishedRecording from '@hooks/useGetAudioChatPublishedRecording'
 import useAudioPlayer from '@hooks/usePersistedAudioPlayer'
 import PublishedRecordingLensPublication from '@components/pages/rally/[idRally]/PublishedRecordingLensPublication'
 import PublishedRecordingAbout from '@components/pages/rally/[idRally]/PublishedRecordingAbout'
+import DecryptGatedContent from '@components/DecryptGatedContent'
 
 const Page: NextPage = () => {
   const {
@@ -44,10 +45,12 @@ const Page: NextPage = () => {
   const queryCurrentUserGuildMemberships = useGetGuildMembershipsByWalletAddress(address as `0x${string}`, {
     enabled: address && queryAudioChatMetadata?.data?.access_control?.guilds?.length > 0 ? true : false,
   })
-  const queryPublishedRecording = useGetAudioChatPublishedRecording(
-    idRally as `0x${string}`,
-    queryAudioChatMetadata?.data?.recording,
-  )
+  const {
+    queryPublishedRecording,
+    queryDecryptPublishedRecording,
+    mutationDecryptMetadata,
+    mutationSignDecryptMetadataMessage,
+  } = useGetAudioChatPublishedRecording(idRally as `0x${string}`, queryAudioChatMetadata?.data?.recording)
   const stateTxUiRallyGoLive = useStoreTxUiGoLiveRally()
   const { onClickGoLive, stateGoLive } = useGoLiveAudioChat(stateTxUiRallyGoLive)
   const setAudioPlayer = useAudioPlayer((state: any) => state.setAudioPlayer)
@@ -56,6 +59,7 @@ const Page: NextPage = () => {
   const rally = useStoreCurrentLiveRally((state: any) => state.rally)
   const setIsSignedIn = useStoreHasSignedInWithLens((state) => state.setIsSignedIn)
   const { disconnect } = useDisconnect()
+
   return (
     <>
       <Head>
@@ -315,7 +319,11 @@ const Page: NextPage = () => {
                                   </div>
                                 )}
                                 {DICTIONARY_STATES_AUDIO_CHATS.FINISHED.label === queryAudioChatMetadata.data.state && (
-                                  <div className="pt-4  gap-3 flex flex-col justify-center items-center">
+                                  <div
+                                    className={`${
+                                      queryAudioChatMetadata?.data?.creator === address ? 'pt-2' : 'pt-4'
+                                    } gap-3 flex flex-col justify-center items-center`}
+                                  >
                                     {queryAudioChatMetadata.data.will_be_recorded === false ? (
                                       <p className="italic text-neutral-11 text-sm">No recordings available.</p>
                                     ) : (
@@ -340,67 +348,151 @@ const Page: NextPage = () => {
                                           </>
                                         ) : (
                                           <>
-                                            {queryPublishedRecording?.isSuccess &&
-                                              !queryPublishedRecording?.data?.recording_file && (
-                                                <p className="italic text-neutral-11 text-sm">
-                                                  The creator didn't publish any recording yet.
-                                                </p>
-                                              )}
+                                            {/* @ts-ignore */}
+                                            {queryAudioChatByIdRawData?.data?.recording_arweave_transaction_id ===
+                                              '' && (
+                                              <p className="italic text-neutral-11 text-sm">
+                                                The creator didn't publish any recording yet.
+                                              </p>
+                                            )}
                                           </>
                                         )}
 
-                                        {queryPublishedRecording?.isLoading && (
-                                          <div className="mb-6 flex items-center justify-center space-i-1ex">
-                                            <IconSpinner className="text-xs animate-spin" />
-                                            <p className="font-bold animate-pulse">Loading recording...</p>
-                                          </div>
-                                        )}
-
-                                        {queryPublishedRecording?.isSuccess &&
-                                          queryPublishedRecording?.data?.recording_file && (
-                                            <>
-                                              <Button
-                                                disabled={
-                                                  stateVoiceChat?.room.state === 'connected' ||
-                                                  playedRally?.id === idRally
-                                                }
-                                                intent={
-                                                  stateVoiceChat?.room.state === 'connected' ||
-                                                  playedRally?.id === idRally
-                                                    ? 'neutral-ghost'
-                                                    : 'interactive-outline'
-                                                }
-                                                onClick={() => {
-                                                  setAudioPlayer({
-                                                    isOpen: true,
-                                                    trackSrc: queryPublishedRecording?.data?.recording_file,
-                                                    rally: {
-                                                      clickedAt: new Date(),
-                                                      timestamp: 0,
-                                                      name: queryPublishedRecording?.data?.name,
-                                                      imageSrc: queryPublishedRecording?.data?.image,
-                                                      id: idRally,
-                                                      //@ts-ignore
-                                                      lensPublicationId:
-                                                        queryAudioChatMetadata?.data?.lens_publication_id,
-                                                      metadata: queryPublishedRecording?.data,
-                                                    },
-                                                  })
-                                                }}
-                                                scale="sm"
-                                                className="!pis-2 !pie-3"
-                                              >
-                                                {playedRally?.id === idRally ? (
-                                                  <>Playing</>
-                                                ) : (
-                                                  <>
-                                                    <PlayIcon className="w-5 mie-1ex" />
-                                                    Play recording
-                                                  </>
-                                                )}
-                                              </Button>
-                                            </>
+                                        {/* @ts-ignore */}
+                                        {queryPublishedRecording?.isLoading &&
+                                          //@ts-ignore
+                                          queryAudioChatByIdRawData?.data?.recording_arweave_transaction_id !== '' && (
+                                            <div className="mb-6 flex items-center justify-center space-i-1ex">
+                                              <IconSpinner className="text-xs animate-spin" />
+                                              <p className="font-bold animate-pulse">Loading recording...</p>
+                                            </div>
                                           )}
+
+                                        {queryPublishedRecording?.isSuccess && (
+                                          <>
+                                            {queryPublishedRecording?.data?.recording_file ||
+                                            queryDecryptPublishedRecording?.data?.recording_file ? (
+                                              <>
+                                                <Button
+                                                  disabled={
+                                                    stateVoiceChat?.room.state === 'connected' ||
+                                                    playedRally?.id === idRally
+                                                  }
+                                                  intent={
+                                                    stateVoiceChat?.room.state === 'connected' ||
+                                                    playedRally?.id === idRally
+                                                      ? 'neutral-ghost'
+                                                      : 'interactive-outline'
+                                                  }
+                                                  onClick={() => {
+                                                    setAudioPlayer({
+                                                      isOpen: true,
+                                                      trackSrc:
+                                                        queryPublishedRecording?.data?.recording_file ??
+                                                        queryDecryptPublishedRecording?.data?.recording_file,
+                                                      rally: {
+                                                        clickedAt: new Date(),
+                                                        timestamp: 0,
+                                                        name:
+                                                          queryPublishedRecording?.data?.name ??
+                                                          queryDecryptPublishedRecording?.data?.name,
+                                                        imageSrc:
+                                                          queryPublishedRecording?.data?.image ??
+                                                          queryDecryptPublishedRecording?.data?.image,
+                                                        id: idRally,
+                                                        //@ts-ignore
+                                                        lensPublicationId:
+                                                          queryAudioChatMetadata?.data?.lens_publication_id,
+                                                        metadata:
+                                                          queryPublishedRecording?.data ??
+                                                          queryDecryptPublishedRecording?.data,
+                                                      },
+                                                    })
+                                                  }}
+                                                  scale="sm"
+                                                  className="animate-appear !pis-2 !pie-3"
+                                                >
+                                                  {playedRally?.id === idRally ? (
+                                                    <>Playing</>
+                                                  ) : (
+                                                    <>
+                                                      <PlayIcon className="w-5 mie-1ex" />
+                                                      Play recording
+                                                    </>
+                                                  )}
+                                                </Button>
+                                              </>
+                                            ) : (
+                                              <>
+                                                {queryPublishedRecording?.data?.encrypted === true &&
+                                                  !queryDecryptPublishedRecording?.data && (
+                                                    <>
+                                                      <div className="gap-4 flex flex-col w-full  border-neutral-4 rounded-md">
+                                                        <p className="text-neutral-11 text-[0.8rem] xs:text-center">
+                                                          This recording is gated. <br /> To gain access, your wallet
+                                                          must meet the following criteria :
+                                                        </p>
+                                                        <ul>
+                                                          {queryPublishedRecording?.data?.accessControlConditions?.map(
+                                                            (condition: any, i: any) => {
+                                                              if (condition?.operator) {
+                                                                return (
+                                                                  <li
+                                                                    className="text-center py-2 font-bold text-[0.65rem] uppercase text-neutral-11"
+                                                                    key={`operator-${condition.operator}-${i}`}
+                                                                  >
+                                                                    {condition.operator}
+                                                                  </li>
+                                                                )
+                                                              }
+                                                              return (
+                                                                <li
+                                                                  className="bg-neutral-2 border border-neutral-4 p-3 rounded-md"
+                                                                  key={`condition-${i}-${condition?.chain}-${condition?.standardContractType}-${condition?.contractAddress}`}
+                                                                >
+                                                                  <DecryptGatedContent condition={condition} />
+                                                                </li>
+                                                              )
+                                                            },
+                                                          )}
+                                                        </ul>
+                                                        <Button
+                                                          disabled={
+                                                            !address ||
+                                                            mutationDecryptMetadata?.isLoading ||
+                                                            (mutationDecryptMetadata?.isSuccess &&
+                                                              queryDecryptPublishedRecording?.isLoading)
+                                                          }
+                                                          isLoading={mutationDecryptMetadata?.isLoading}
+                                                          onClick={async () =>
+                                                            await mutationDecryptMetadata.mutateAsync()
+                                                          }
+                                                          scale="sm"
+                                                          intent="interactive-outline"
+                                                          className={'mx-auto !pis-4 !pie-2 animate-appear'}
+                                                        >
+                                                          {mutationDecryptMetadata?.isError ||
+                                                          mutationSignDecryptMetadataMessage?.isError
+                                                            ? 'Try again'
+                                                            : mutationSignDecryptMetadataMessage
+                                                            ? 'Decrypt'
+                                                            : mutationDecryptMetadata?.isLoading
+                                                            ? 'Decrypting...'
+                                                            : mutationDecryptMetadata?.isSuccess &&
+                                                              mutationDecryptMetadata?.data?.decryptedString &&
+                                                              queryDecryptPublishedRecording?.isLoading &&
+                                                              address
+                                                            ? 'Loading recording...'
+                                                            : 'Decrypt'}
+                                                          <LockOpenIcon className="mis-1ex w-4" />
+                                                        </Button>
+                                                      </div>
+                                                    </>
+                                                  )}
+                                              </>
+                                            )}
+                                          </>
+                                        )}
                                       </>
                                     )}
                                   </div>
@@ -528,13 +620,25 @@ const Page: NextPage = () => {
                       </footer>
                     )}
                   </article>
-                  {/* @ts-ignore */}
-                  {queryAudioChatMetadata?.isSuccess &&
+                  {((queryAudioChatMetadata?.isSuccess &&
                     //@ts-ignore
                     queryAudioChatByIdRawData?.data?.lens_publication_id === '' &&
-                    queryPublishedRecording?.data?.metadata && (
-                      <PublishedRecordingAbout publication={queryPublishedRecording?.data} />
-                    )}
+                    queryPublishedRecording?.data?.encrypted !== true &&
+                    queryPublishedRecording?.data?.metadata) ||
+                    (queryPublishedRecording?.data?.encrypted === true && queryDecryptPublishedRecording?.data)) && (
+                    <div className="mt-8 w-full animate-appear text-center">
+                      <header className="py-3 border-b px-3 md:px-6 -mx-3 md:-mx-6 border-neutral-4 text-neutral-10 text-2xs">
+                        Published on Rally
+                      </header>
+                      <PublishedRecordingAbout
+                        publication={
+                          queryPublishedRecording?.data?.encrypted === true
+                            ? { metadata: queryDecryptPublishedRecording?.data }
+                            : queryPublishedRecording?.data
+                        }
+                      />
+                    </div>
+                  )}
                   {/* @ts-ignore */}
                   {queryAudioChatMetadata?.isSuccess && queryAudioChatByIdRawData?.data?.lens_publication_id !== '' && (
                     <PublishedRecordingLensPublication

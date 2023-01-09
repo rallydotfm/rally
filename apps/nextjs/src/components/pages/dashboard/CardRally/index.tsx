@@ -9,7 +9,7 @@ import {
   CalendarIcon,
   EllipsisHorizontalIcon,
   ExclamationCircleIcon,
-  PauseIcon,
+  LockOpenIcon,
   PencilIcon,
   PlayCircleIcon,
   PlayIcon,
@@ -24,6 +24,7 @@ import { useRouter } from 'next/router'
 import { IconSpinner } from '@components/Icons'
 import { trpc } from '@utils/trpc'
 import { useStoreLiveVoiceChat } from '@hooks/useVoiceChat'
+import { useAccount } from 'wagmi'
 
 interface CardRallyProps {
   data: any
@@ -36,9 +37,15 @@ interface CardRallyProps {
 export const CardRally = (props: CardRallyProps) => {
   const { data, onSelectRallyToDelete, onSelectRallyToCancel, onClickEndLive, onClickGoLive } = props
   const { push } = useRouter()
+  const account = useAccount()
   const playedRally = useAudioPlayer((state: any) => state.rally)
   const stateVoiceChat: any = useStoreLiveVoiceChat()
-  const queryPublishedRecording = useGetAudioChatPublishedRecording(data.id, data.recording)
+  const {
+    queryPublishedRecording,
+    mutationSignDecryptMetadataMessage,
+    mutationDecryptMetadata,
+    queryDecryptPublishedRecording,
+  } = useGetAudioChatPublishedRecording(data.id, data.recording)
   const querySessionRecordings: any = trpc.recordings.rally_available_recordings.useQuery(
     {
       id_rally: data?.id,
@@ -170,43 +177,88 @@ export const CardRally = (props: CardRallyProps) => {
                     </>
                   ) : (
                     <>
-                      {queryPublishedRecording?.data?.recording_file && (
+                      {(queryPublishedRecording?.data || queryDecryptPublishedRecording?.data) && (
                         <>
-                          <Button
-                            disabled={stateVoiceChat?.room.state === 'connected' || playedRally?.id === data?.id}
-                            intent={
-                              stateVoiceChat?.room.state === 'connected' || playedRally?.id === data?.id
-                                ? 'neutral-ghost'
-                                : 'interactive-outline'
-                            }
-                            onClick={() => {
-                              setAudioPlayer({
-                                isOpen: true,
-                                trackSrc: queryPublishedRecording?.data?.recording_file,
-                                rally: {
-                                  clickedAt: new Date(),
-                                  timestamp: 0,
-                                  name: queryPublishedRecording?.data?.name,
-                                  imageSrc: queryPublishedRecording?.data?.image,
-                                  id: data?.id,
-                                  //@ts-ignore
-                                  lensPublicationId: data?.lens_publication_id,
-                                  metadata: queryPublishedRecording?.data,
-                                },
-                              })
-                            }}
-                            scale="sm"
-                            className="!pis-2 !pie-3"
-                          >
-                            {playedRally?.id === data?.id ? (
-                              <>Playing</>
-                            ) : (
-                              <>
-                                <PlayIcon className="w-5 mie-1ex" />
-                                Play
-                              </>
-                            )}
-                          </Button>
+                          {queryPublishedRecording?.data?.recording_file ||
+                          queryDecryptPublishedRecording?.data?.recording_file ? (
+                            <>
+                              <Button
+                                disabled={stateVoiceChat?.room.state === 'connected' || playedRally?.id === data?.id}
+                                intent={
+                                  stateVoiceChat?.room.state === 'connected' || playedRally?.id === data?.id
+                                    ? 'neutral-ghost'
+                                    : 'interactive-outline'
+                                }
+                                onClick={() => {
+                                  const recording =
+                                    queryPublishedRecording?.data?.encrypted !== true
+                                      ? queryPublishedRecording?.data
+                                      : queryDecryptPublishedRecording?.data
+                                  setAudioPlayer({
+                                    isOpen: true,
+                                    trackSrc: recording?.recording_file,
+                                    rally: {
+                                      clickedAt: new Date(),
+                                      timestamp: 0,
+                                      name: recording?.name,
+                                      imageSrc: recording?.image,
+                                      id: data?.id,
+                                      //@ts-ignore
+                                      lensPublicationId: data?.lens_publication_id,
+                                      metadata: recording,
+                                    },
+                                  })
+                                }}
+                                scale="sm"
+                                className="!pis-2 animate-appear !pie-3"
+                              >
+                                {playedRally?.id === data?.id ? (
+                                  <>Playing</>
+                                ) : (
+                                  <>
+                                    <PlayIcon className="w-5 mie-1ex" />
+                                    Play
+                                  </>
+                                )}
+                              </Button>
+                            </>
+                          ) : (
+                            <>
+                              {queryPublishedRecording?.data?.encrypted === true && (
+                                <>
+                                  <Button
+                                    disabled={
+                                      !account?.address ||
+                                      mutationDecryptMetadata?.isLoading ||
+                                      (mutationDecryptMetadata?.isSuccess && queryDecryptPublishedRecording?.isLoading)
+                                    }
+                                    isLoading={mutationDecryptMetadata?.isLoading}
+                                    onClick={async () => await mutationDecryptMetadata.mutateAsync()}
+                                    scale="sm"
+                                    intent="interactive-outline"
+                                    className={
+                                      '2xs:w-fit-content md:w-full lg:w-fit-content relative z-20 !pis-4 !pie-2 animate-appear'
+                                    }
+                                  >
+                                    {mutationDecryptMetadata?.isError || mutationSignDecryptMetadataMessage?.isError
+                                      ? 'Try again'
+                                      : mutationSignDecryptMetadataMessage.isIdle
+                                      ? 'Decrypt'
+                                      : mutationDecryptMetadata?.isLoading
+                                      ? 'Decrypting...'
+                                      : mutationDecryptMetadata?.isSuccess &&
+                                        //@ts-ignore
+                                        mutationDecryptMetadata?.decryptedString &&
+                                        queryDecryptPublishedRecording?.isLoading &&
+                                        account?.address
+                                      ? 'Loading recording...'
+                                      : 'Decrypt'}
+                                    <LockOpenIcon className="mis-1ex w-4" />
+                                  </Button>
+                                </>
+                              )}
+                            </>
+                          )}
                         </>
                       )}
                     </>
@@ -335,7 +387,7 @@ export const CardRally = (props: CardRallyProps) => {
                       return (
                         <li
                           className="relative z-20 bg-neutral-5 animate-appear delay-75 pis-4 py-1 pie-1 rounded-full text-2xs flex justify-between items-center"
-                          key={`${data.id}-${recording?.name}`}
+                          key={`rally-session-recording${data.id}-${recording?.name}`}
                         >
                           <div className="flex items-center">
                             <button

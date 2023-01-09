@@ -36,7 +36,7 @@ export const CardGuild = (props: CardGuildProps) => {
           ?.filter((role: any) => guild?.roles?.includes(`${role.id}`))
           ?.map((role: any) => {
             return (
-              <li className="animate-appear" key={`requirement-${role}-${role.id}`}>
+              <li className="animate-appear" key={`rally-card-guild-requirement${role}-${role.id}`}>
                 <mark className="bg-neutral-6 flex text-center text-neutral-12 px-2 rounded font-medium">
                   {role.name}
                 </mark>

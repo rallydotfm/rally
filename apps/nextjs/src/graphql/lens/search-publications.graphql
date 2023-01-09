@@ -1,4 +1,4 @@
-query SearchPublications($request: SearchQueryRequest!) {
+query SearchPublications($request: SearchQueryRequest!, $profileId: ProfileId) {
   search(request: $request) {
     ... on PublicationSearchResult {
       __typename

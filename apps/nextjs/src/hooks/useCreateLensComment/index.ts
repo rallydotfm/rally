@@ -15,6 +15,7 @@ import { formatISO } from 'date-fns'
 import createCommentViaDispatcher from '@services/lens/publications/commentViaDispatcher'
 import createCommentTypedData from '@services/lens/publications/comment'
 import type { CreatePublicCommentRequest } from '@graphql/lens/generated'
+import { ipfsClient } from '@config/ipfs'
 
 export function useCreateLensComment() {
   const queryClient = useQueryClient()
@@ -46,15 +47,11 @@ export function useCreateLensComment() {
     options: {},
   })
 
-  const mutationUploadJsonFile = useMutation(async (data: string) => {
+  const mutationUploadJsonFile = useMutation(async (data: any) => {
     try {
-      const txn = await bundlr.upload(data, {
-        tags: [
-          { name: 'Content-Type', value: 'application/json' },
-          { name: 'App-Name', value: 'Rally' },
-        ],
-      })
-      return txn?.id
+      const result = await ipfsClient.add(JSON.stringify(data))
+      const { path } = result
+      return path
     } catch (e) {
       console.error(e)
       toast.error('Something went wrong while uploading your recording file.')
@@ -160,10 +157,10 @@ export function useCreateLensComment() {
         appId: 'Rally',
       }
 
-      const arweaveTxId = await mutationUploadJsonFile.mutateAsync(JSON.stringify(metadata))
+      const cid = await mutationUploadJsonFile.mutateAsync(metadata)
 
       queryClient.setQueryData(['publication-comment-feed', values?.publicationId], (prev: any) => {
-        const previousComments = previousCommentsFeedData.publications.items
+        const previousComments = previousCommentsFeedData?.publications?.items ?? []
         const updatedList = [
           {
             createdAt: formatISO(new Date()),
@@ -185,7 +182,7 @@ export function useCreateLensComment() {
       const createCommentRequest = {
         profileId,
         publicationId: values?.publicationId,
-        contentURI: `https://arweave.net/${arweaveTxId}`,
+        contentURI: `ipfs://${cid}`,
         collectModule,
         referenceModule,
       }

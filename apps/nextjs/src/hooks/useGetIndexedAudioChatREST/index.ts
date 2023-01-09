@@ -3,6 +3,9 @@ import { useQuery } from '@tanstack/react-query'
 import { DICTIONARY_STATES_AUDIO_CHATS } from '@helpers/mappingAudioChatState'
 import { getUnixTime } from 'date-fns'
 
+/**
+ * Fallback indexer ; uses the values stored in Supabase. Use this when there's an issue with the subgraph.
+ */
 export function useIndexedAudioChatsRest(args: any, options: any) {
   const getIndexedAudioChatsResult = useQuery(
     ['search-audio-chats', args],
