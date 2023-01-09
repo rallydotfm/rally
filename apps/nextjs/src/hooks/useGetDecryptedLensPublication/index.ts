@@ -10,11 +10,13 @@ export const useStoreDecryptPublication = create((set) => ({
     try {
       //@ts-ignore
       await window?.ethereum?.enable()
+      //@ts-ignore
       const provider = new providers.Web3Provider(window?.ethereum)
       await provider._ready()
       const sdk = await LensGatedSDK.create({
         provider,
         signer: provider.getSigner(),
+        //@ts-ignore
         env: (process.env.NEXT_PUBLIC_ENVIRONMENT as string) || (LensEnvironment.Mumbai as string),
       })
 

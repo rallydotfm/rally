@@ -229,9 +229,11 @@ export function useSmartContract(stateTxUi: TxUi) {
             const sdk = await LensGatedSDK.create({
               provider,
               signer,
+              //@ts-ignore
               env: process.env.NEXT_PUBLIC_ENVIRONMENT || LensEnvironment.Mumbai,
             })
             const { error, contentURI, encryptedMetadata } = await sdk.gated.encryptMetadata(
+              //@ts-ignore
               recordingData,
               queryLensProfile?.data?.id,
               accessControl, // or any other access condition object
@@ -266,6 +268,7 @@ export function useSmartContract(stateTxUi: TxUi) {
             setMetadataArweaveTxId(_metadataArweaveTxId)
 
             const litEncryptedMetadata = await mutationEncryptText.mutateAsync({
+              //@ts-ignore
               text: _metadataArweaveTxId,
               accessControlConditions: litCriteria,
             })
@@ -299,8 +302,11 @@ export function useSmartContract(stateTxUi: TxUi) {
       const recordingMetadataArweaveTxId =
         values.gated_module === true
           ? jsonToBase64({
+              //@ts-ignore
               access_control_conditions: encrypted?.litCriteria,
+              //@ts-ignore
               arweave_transaction_id: encrypted?.litEncryptedMetadata?.encryptedString,
+              //@ts-ignore
               encrypted_symmetric_key: encrypted?.litEncryptedMetadata?.encryptedSymmetricKey,
             })
           : jsonToBase64({

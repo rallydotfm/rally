@@ -26,6 +26,7 @@ export const Publication = (props: any) => {
       const { pathname } = new URL(data()?.access_control_conditions?.[index]?.publicationUrl)
       const id = pathname.match(/\/(posts|post|bytes|watch)\/([^\/\?]+)/)?.[2]
       setPublicationContractAddress(null)
+      //@ts-ignore
       setPublicationId(id)
     }
   }, [data()?.access_control_conditions?.[index]?.publicationUrl])

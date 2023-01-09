@@ -137,7 +137,9 @@ export function useCreateLensPost() {
         referenceModule,
       }
 
+      //@ts-ignore
       if (gated?.encryptedSymmetricKey) {
+        //@ts-ignore
         createPostRequest.gated = gated
         createPostRequest.contentURI = encrypted?.contentURI
       }

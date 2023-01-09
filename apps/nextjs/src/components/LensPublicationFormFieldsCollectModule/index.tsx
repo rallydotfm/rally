@@ -39,7 +39,9 @@ export const LensPublicationFormFieldsCollectModule = (props: LensPublicationFor
               disabled ||
               data()?.publish_on_lens !== true ||
               !account?.address ||
+              //@ts-ignore
               chain?.unsupported === true ||
+              //@ts-ignore
               chain?.id === 1
             }
             value={data()?.collect_module}
@@ -76,7 +78,9 @@ export const LensPublicationFormFieldsCollectModule = (props: LensPublicationFor
                 disabled ||
                 data()?.publish_on_lens !== true ||
                 !account?.address ||
+                //@ts-ignore
                 chain?.unsupported === true ||
+                //@ts-ignore
                 chain?.id === 1
               }
               value={data()?.collect_module_has_fee}
@@ -131,6 +135,7 @@ export const LensPublicationFormFieldsCollectModule = (props: LensPublicationFor
                           placeholder="0"
                           step="0.01"
                           required={true}
+                          //@ts-ignore
                           disabled={!account?.address || chain?.unsupported === true || chain?.id === 1}
                           hasError={errors()?.collect_module_fee_amount?.length ? true : false}
                           name="collect_module_fee_amount"
@@ -236,7 +241,9 @@ export const LensPublicationFormFieldsCollectModule = (props: LensPublicationFor
                   disabled ||
                   data()?.publish_on_lens !== true ||
                   !account?.address ||
+                  //@ts-ignore
                   chain?.unsupported === true ||
+                  //@ts-ignore
                   chain?.id === 1
                 }
                 value={data()?.collect_module_is_limited_amount}
@@ -299,7 +306,9 @@ export const LensPublicationFormFieldsCollectModule = (props: LensPublicationFor
                   disabled ||
                   data()?.publish_on_lens !== true ||
                   !account?.address ||
+                  //@ts-ignore
                   chain?.unsupported === true ||
+                  //@ts-ignore
                   chain?.id === 1
                 }
                 label="Flash collect"

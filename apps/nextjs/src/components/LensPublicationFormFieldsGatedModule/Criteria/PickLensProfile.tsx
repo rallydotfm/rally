@@ -236,6 +236,7 @@ export const PickLensProfile = (props: any) => {
               queryUserProfileLens?.data?.followNftAddress === '0x0000000000000000000000000000000000000000')
           }
           onClick={() => {
+            //@ts-ignore
             setPickedProfile(queryUserProfileLens?.data)
             onPickValue(queryUserProfileLens?.data?.id)
             if (
@@ -254,6 +255,7 @@ export const PickLensProfile = (props: any) => {
           Pick my profile
         </button>
       )}
+      {/* @ts-ignore */}
       {pickedProfile !== null && pickedProfile?.id === data()?.access_control_conditions?.[index]?.profileId && (
         <div className="animate-appear text-2xs mt-6">
           Picked profile:{' '}
@@ -265,17 +267,22 @@ export const PickLensProfile = (props: any) => {
                 width="40px"
                 height="40px"
                 className="w-full h-full object-cover"
+                /* @ts-ignore */
                 src={pickedProfile?.picture?.original?.url?.replace('ipfs://', 'https://lens.infura-ipfs.io/ipfs/')}
                 alt=""
               />
             </div>
             <div className="flex flex-col whitespace-pre-line">
               <span className="font-bold text-2xs w-full">
+                {/* @ts-ignore */}
                 {pickedProfile?.name ??
+                  //@ts-ignore
                   pickedProfile?.onChainIdentity?.ens?.name ??
+                  //@ts-ignore
                   shortenEthereumAddress(pickedProfile?.ownedBy)}
                 &nbsp;
               </span>
+              {/* @ts-ignore */}
               <span className="text-[0.9em] opacity-50">@{pickedProfile.handle} </span>
             </div>
           </div>

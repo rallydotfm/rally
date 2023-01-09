@@ -31,6 +31,7 @@ export const CardRecording = (props: CardRecordingProps) => {
   const setAudioPlayer = useAudioPlayer((state) => state.setAudioPlayer)
 
   if (
+    //@ts-ignore
     (queryPublishedRecording?.isLoading && queryPublishedRecording?.data?.encrypted !== true) ||
     (queryPublishedRecording?.data?.encrypted === true && queryDecryptPublishedRecording?.isLoading)
   )

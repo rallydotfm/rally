@@ -1,5 +1,4 @@
 import EthereumAddress from '@components/EthereumAddress'
-import { ScalarOperator } from '@lens-protocol/sdk-gated'
 import Nft from './Nft'
 import Token from './Token'
 

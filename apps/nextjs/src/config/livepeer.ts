@@ -13,7 +13,9 @@ export const livepeerClient = createReactClient({
 
 export const livepeerTheme: ThemeConfig = {
   colors: {
+    //@ts-ignore
     accent: tailwindTheme?.colors.interactive[10],
+    //@ts-ignore
     containerBorderColor: tailwindTheme?.colors.interactive[4],
   },
 }

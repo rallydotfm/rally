@@ -8,6 +8,7 @@ export const Token = (props: any) => {
   const { condition } = props
   const queryToken = useGetErc20Token({
     contract: condition.contractAddress,
+    //@ts-ignore
     chainId: chainRPC?.[supportedChains.filter((c) => c.lit === condition?.chain)?.[0]?.id],
   })
   return (

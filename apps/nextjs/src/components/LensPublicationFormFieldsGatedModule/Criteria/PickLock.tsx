@@ -13,6 +13,7 @@ interface LockSuggestionsProps {
   onSelectValue: any
   chainId: number
   index: number
+  data: any
 }
 
 export const LockSuggestions = (props: LockSuggestionsProps) => {

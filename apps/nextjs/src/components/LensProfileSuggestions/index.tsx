@@ -52,6 +52,7 @@ export const LensProfileSuggestions = (props: LensProfileSuggestionsProps) => {
               <></>
               {shouldSearchEns === true &&
               (querySearchLensProfile?.isError ||
+                //@ts-ignore
                 (querySearchLensProfile?.isSuccess && querySearchLensProfile?.data?.items?.length === 0)) ? (
                 <>
                   {querySearchEns?.isLoading && (
