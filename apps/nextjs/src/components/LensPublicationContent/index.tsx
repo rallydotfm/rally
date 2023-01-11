@@ -7,8 +7,6 @@ import { useQueryClient } from '@tanstack/react-query'
 import { useRouter } from 'next/router'
 import dynamic from 'next/dynamic'
 import VideoPlayer from './VideoPlayer'
-import { livepeerClient, livepeerTheme } from '@config/livepeer'
-import { LivepeerConfig } from '@livepeer/react'
 import { useGetDecryptedLensPublication, useStoreDecryptPublication } from '@hooks/useGetDecryptedLensPublication'
 import { useMountEffect } from '@react-hookz/web'
 import Button from '@components/Button'
@@ -101,7 +99,7 @@ export const LensPublicationContent = (props: any) => {
         This publication is gated.
         <Button
           scale="sm"
-          className="mt-3 w-fit-content mx-auto relative z-20 !pis-4 !pie-2 animate-appear"
+          className="mt-6 w-fit-content relative z-20 !pis-4 !pie-2 animate-appear 2xs:mx-0"
           type="button"
           intent="interactive-outline"
           isLoading={mutationInitializeDecryptor?.isLoading || mutationDecryptPublication?.isLoading}
@@ -125,7 +123,7 @@ export const LensPublicationContent = (props: any) => {
     )
   }
   return (
-    <LivepeerConfig theme={livepeerTheme} client={livepeerClient}>
+    <>
       {publication?.isGated && mutationDecryptPublication?.isLoading && 'decrypting...'}
       <article className="animate-appear">
         <div className="prose w-full prose-invert">
@@ -181,7 +179,7 @@ export const LensPublicationContent = (props: any) => {
           </div>
         )}
       </article>
-    </LivepeerConfig>
+    </>
   )
 }
 

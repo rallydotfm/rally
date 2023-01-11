@@ -16,7 +16,6 @@ export async function getIndexedAudioChats(audioChatsRequest: any) {
         $states: [Int]!
         $categories: [String]!
         $creator: String!
-        $orderBy: String!
         $orderDirection: String!
         $start_at_min: Int!
         $start_at_max: Int!
@@ -24,7 +23,6 @@ export async function getIndexedAudioChats(audioChatsRequest: any) {
         audioChats(
             first: $first
             skip: $skip
-            orderBy: $orderBy
             orderDirection: $orderDirection
             where: {
               creator_contains: $creator                

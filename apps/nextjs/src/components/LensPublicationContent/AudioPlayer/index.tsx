@@ -1,6 +1,7 @@
 import { useRef } from 'react'
 import { Audio, Media, MuteButton, PlayButton, Time, SliderValueText, TimeSlider } from '@vidstack/player-react'
 import { PlayPauseIcon, PlayIcon, PauseIcon, SpeakerWaveIcon, SpeakerXMarkIcon } from '@heroicons/react/20/solid'
+import EthereumAddress from '@components/EthereumAddress'
 
 export const AudioPlayer = (props: any) => {
   const { publication } = props
@@ -26,16 +27,7 @@ export const AudioPlayer = (props: any) => {
           {publication?.metadata?.name ??
             publication?.metadata?.attributes?.filter((attr: any) => attr?.traitType === 'title')?.[0]?.value}
         </p>
-        <p className="text-xs font-medium mt-1">
-          {console.log(publication?.metadata)}
-          by{' '}
-          {publication?.metadata?.attributes?.filter((attr: any) => attr?.traitType === 'author')?.[0]?.value ??
-            publication?.metadata?.attributes?.filter((attr: any) => attr?.traitType === 'creator')?.[0]?.value ??
-            publication?.metadata?.attributes?.filter((attr: any) => attr?.traitType === 'host')?.[0]?.value ??
-            publication?.metadata?.attributes?.filter((attr: any) => attr?.traitType === 'artist')?.[0]?.value ??
-            publication?.profile?.name ??
-            publication?.profile?.onChainIdentity?.ens?.name}{' '}
-        </p>
+        <p className="text-xs font-medium mt-1">by {publication?.profile?.name}</p>
         <Media className="w-full">
           <Audio ref={media}>
             <audio

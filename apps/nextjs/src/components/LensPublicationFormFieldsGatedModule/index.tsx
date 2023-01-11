@@ -19,9 +19,10 @@ interface LensPublicationFormFieldsGatedModuleProps {
   setFields: any
   addField: any
   resetField: any
+  isCrossPost: boolean
 }
 export const LensPublicationFormFieldsGatedModule = (props: LensPublicationFormFieldsGatedModuleProps) => {
-  const { disabled, data, setData, errors, addField, resetField, setFields } = props
+  const { disabled, data, setData, errors, addField, resetField, setFields, isCrossPost } = props
   const account = useAccount()
   const { chain } = useNetwork()
 
@@ -48,7 +49,7 @@ export const LensPublicationFormFieldsGatedModule = (props: LensPublicationFormF
               if (value === false) {
                 resetField('access_control_conditions')
               } else {
-                setData('publish_on_lens', false)
+                if (isCrossPost === true) setData('publish_on_lens', false)
               }
             }}
           >

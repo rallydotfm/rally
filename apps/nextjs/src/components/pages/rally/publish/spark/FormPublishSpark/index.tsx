@@ -5,26 +5,26 @@ import FormTextarea from '@components/FormTextarea'
 import InputTags from '@components/InputTags'
 import { useAccount, useNetwork } from 'wagmi'
 import { useStoreHasSignedInWithLens } from '@hooks/useSignInWithLens'
-import InputCheckboxToggle from '@components/InputCheckboxToggle'
 import LensPublicationFormFieldsReferenceModule from '@components/LensPublicationFormFieldsReferenceModule'
 import LensPublicationFormFieldsCollectModule from '@components/LensPublicationFormFieldsCollectModule'
 import LensPublicationFormFieldsGatedModule from '@components/LensPublicationFormFieldsGatedModule'
+import React from 'react'
 
-interface FormPublishRecording {
+interface FormPublishSpark {
   disabled: boolean
   showSectionLens: boolean
   state: any
-  apiInputRecordingTags: any
+  apiInputSparkTags: any
   storeForm: any
   labelButtonSubmit: string
   labelButtonSubmitting: string
 }
-export const FormPublishRecording = (props: FormPublishRecording) => {
+export const FormPublishSpark = (props: FormPublishSpark) => {
   const {
     showSectionLens,
     disabled,
     state,
-    apiInputRecordingTags,
+    apiInputSparkTags,
     labelButtonSubmit,
     labelButtonSubmitting,
     storeForm: { form, setData, setFields, resetField, addField, data, errors, isValid },
@@ -40,25 +40,25 @@ export const FormPublishRecording = (props: FormPublishRecording) => {
           <fieldset className="space-y-5">
             <FormField className="!mt-0">
               <FormField.InputField>
-                <FormField.Label hasError={errors()?.recording_title?.length ? true : false} htmlFor="recording_title">
+                <FormField.Label hasError={errors()?.spark_title?.length ? true : false} htmlFor="spark_title">
                   Title
                 </FormField.Label>
-                <FormField.Description id="input-recording_title-description">
-                  The title of your recording.
+                <FormField.Description id="input-spark_title-description">
+                  The title of your spark.
                 </FormField.Description>
                 <FormInput
                   disabled={disabled || !account?.address || chain?.unsupported === true || chain?.id === 1}
-                  hasError={errors()?.recording_title?.length ? true : false}
-                  placeholder="Eg: RallyDAO meeting #5"
-                  name="recording_title"
-                  id="recording_title"
+                  hasError={errors()?.spark_title?.length ? true : false}
+                  placeholder="Eg: We are open-source"
+                  name="spark_title"
+                  id="spark_title"
                   required
-                  aria-describedby="input-recording_title-description input-recording_title-helpblock"
+                  aria-describedby="input-spark_title-description input-spark_title-helpblock"
                 />
               </FormField.InputField>
               <FormField.HelpBlock
-                hasError={errors()?.recording_title?.length ? true : false}
-                id="input-recording_title-helpblock"
+                hasError={errors()?.spark_title?.length ? true : false}
+                id="input-spark_title-helpblock"
               >
                 Please type a title.
               </FormField.HelpBlock>
@@ -67,27 +67,27 @@ export const FormPublishRecording = (props: FormPublishRecording) => {
             <FormField>
               <FormField.InputField>
                 <FormField.Label
-                  hasError={errors()?.recording_description?.length ? true : false}
-                  htmlFor="recording_description"
+                  hasError={errors()?.spark_description?.length ? true : false}
+                  htmlFor="spark_description"
                 >
                   Description
                 </FormField.Label>
-                <FormField.Description id="input-recording_description-description">
-                  A few words on what was discussed in your recording.
+                <FormField.Description id="input-spark_description-description">
+                  A few words what's happening in this spark
                 </FormField.Description>
                 <FormTextarea
                   disabled={disabled || !account?.address || chain?.unsupported === true || chain?.id === 1}
                   className="min-h-[30ch]"
-                  hasError={errors()?.recording_description?.length ? true : false}
+                  hasError={errors()?.spark_description?.length ? true : false}
                   placeholder="Eg: Community discussion about the future of Rally. Members only !"
-                  name="recording_description"
-                  id="recording_description"
-                  aria-describedby="input-recording_description-description input-recording_description-helpblock"
+                  name="spark_description"
+                  id="spark_description"
+                  aria-describedby="input-spark_description-description input-spark_description-helpblock"
                 />
               </FormField.InputField>
               <FormField.HelpBlock
-                hasError={errors()?.recording_description?.length ? true : false}
-                id="input-recording_description-helpblock"
+                hasError={errors()?.spark_description?.length ? true : false}
+                id="input-spark_description-helpblock"
               >
                 Please type a description.
               </FormField.HelpBlock>
@@ -95,21 +95,21 @@ export const FormPublishRecording = (props: FormPublishRecording) => {
 
             <FormField>
               <FormField.InputField>
-                <FormField.Label hasError={errors()?.recording_tags?.length ? true : false} htmlFor="recording_tags">
+                <FormField.Label hasError={errors()?.spark_tags?.length ? true : false} htmlFor="spark_tags">
                   Tags
                 </FormField.Label>
-                <FormField.Description id="input-recording_tags-description">
-                  Keywords to let your audience know what to expect from this recording
+                <FormField.Description id="input-spark_tags-description">
+                  Keywords to let your audience know what to expect from this spark
                 </FormField.Description>
                 <InputTags
                   disabled={disabled || !account?.address || chain?.unsupported === true || chain?.id === 1}
                   className="w-full"
-                  api={apiInputRecordingTags}
+                  api={apiInputSparkTags}
                 />
               </FormField.InputField>
               <FormField.HelpBlock
-                hasError={errors()?.recording_tags?.length ? true : false}
-                id="input-recording_tags-helpblock"
+                hasError={errors()?.spark_tags?.length ? true : false}
+                id="input-spark_tags-helpblock"
               >
                 Please add at least 1 tag.
               </FormField.HelpBlock>
@@ -118,27 +118,6 @@ export const FormPublishRecording = (props: FormPublishRecording) => {
 
           <fieldset disabled={!showSectionLens}>
             <div className="space-y-5">
-              <FormField>
-                <InputCheckboxToggle
-                  disabled={
-                    disabled || !showSectionLens || !account?.address || chain?.unsupported === true || chain?.id === 1
-                  }
-                  label="Share on Lens (public recordings only)"
-                  helpText={
-                    showSectionLens
-                      ? `Enabling this option will share this recording on your Lens profile.`
-                      : `Connect to your Lens profile to enable this option.`
-                  }
-                  checked={data()?.publish_on_lens === true ? true : false}
-                  onChange={(value: any) => {
-                    setData('publish_on_lens', value)
-                    if (value === true) {
-                      setData('gated_module', false)
-                      resetField('access_control_conditions')
-                    }
-                  }}
-                />
-              </FormField>
               <div className="relative focus-within:z-10 bg-neutral-1 p-6 rounded-md">
                 <h2 className="font-semibold text-sm mb-1.5">Configure access-control settings</h2>
                 <p className="mb-4 text-neutral-11 text-xs">
@@ -149,8 +128,9 @@ export const FormPublishRecording = (props: FormPublishRecording) => {
                   <LensPublicationFormFieldsGatedModule
                     data={data}
                     setData={setData}
+                    isCrossPost={false}
                     errors={errors}
-                    disabled={disabled || data()?.publish_on_lens === true}
+                    disabled={disabled}
                     setFields={setFields}
                     addField={addField}
                     resetField={resetField}
@@ -158,38 +138,34 @@ export const FormPublishRecording = (props: FormPublishRecording) => {
                 </div>
               </div>
 
-              {data()?.publish_on_lens === true && (
-                <>
-                  <div className="relative focus-within:z-10 bg-neutral-1 p-6 rounded-md">
-                    <h2 className="font-semibold text-sm mb-1.5">Configure collect settings</h2>
-                    <p className="mb-4 text-neutral-11 text-xs">
-                      Collects allow you to monetize your content. When sharing your recording, you can configure a
-                      collect module that defines who can collect your recording, when and for how much.
-                    </p>
-                    <div className="space-y-6">
-                      <LensPublicationFormFieldsCollectModule
-                        data={data}
-                        setFields={setFields}
-                        setData={setData}
-                        errors={errors}
-                        disabled={disabled || !showSectionLens}
-                      />
-                    </div>
-                  </div>
-                  <div className="relative focus-within:z-10 bg-neutral-1 p-6 rounded-md">
-                    <h2 className="font-semibold text-sm mb-1.5">Configure mirror and comments settings</h2>
-                    <p className="mb-4 text-neutral-11 text-xs">Fine-tune who can comment and mirror your post.</p>
-                    <div className="space-y-6">
-                      <LensPublicationFormFieldsReferenceModule
-                        data={data}
-                        setData={setData}
-                        errors={errors}
-                        disabled={disabled || !showSectionLens}
-                      />
-                    </div>
-                  </div>
-                </>
-              )}
+              <div className="relative focus-within:z-10 bg-neutral-1 p-6 rounded-md">
+                <h2 className="font-semibold text-sm mb-1.5">Configure collect settings</h2>
+                <p className="mb-4 text-neutral-11 text-xs">
+                  Collects allow you to monetize your content. When sharing your spark, you can configure a collect
+                  module that defines who can collect your spark, when and for how much.
+                </p>
+                <div className="space-y-6">
+                  <LensPublicationFormFieldsCollectModule
+                    data={data}
+                    setFields={setFields}
+                    setData={setData}
+                    errors={errors}
+                    disabled={disabled}
+                  />
+                </div>
+              </div>
+              <div className="relative focus-within:z-10 bg-neutral-1 p-6 rounded-md">
+                <h2 className="font-semibold text-sm mb-1.5">Configure mirror and comments settings</h2>
+                <p className="mb-4 text-neutral-11 text-xs">Fine-tune who can comment and mirror your post.</p>
+                <div className="space-y-6">
+                  <LensPublicationFormFieldsReferenceModule
+                    data={data}
+                    setData={setData}
+                    errors={errors}
+                    disabled={disabled || !showSectionLens}
+                  />
+                </div>
+              </div>
             </div>
           </fieldset>
         </div>
@@ -245,4 +221,4 @@ export const FormPublishRecording = (props: FormPublishRecording) => {
   )
 }
 
-export default FormPublishRecording
+export default FormPublishSpark

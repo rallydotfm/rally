@@ -2,8 +2,8 @@ import FormPublishRecording from '../FormPublishRecording'
 import {
   useSmartContract,
   useStoreTxUi,
-} from '@components/pages/rally/publish-recording/FormPublishRecording/useSmartContract'
-import useForm from '@components/pages/rally/publish-recording/FormPublishRecording/useForm'
+} from '@components/pages/rally/publish/recording/FormPublishRecording/useSmartContract'
+import useForm from '@components/pages/rally/publish/recording/FormPublishRecording/useForm'
 import { useMountEffect, useUnmountEffect, useUpdateEffect } from '@react-hookz/web'
 import DialogModal from '@components/DialogModal'
 import Button from '@components/Button'

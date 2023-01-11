@@ -349,6 +349,7 @@ export function useSmartContract(stateTxUi: TxUi) {
           //@ts-ignore
           getUnixTime(new Date()),
           metadata,
+          creatorWalletAddress,
           isIndexed,
           '',
           '',
