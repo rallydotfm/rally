@@ -10,10 +10,9 @@ import VideoPlayer from './VideoPlayer'
 import { livepeerClient, livepeerTheme } from '@config/livepeer'
 import { LivepeerConfig } from '@livepeer/react'
 import { useGetDecryptedLensPublication, useStoreDecryptPublication } from '@hooks/useGetDecryptedLensPublication'
-import { useMountEffect, useUpdateEffect } from '@react-hookz/web'
+import { useMountEffect } from '@react-hookz/web'
 import Button from '@components/Button'
-import { useStoreHasSignedInWithLens } from '@hooks/useSignInWithLens'
-import { useAccount } from 'wagmi'
+import { LockOpenIcon } from '@heroicons/react/20/solid'
 
 const NoSSRAudioPlayer = dynamic(() => import('./AudioPlayer'), {
   ssr: false,
@@ -90,45 +89,37 @@ export const LensPublicationContent = (props: any) => {
   const { publication, ...rest } = props
   const { mutationInitializeDecryptor, mutationDecryptPublication } = useGetDecryptedLensPublication()
   const sdk = useStoreDecryptPublication((state: any) => state?.sdk)
-  const isSignedIn = useStoreHasSignedInWithLens((state) => state.isSignedIn)
-  const account = useAccount()
   useMountEffect(() => {
-    if (
-      isSignedIn === true &&
-      account?.address &&
-      publication?.isGated === true &&
-      publication?.canDecrypt === true &&
-      sdk
-    ) {
-      mutationDecryptPublication.mutate(publication?.metadata)
+    if (!sdk && publication?.isGated) {
+      mutationInitializeDecryptor.mutate()
     }
   })
 
-  useUpdateEffect(() => {
-    if (
-      isSignedIn === true &&
-      account?.address &&
-      sdk &&
-      publication.isGated === true &&
-      publication?.canDecrypt === true
-    ) {
-      mutationDecryptPublication.mutate(publication?.metadata)
-    }
-  }, [isSignedIn, sdk, account?.address, publication?.isGated, publication?.canDecrypt])
-
-  if (publication?.isGated && sdk) {
+  if (publication?.isGated && !mutationDecryptPublication?.data?.decrypted) {
     return (
       <article className="flex flex-col">
         This publication is gated.
         <Button
           scale="sm"
-          className="mt-3 w-fit-content mx-auto"
-          intent="primary-outline"
-          isLoading={mutationInitializeDecryptor?.isLoading}
-          disabled={mutationInitializeDecryptor?.isLoading}
-          onClick={async () => await mutationInitializeDecryptor.mutateAsync()}
+          className="mt-3 w-fit-content mx-auto relative z-20 !pis-4 !pie-2 animate-appear"
+          type="button"
+          intent="interactive-outline"
+          isLoading={mutationInitializeDecryptor?.isLoading || mutationDecryptPublication?.isLoading}
+          disabled={mutationInitializeDecryptor?.isLoading || mutationDecryptPublication?.isLoading}
+          onClick={async () =>
+            await mutationInitializeDecryptor.mutateAsync(undefined, {
+              async onSuccess(data, variables, context) {
+                await mutationDecryptPublication.mutateAsync(publication?.metadata)
+              },
+            })
+          }
         >
-          Activate decryptor
+          {mutationDecryptPublication?.isError
+            ? 'Try again'
+            : mutationDecryptPublication?.isLoading
+            ? 'Decrypting...'
+            : 'Decrypt'}
+          <LockOpenIcon className="mis-1ex w-4" />
         </Button>
       </article>
     )

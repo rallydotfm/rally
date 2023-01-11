@@ -154,20 +154,13 @@ export const CardRally = (props: CardRallyProps) => {
                         <>
                           <div className="gap-2 flex flex-col w-full">
                             <p className="text-neutral-11 text-[0.75rem]">This recording is gated.</p>
-
                             <Button
-                              disabled={
-                                !account?.address ||
-                                mutationDecryptMetadata?.isLoading ||
-                                (mutationDecryptMetadata?.isSuccess && queryDecryptPublishedRecording?.isLoading)
-                              }
+                              disabled={!account?.address || mutationDecryptMetadata?.isLoading}
                               isLoading={mutationDecryptMetadata?.isLoading}
                               onClick={async () => await mutationDecryptMetadata.mutateAsync()}
                               scale="sm"
                               intent="interactive-outline"
-                              className={
-                                '2xs:w-fit-content md:w-full lg:w-fit-content relative z-20 !pis-4 !pie-2 animate-appear'
-                              }
+                              className={'2xs:w-fit-content relative z-20 !pis-4 !pie-2 animate-appear'}
                             >
                               {mutationDecryptMetadata?.isError || mutationSignDecryptMetadataMessage?.isError
                                 ? 'Try again'

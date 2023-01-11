@@ -1,8 +1,8 @@
 import { UNISWAP_SUBGRAPH_API_URL } from '@config/uniswap'
 
 /**
- * Retrieve locks from subgraph - filtered by lock manager eth address
- * @param chainId - id of the chain we need to retrieve the locks info from
+ * Retrieve erc20 tokens from subgraph
+ * @param chainId - id of the chain we need to retrieve the token from
  * @param query - free search text on token name
  */
 export async function getErc20Tokens(args: { chainId: number; query: string }) {
@@ -15,20 +15,26 @@ export async function getErc20Tokens(args: { chainId: number; query: string }) {
     },
     body: JSON.stringify({
       query: `
-          query Tokens($query: String!) {
-            tokens(first: 30 where: {
-              name_contains: $query
-            })
+          query Tokens($query: String!, $orderBy: String!) {
+            tokens(
+              first: 50 
+              orderBy: $orderBy
+              orderDirection: desc  
+              where: {
+                name_contains: $query
+                
+              })
              {
-                id
-                symbol
-                name
-              }
+              id
+              symbol
+              name
+            }
           
         }
         `,
       variables: {
         query: args.query ?? '',
+        orderBy: args?.chainId === 1 ? 'volumeUSD' : 'lastPriceUSD',
       },
     }),
   })

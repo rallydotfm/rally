@@ -39,7 +39,7 @@ export function useGetAudioChatsByLensHandle(handle: string) {
       orderBy: order[0],
       orderDirection: order[1],
       start_at_min: 0,
-      start_at_max: getUnixTime(addYears(new Date(), 100)),
+      start_at_max: getUnixTime(addYears(new Date(), 5)),
     },
     {
       enabled:

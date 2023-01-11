@@ -218,20 +218,6 @@ export const PublishRecording = (props: any) => {
                 Sign the 'Upload recording file to Bundlr' message and sign the transaction
               </DeploymentStep>
             </li>
-
-            <li
-              className={`
-            flex items-center
-            ${statePublishRecording.uploadMetadata.isIdle ? 'text-neutral-11' : 'text-white'}`}
-            >
-              <DeploymentStep
-                isLoading={statePublishRecording.uploadMetadata.isLoading}
-                isError={statePublishRecording.uploadMetadata.isError}
-                isSuccess={statePublishRecording.uploadMetadata.isSuccess}
-              >
-                Sign the 'Upload recording metadata file to Bundlr' message
-              </DeploymentStep>
-            </li>
             {formPublishRecording?.data()?.gated_module === true && (
               <>
                 <li
@@ -252,7 +238,7 @@ export const PublishRecording = (props: any) => {
                   className={`
             flex items-center
             ${
-              statePublishRecording.encrypt.isIdle && !statePublishRecording.signEncryptMessage.isSuccess
+              statePublishRecording.encrypt.isIdle || statePublishRecording.signEncryptMessage.isSuccess !== true
                 ? 'text-neutral-11'
                 : 'text-white'
             }`}
@@ -269,13 +255,27 @@ export const PublishRecording = (props: any) => {
                 </li>
               </>
             )}
+
+            <li
+              className={`
+            flex items-center
+            ${statePublishRecording.uploadMetadata.isIdle ? 'text-neutral-11' : 'text-white'}`}
+            >
+              <DeploymentStep
+                isLoading={statePublishRecording.uploadMetadata.isLoading}
+                isError={statePublishRecording.uploadMetadata.isError}
+                isSuccess={statePublishRecording.uploadMetadata.isSuccess}
+              >
+                Sign the 'Upload recording metadata file to Bundlr' message
+              </DeploymentStep>
+            </li>
             {formPublishRecording?.data()?.publish_on_lens === true && (
               <>
                 <li
                   className={`
             flex items-center
             ${
-              statePublishRecording.postToLens.isIdle || statePublishRecording.postToLensGasless
+              statePublishRecording.postToLens.isIdle || statePublishRecording.postToLensGasless.isIdle
                 ? 'text-neutral-11'
                 : 'text-white'
             }`}

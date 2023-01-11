@@ -74,7 +74,7 @@ export function useSmartContract(stateTxUi: TxUi) {
       const iface = new utils.Interface(audioChatABI)
       const log = data.logs
       toast.success('Your rally was created successfully !')
-      const { audio_event_id, is_indexed, start_at, created_at, cid_metadata, current_state } = iface.parseLog(
+      const { audio_event_id, is_indexed, start_at, created_at, cid_metadata, current_state, ...rest } = iface.parseLog(
         //@ts-ignore
         log[0],
       ).args
@@ -349,7 +349,6 @@ export function useSmartContract(stateTxUi: TxUi) {
           //@ts-ignore
           getUnixTime(new Date()),
           metadata,
-          creatorWalletAddress,
           isIndexed,
           '',
           '',

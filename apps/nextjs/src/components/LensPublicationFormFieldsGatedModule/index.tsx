@@ -9,6 +9,7 @@ import { Criteria } from './Criteria'
 import { ContractType, ScalarOperator } from '@lens-protocol/sdk-gated'
 import { CurrencyDollarIcon } from '@heroicons/react/24/outline'
 import { IconLensProtocol, IconUnlockProtocol } from '@components/Icons'
+import { chainId } from '@config/wagmi'
 
 interface LensPublicationFormFieldsGatedModuleProps {
   disabled: boolean
@@ -46,6 +47,8 @@ export const LensPublicationFormFieldsGatedModule = (props: LensPublicationFormF
               setData('gated_module', value)
               if (value === false) {
                 resetField('access_control_conditions')
+              } else {
+                setData('publish_on_lens', false)
               }
             }}
           >
@@ -75,7 +78,10 @@ export const LensPublicationFormFieldsGatedModule = (props: LensPublicationFormF
                           : condition?.type === 'eoa'
                           ? 'Wallet address'
                           : condition?.type === 'nft' &&
-                            condition.contractAddress === '0xdb46d1dc155634fbc732f92e853b10b288ad5a1d'
+                            [
+                              '0xdb46d1dc155634fbc732f92e853b10b288ad5a1d',
+                              '0xe00dc8cb3a7c3f8e5ab5286afabb0c2d1054187b',
+                            ].includes(condition?.contractAddress)
                           ? 'Own a Lens profile'
                           : condition?.type}
                       </span>
@@ -97,7 +103,7 @@ export const LensPublicationFormFieldsGatedModule = (props: LensPublicationFormF
                           className="!rounded-t !pb-2 !rounded-b-none w-full"
                           scale="xs"
                           type="button"
-                          disabled={!account?.address || chain?.unsupported === true || chain?.id === 1}
+                          disabled={!account?.address || disabled || chain?.unsupported === true || chain?.id === 1}
                           onClick={() => {
                             const updated = data()?.access_control_conditions.filter(
                               (c: any) => c.key !== condition.key,
@@ -141,7 +147,7 @@ export const LensPublicationFormFieldsGatedModule = (props: LensPublicationFormF
               <ul className="pt-6 w-full text-sm flex flex-col gap-3">
                 <li className="relative" value="profile">
                   <Listbox
-                    disabled={data()?.access_control_conditions?.length >= 5}
+                    disabled={disabled || data()?.access_control_conditions?.length >= 5}
                     name="access_control_conditions_select_lens"
                     onChange={(value) => {
                       switch (value) {
@@ -149,8 +155,11 @@ export const LensPublicationFormFieldsGatedModule = (props: LensPublicationFormF
                           {
                             addField('access_control_conditions', {
                               type: 'nft',
-                              chainID: 137,
-                              contractAddress: '0xdb46d1dc155634fbc732f92e853b10b288ad5a1d',
+                              chainID: chainId,
+                              contractAddress:
+                                chainId === 137
+                                  ? '0xdb46d1dc155634fbc732f92e853b10b288ad5a1d'
+                                  : '0xe00dc8cb3a7c3f8e5ab5286afabb0c2d1054187b',
                               contractType: ContractType.Erc721,
                               tokenIds: [],
                             })
@@ -191,7 +200,7 @@ export const LensPublicationFormFieldsGatedModule = (props: LensPublicationFormF
                     }}
                   >
                     <Listbox.Button
-                      disabled={data()?.access_control_conditions?.length >= 5}
+                      disabled={disabled || data()?.access_control_conditions?.length >= 5}
                       className="disabled:opacity-50 ui-open:rounded-b-none ui-open:bg-neutral-3 focus:ui-open:bg-neutral-4 flex relative items-center gap-x-5 cursor-pointer w-full text-neutral-12 p-3 font-bold bg-neutral-5 border hover:bg-neutral-6 focus:bg-neutral-2 border-neutral-4 rounded-md ui-active:bg-neutral-8"
                     >
                       <div className="w-7 rounded-full aspect-square flex items-center justify-center bg-[#abfe2c]">
@@ -205,12 +214,6 @@ export const LensPublicationFormFieldsGatedModule = (props: LensPublicationFormF
                         value="lens-profile-any"
                       >
                         Own a profile
-                      </Listbox.Option>
-                      <Listbox.Option
-                        className="cursor-pointer flex items-center space-i-2 px-4 text-start py-2.5 ui-active:bg-neutral-12 ui-active:text-neutral-1 font-bold"
-                        value="lens-profile-with-id"
-                      >
-                        Own a specific profile
                       </Listbox.Option>
                       <Listbox.Option
                         className="cursor-pointer flex items-center space-i-2 px-4 text-start py-2.5 ui-active:bg-neutral-12 ui-active:text-neutral-1 font-bold"
@@ -229,7 +232,7 @@ export const LensPublicationFormFieldsGatedModule = (props: LensPublicationFormF
                 </li>
                 <li>
                   <button
-                    disabled={data()?.access_control_conditions?.length >= 5}
+                    disabled={disabled || data()?.access_control_conditions?.length >= 5}
                     className="disabled:opacity-50 flex items-center gap-x-5 cursor-pointer w-full text-neutral-12 p-3 font-bold bg-neutral-5 border hover:bg-neutral-6 focus:bg-neutral-2 border-neutral-4 rounded-md ui-active:bg-neutral-8"
                     onClick={() => {
                       addField('access_control_conditions', {
@@ -248,7 +251,7 @@ export const LensPublicationFormFieldsGatedModule = (props: LensPublicationFormF
                 </li>
                 <li>
                   <button
-                    disabled={data()?.access_control_conditions?.length >= 5}
+                    disabled={disabled || data()?.access_control_conditions?.length >= 5}
                     className="disabled:opacity-50 flex items-center gap-x-5 cursor-pointer w-full text-neutral-12 p-3 font-bold bg-neutral-5 border hover:bg-neutral-6 focus:bg-neutral-2 border-neutral-4 rounded-md ui-active:bg-neutral-8"
                     type="button"
                     onClick={() => {
@@ -266,7 +269,7 @@ export const LensPublicationFormFieldsGatedModule = (props: LensPublicationFormF
 
                 <li>
                   <button
-                    disabled={data()?.access_control_conditions?.length >= 5}
+                    disabled={disabled || data()?.access_control_conditions?.length >= 5}
                     type="button"
                     onClick={() => {
                       addField('access_control_conditions', {
@@ -286,7 +289,7 @@ export const LensPublicationFormFieldsGatedModule = (props: LensPublicationFormF
 
                 <li>
                   <button
-                    disabled={data()?.access_control_conditions?.length >= 5}
+                    disabled={disabled || data()?.access_control_conditions?.length >= 5}
                     type="button"
                     onClick={() => {
                       addField('access_control_conditions', {

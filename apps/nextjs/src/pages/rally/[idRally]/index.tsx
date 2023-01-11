@@ -8,7 +8,7 @@ import { useConnectModal, useChainModal } from '@rainbow-me/rainbowkit'
 import { useSession } from 'next-auth/react'
 import Link from 'next/link'
 import button from '@components/Button/styles'
-import { ArrowLeftIcon, LockOpenIcon, PlayIcon } from '@heroicons/react/20/solid'
+import { ArrowLeftIcon, ChevronDownIcon, LockOpenIcon, PlayIcon } from '@heroicons/react/20/solid'
 import Button from '@components/Button'
 import { useAccount, useDisconnect, useNetwork } from 'wagmi'
 import { DICTIONARY_STATES_AUDIO_CHATS } from '@helpers/mappingAudioChatState'
@@ -30,6 +30,7 @@ import useAudioPlayer from '@hooks/usePersistedAudioPlayer'
 import PublishedRecordingLensPublication from '@components/pages/rally/[idRally]/PublishedRecordingLensPublication'
 import PublishedRecordingAbout from '@components/pages/rally/[idRally]/PublishedRecordingAbout'
 import DecryptGatedContent from '@components/DecryptGatedContent'
+import { Disclosure } from '@headlessui/react'
 
 const Page: NextPage = () => {
   const {
@@ -252,7 +253,7 @@ const Page: NextPage = () => {
                             </ul>
                           </div>
                         ) : (
-                          <p className="px-6 xs:px-8 font-semibold text-center text-xs">Free to join</p>
+                          <p className="px-6 xs:px-8 font-semibold text-center text-xs">Anyone can join</p>
                         )}
                         {([
                           DICTIONARY_STATES_AUDIO_CHATS.READY.label,
@@ -428,34 +429,6 @@ const Page: NextPage = () => {
                                                   !queryDecryptPublishedRecording?.data && (
                                                     <>
                                                       <div className="gap-4 flex flex-col w-full  border-neutral-4 rounded-md">
-                                                        <p className="text-neutral-11 text-[0.8rem] xs:text-center">
-                                                          This recording is gated. <br /> To gain access, your wallet
-                                                          must meet the following criteria :
-                                                        </p>
-                                                        <ul>
-                                                          {queryPublishedRecording?.data?.accessControlConditions?.map(
-                                                            (condition: any, i: any) => {
-                                                              if (condition?.operator) {
-                                                                return (
-                                                                  <li
-                                                                    className="text-center py-2 font-bold text-[0.65rem] uppercase text-neutral-11"
-                                                                    key={`operator-${condition.operator}-${i}`}
-                                                                  >
-                                                                    {condition.operator}
-                                                                  </li>
-                                                                )
-                                                              }
-                                                              return (
-                                                                <li
-                                                                  className="bg-neutral-2 border border-neutral-4 p-3 rounded-md"
-                                                                  key={`condition-${i}-${condition?.chain}-${condition?.standardContractType}-${condition?.contractAddress}`}
-                                                                >
-                                                                  <DecryptGatedContent condition={condition} />
-                                                                </li>
-                                                              )
-                                                            },
-                                                          )}
-                                                        </ul>
                                                         <Button
                                                           disabled={
                                                             !address ||
@@ -486,6 +459,73 @@ const Page: NextPage = () => {
                                                             : 'Decrypt'}
                                                           <LockOpenIcon className="mis-1ex w-4" />
                                                         </Button>
+                                                        <p className="text-neutral-11 text-[0.8rem] xs:text-center">
+                                                          This recording is gated. <br /> To gain access, your wallet
+                                                          must meet the following criteria :
+                                                        </p>
+                                                        {queryPublishedRecording?.data?.accessControlConditions
+                                                          ?.length > 3 ? (
+                                                          <>
+                                                            <Disclosure>
+                                                              <Disclosure.Button className="font-bold flex items-center justify-center border-neutral-4 w-full text-2xs">
+                                                                Conditions <ChevronDownIcon className="mis-3 w-4" />
+                                                              </Disclosure.Button>
+                                                              <Disclosure.Panel>
+                                                                <ul>
+                                                                  {queryPublishedRecording?.data?.accessControlConditions?.map(
+                                                                    (condition: any, i: any) => {
+                                                                      if (condition?.operator) {
+                                                                        return (
+                                                                          <li
+                                                                            className="text-center py-2 font-bold text-[0.65rem] uppercase text-neutral-11"
+                                                                            key={`operator-${condition.operator}-${i}`}
+                                                                          >
+                                                                            {condition.operator}
+                                                                          </li>
+                                                                        )
+                                                                      }
+                                                                      return (
+                                                                        <li
+                                                                          className="bg-neutral-2 border border-neutral-4 p-3 rounded-md"
+                                                                          key={`condition-${i}-${condition?.chain}-${condition?.standardContractType}-${condition?.contractAddress}`}
+                                                                        >
+                                                                          <DecryptGatedContent condition={condition} />
+                                                                        </li>
+                                                                      )
+                                                                    },
+                                                                  )}
+                                                                </ul>
+                                                              </Disclosure.Panel>
+                                                            </Disclosure>
+                                                          </>
+                                                        ) : (
+                                                          <>
+                                                            <ul>
+                                                              {queryPublishedRecording?.data?.accessControlConditions?.map(
+                                                                (condition: any, i: any) => {
+                                                                  if (condition?.operator) {
+                                                                    return (
+                                                                      <li
+                                                                        className="text-center py-2 font-bold text-[0.65rem] uppercase text-neutral-11"
+                                                                        key={`operator-${condition.operator}-${i}`}
+                                                                      >
+                                                                        {condition.operator}
+                                                                      </li>
+                                                                    )
+                                                                  }
+                                                                  return (
+                                                                    <li
+                                                                      className="bg-neutral-2 border border-neutral-4 p-3 rounded-md"
+                                                                      key={`condition-${i}-${condition?.chain}-${condition?.standardContractType}-${condition?.contractAddress}`}
+                                                                    >
+                                                                      <DecryptGatedContent condition={condition} />
+                                                                    </li>
+                                                                  )
+                                                                },
+                                                              )}
+                                                            </ul>
+                                                          </>
+                                                        )}
                                                       </div>
                                                     </>
                                                   )}
@@ -622,7 +662,6 @@ const Page: NextPage = () => {
                   </article>
                   {((queryAudioChatMetadata?.isSuccess &&
                     //@ts-ignore
-                    queryAudioChatByIdRawData?.data?.lens_publication_id === '' &&
                     queryPublishedRecording?.data?.encrypted !== true &&
                     queryPublishedRecording?.data?.metadata) ||
                     (queryPublishedRecording?.data?.encrypted === true && queryDecryptPublishedRecording?.data)) && (

@@ -68,6 +68,8 @@ export function useLit() {
       }
     } catch (e) {
       console.error(e)
+      //@ts-ignore
+      toast.error(e?.message)
     }
   })
 
@@ -109,6 +111,8 @@ export function useLit() {
         const decrypted = await LitJsSdk.decryptString(blob, symmetricKey)
         return { decryptedString: decrypted }
       } catch (e) {
+        //@ts-ignore
+        toast.error(e?.message)
         console.error(e)
       }
     },

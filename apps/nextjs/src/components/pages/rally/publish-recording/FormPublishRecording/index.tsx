@@ -114,24 +114,6 @@ export const FormPublishRecording = (props: FormPublishRecording) => {
                 Please add at least 1 tag.
               </FormField.HelpBlock>
             </FormField>
-            <div className="relative focus-within:z-10 bg-neutral-1 p-6 rounded-md">
-              <h2 className="font-semibold text-sm mb-1.5">Configure access-control settings</h2>
-              <p className="mb-4 text-neutral-11 text-xs">
-                Define who can access your post with on-chain criteria.
-                <br /> Your wallet will be whitelisted by default.
-              </p>
-              <div className="space-y-6">
-                <LensPublicationFormFieldsGatedModule
-                  data={data}
-                  setData={setData}
-                  errors={errors}
-                  disabled={disabled || !showSectionLens}
-                  setFields={setFields}
-                  addField={addField}
-                  resetField={resetField}
-                />
-              </div>
-            </div>
           </fieldset>
 
           <fieldset disabled={!showSectionLens}>
@@ -141,7 +123,7 @@ export const FormPublishRecording = (props: FormPublishRecording) => {
                   disabled={
                     disabled || !showSectionLens || !account?.address || chain?.unsupported === true || chain?.id === 1
                   }
-                  label="Share on Lens"
+                  label="Share on Lens (public recordings only)"
                   helpText={
                     showSectionLens
                       ? `Enabling this option will share this recording on your Lens profile.`
@@ -150,9 +132,32 @@ export const FormPublishRecording = (props: FormPublishRecording) => {
                   checked={data()?.publish_on_lens === true ? true : false}
                   onChange={(value: any) => {
                     setData('publish_on_lens', value)
+                    if (value === true) {
+                      setData('gated_module', false)
+                      resetField('access_control_conditions')
+                    }
                   }}
                 />
               </FormField>
+              <div className="relative focus-within:z-10 bg-neutral-1 p-6 rounded-md">
+                <h2 className="font-semibold text-sm mb-1.5">Configure access-control settings</h2>
+                <p className="mb-4 text-neutral-11 text-xs">
+                  Define who can access your post with on-chain criteria.
+                  <br /> Your wallet will be whitelisted by default.
+                </p>
+                <div className="space-y-6">
+                  <LensPublicationFormFieldsGatedModule
+                    data={data}
+                    setData={setData}
+                    errors={errors}
+                    disabled={disabled || data()?.publish_on_lens === true}
+                    setFields={setFields}
+                    addField={addField}
+                    resetField={resetField}
+                  />
+                </div>
+              </div>
+
               {data()?.publish_on_lens === true && (
                 <>
                   <div className="relative focus-within:z-10 bg-neutral-1 p-6 rounded-md">

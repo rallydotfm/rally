@@ -24,6 +24,9 @@ export const Token = (props: any) => {
         isAddress(data()?.access_control_conditions?.[index]?.contractAddress) === true
           ? true
           : false,
+      onError(err: any) {
+        console.error(err)
+      },
 
       onSuccess(data: { name: string; decimals: number; symbol: string }) {
         if (data) {

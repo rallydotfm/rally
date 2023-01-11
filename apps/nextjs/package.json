@@ -22,6 +22,7 @@
     "@lit-protocol/sdk-browser": "^1.1.228",
     "@livekit/react-core": "^1.0.3",
     "@livepeer/react": "^1.5.6",
+    "@nomad-xyz/multi-provider": "^1.1.0",
     "@rainbow-me/rainbowkit": "^0.7.3",
     "@rainbow-me/rainbowkit-siwe-next-auth": "^0.1.4",
     "@rally/abi": "*",

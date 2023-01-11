@@ -15,7 +15,6 @@ import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { formatRelative } from 'date-fns'
 import Link from 'next/link'
 import { useAccount } from 'wagmi'
-import PublishedRecordingAbout from '../PublishedRecordingAbout'
 import PostComment from './PostComment'
 
 interface PublishedRecordingLensPublicationProps {
@@ -73,7 +72,6 @@ export const PublishedRecordingLensPublication = (props: PublishedRecordingLensP
             Published on Lens&nbsp;·&nbsp;
             {formatRelative(new Date(queryLinkedLensPublication?.data?.publication?.createdAt), new Date())}
           </header>
-          <PublishedRecordingAbout publication={queryLinkedLensPublication?.data?.publication} />
           <ul className="pt-4 max-w-screen-2xs mx-auto flex gap-10 justify-center items-center">
             <li className="flex flex-col items-center gap-2">
               <ButtonCollectPublication

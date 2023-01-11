@@ -8,7 +8,6 @@ import FormField from '@components/FormField'
 import FormSelect from '@components/FormSelect'
 import Publication from './Publication'
 import { supportedChains } from '@config/lit'
-import { Button } from '@components/Button'
 
 export const Criteria = (props: any) => {
   const { type, ...rest } = props
@@ -16,8 +15,10 @@ export const Criteria = (props: any) => {
   switch (type) {
     case 'nft':
       if (
-        data()?.access_control_conditions?.[index]?.contractAddress === '0xdb46d1dc155634fbc732f92e853b10b288ad5a1d' &&
-        data()?.access_control_conditions?.[index]?.chainID === 137
+        (data()?.access_control_conditions?.[index]?.contractAddress === '0xdb46d1dc155634fbc732f92e853b10b288ad5a1d' &&
+          data()?.access_control_conditions?.[index]?.chainID === 137) ||
+        (data()?.access_control_conditions?.[index]?.contractAddress === '0xe00dc8cb3a7c3f8e5ab5286afabb0c2d1054187b' &&
+          data()?.access_control_conditions?.[index]?.chainID === 80001)
       )
         return (
           <div className="pb-4 xs:text-center text-xs font-bold m-auto">

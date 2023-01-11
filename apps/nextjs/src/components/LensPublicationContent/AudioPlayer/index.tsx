@@ -27,6 +27,7 @@ export const AudioPlayer = (props: any) => {
             publication?.metadata?.attributes?.filter((attr: any) => attr?.traitType === 'title')?.[0]?.value}
         </p>
         <p className="text-xs font-medium mt-1">
+          {console.log(publication?.metadata)}
           by{' '}
           {publication?.metadata?.attributes?.filter((attr: any) => attr?.traitType === 'author')?.[0]?.value ??
             publication?.metadata?.attributes?.filter((attr: any) => attr?.traitType === 'creator')?.[0]?.value ??

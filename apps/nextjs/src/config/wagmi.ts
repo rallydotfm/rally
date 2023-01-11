@@ -6,11 +6,11 @@ import { alchemyProvider } from 'wagmi/providers/alchemy'
 export const chainId = process?.env?.NEXT_PUBLIC_CHAIN === 'mumbai' ? chain.polygonMumbai?.id : chain?.polygon?.id
 export const { chains, provider } = configureChains(
   // for now we just want to support Mumbai testnet
-  [process?.env?.NEXT_PUBLIC_CHAIN === 'mumbai' ? chain.polygonMumbai : chain?.polygon],
+  [chain.polygonMumbai, chain?.polygon, chain?.mainnet],
   // later on here we could add other providers
   // like Alchemy, Ankr, Infura...
   // eg: see https://wagmi.sh/docs/providers/alchemy
-  [alchemyProvider({ apiKey: process.env.NEXT_PUBLIC_ALCHEMY_KEY }), publicProvider()],
+  [publicProvider(), alchemyProvider({ apiKey: process.env.NEXT_PUBLIC_ALCHEMY_KEY })],
 )
 
 const { wallets } = getDefaultWallets({
@@ -27,9 +27,9 @@ export const wagmiClient = createClient({
 })
 
 export const chainRPC = {
-  [1]: 'https://1rpc.io/eth',
+  [1]: 'https://rpc.ankr.com/eth',
   [56]: 'https://1rpc.io/bnb',
-  [137]: 'https://1rpc.io/matic',
+  [137]: 'https://rpc.ankr.com/polygon',
   [43114]: 'https://1rpc.io/avax/c',
   [42161]: 'https://1rpc.io/arb',
   [1284]: 'https://1rpc.io/glmr',

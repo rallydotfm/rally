@@ -142,14 +142,14 @@ export const Publication = (props: any) => {
                       <p className="font-medium text-[0.9em] italic">
                         {queryPublicationById?.data?.publication?.metadata?.name}
                       </p>
-                      <p className="font-medium text-[0.9em]">
-                        by{' '}
+                      <p className="mt-3 font-medium text-[0.9em]">
+                        Publication by{' '}
                         {queryPublicationById?.data?.publication?.profile?.name ??
                           queryPublicationById?.data?.publication?.profile?.onChainIdentity?.ens?.name ??
                           queryPublicationById?.data?.publication?.profile?.handle}{' '}
-                        {queryPublicationById?.data?.publication?.profile?.name ||
-                          (queryPublicationById?.data?.publication?.profile?.onChainIdentity?.ens?.name &&
-                            `(${queryPublicationById?.data?.publication?.profile?.handle})`)}
+                        {(queryPublicationById?.data?.publication?.profile?.name ||
+                          queryPublicationById?.data?.publication?.profile?.onChainIdentity?.ens?.name) &&
+                          `(${queryPublicationById?.data?.publication?.profile?.handle})`}
                       </p>
                     </div>
                   </div>

@@ -9,7 +9,7 @@ export function useGetPublishedRecordingsByWalletAddress(address?: string) {
   const queryRecordingsByAddressRawData = useContractRead({
     ...contractConfigAudioChat,
     chainId,
-    functionName: 'getAllRecordingsByWalletAddress',
+    functionName: 'getAudioChatsByAddress',
     enabled: address ? true : false,
     args: [address as `0x${string}`],
     cacheOnBlock: true,
@@ -19,19 +19,22 @@ export function useGetPublishedRecordingsByWalletAddress(address?: string) {
     },
   })
 
-  console.log(queryRecordingsByAddressRawData.data)
   const queriesAudioChatsByAddressMetadata = useQueries({
     //@ts-ignore
     enabled: queryRecordingsByAddressRawData?.data?.length > 0 ?? false,
     //@ts-ignore
     queries: queryRecordingsByAddressRawData?.data?.length
       ? //@ts-ignore
-        queryRecordingsByAddressRawData?.data?.map((audioChat) => {
-          return {
-            queryKey: ['audio-chat-metadata', audioChat?.audio_event_id],
-            queryFn: async () => await getAudioChatMetadata(audioChat),
-          }
-        })
+        queryRecordingsByAddressRawData?.data
+          //@ts-ignore
+          ?.filter((audioChat) => audioChat?.arweave_transaction_id !== '')
+          //@ts-ignore
+          ?.map((audioChat) => {
+            return {
+              queryKey: ['audio-chat-metadata', audioChat?.audio_event_id],
+              queryFn: async () => await getAudioChatMetadata(audioChat),
+            }
+          })
       : [],
   })
 

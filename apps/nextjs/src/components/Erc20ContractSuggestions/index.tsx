@@ -26,6 +26,7 @@ export const Erc20ContractSuggestions = (props: Erc20ContractSuggestionsProps) =
           chainId: chainId,
         })
         const result = await response.json()
+        console.log(result)
         return result?.data
       } catch (e) {
         console.error(e)

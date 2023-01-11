@@ -1,4 +1,12 @@
 import { supportedChains } from '@config/lit'
+import type {
+  NftOwnership,
+  EoaOwnership,
+  FollowCondition,
+  ProfileOwnership,
+  CollectCondition,
+  Erc20TokenOwnership,
+} from '@lens-protocol/sdk-gated/dist/types'
 
 /**
  * Return formatted access control criteria for both Lens and Lit
@@ -32,11 +40,9 @@ export function getEncryptionCriteria(args: {
     { operator: 'or' },
   ]
 
-  console.log(accessControlConditions)
   let lensCriteria: any = []
   accessControlConditions.map((accessControl, i) => {
     const condition = accessControlConditions[i]
-    console.log(condition)
     const litChain = supportedChains.filter((lChain) => lChain.id === parseInt(condition.chainID))?.[0]?.lit
 
     let lensCondition
@@ -52,32 +58,30 @@ export function getEncryptionCriteria(args: {
           parameters: [':userAddress'],
           returnValueTest: {
             comparator: condition.condition, // the condition that must be met to grant access to the metadata, supported conditions are: '==', '!=', '>', '<', '>=', '<='
-            value: condition.amount.toString(), // the amount of the ERC20 token that grants access to the metadata
+            value: `${condition.amount.toFixed(8)}`, // the amount of the ERC20 token that grants access to the metadata
           },
         }
         // Lens condition
-        lensCondition = {
-          token: {
-            contractAddress: condition.contractAddress, // the address of the ERC20 token that signers should own
-            chainID: parseInt(condition.chainID), // the chain ID of the network
-            amount: condition.amount.toString(), // the amount of the ERC20 token that grants access to the metadata
-            decimals: parseInt(condition.decimals), // the decimals of the ERC20 token that grants access to the metadata
-            condition: condition.condition, // the condition that must be met to grant access to the metadata, supported conditions are: '==', '!=', '>', '<', '>=', '<='
-          },
+        const tokenCondition: Erc20TokenOwnership = {
+          contractAddress: condition.contractAddress, // the address of the ERC20 token that signers should own
+          chainID: parseInt(condition.chainID), // the chain ID of the network
+          amount: `${condition.amount.toFixed(8)}`, // the amount of the ERC20 token that grants access to the metadata
+          decimals: parseInt(condition.decimals), // the decimals of the ERC20 token that grants access to the metadata
+          condition: condition.condition, // the condition that must be met to grant access to the metadata, supported conditions are: '==', '!=', '>', '<', '>=', '<='
         }
+        lensCondition = { token: tokenCondition }
         break
       case 'unlock':
       case 'nft':
         // Unlock Locks are ERC-721
 
         // Lens condition
-        lensCondition = {
-          nft: {
-            contractType: condition.contractType, // the type of the NFT collection, ERC721 and ERC1155 are supported
-            contractAddress: condition.contractAddress, // NFT Contract address
-            chainID: parseInt(condition.chainID), // the chain ID of the network the NFT collection is deployed on
-          },
+        const nftCondition: NftOwnership = {
+          contractType: condition.contractType, // the type of the NFT collection, ERC721 and ERC1155 are supported
+          contractAddress: condition.contractAddress, // NFT Contract address
+          chainID: parseInt(condition.chainID), // the chain ID of the network the NFT collection is deployed on
         }
+        lensCondition = { nft: nftCondition }
         // Lit condition
         litCondition = {
           standardContractType: condition.contractType, // the type of the NFT collection, ERC721 and ERC1155 are supported
@@ -116,11 +120,12 @@ export function getEncryptionCriteria(args: {
         break
       case 'eoa': // externally owned address aka not a contract address
         // Lens condition
+        const eoaCondition: EoaOwnership = {
+          address: condition.address,
+        }
+
         lensCondition = {
-          eoa: {
-            address: condition.address,
-            chainID: parseInt(condition.chainID), // the address of the EOA that grants access to the metadata
-          },
+          eoa: eoaCondition,
         }
 
         // Lit condition
@@ -139,10 +144,11 @@ export function getEncryptionCriteria(args: {
 
       case 'lens-profile': // Own a lens profile with a specific id
         // Lens condition
+        const profileCondition: ProfileOwnership = {
+          profileId: condition.profileId,
+        }
         lensCondition = {
-          profile: {
-            profileId: condition.profileId,
-          },
+          profile: profileCondition,
         }
 
         // Lit condition
@@ -163,10 +169,11 @@ export function getEncryptionCriteria(args: {
 
       case 'follow': // Must follow a specific Lens profile
         // Lens condition
+        const followCondition: FollowCondition = {
+          profileId: condition.profileId,
+        }
         lensCondition = {
-          follow: {
-            profileId: condition.profileId,
-          },
+          follow: followCondition,
         }
 
         // Lit condition
@@ -187,10 +194,11 @@ export function getEncryptionCriteria(args: {
         break
       case 'collect':
         // Lens condition
+        const collectCondition: CollectCondition = {
+          publicationId: condition.publicationId,
+        }
         lensCondition = {
-          collect: {
-            publicationId: condition.publicationId,
-          },
+          collect: collectCondition,
         }
 
         // Lit condition
@@ -231,7 +239,7 @@ export function getEncryptionCriteria(args: {
   if (conditionOperator && accessControlConditions?.length > 1 && ['and', 'or'].includes(conditionOperator)) {
     accessControl = {
       [conditionOperator]: {
-        ...lensCriteria,
+        criteria: lensCriteria,
       },
     }
   } else {

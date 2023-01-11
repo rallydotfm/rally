@@ -57,8 +57,12 @@ async function storedatMiddleware(request: RequestInit) {
     },
   }
 }
-//@ts-ignore
-export const clientLens = new GraphQLClient(LENS_API_URL as string, { requestMiddleware: lensMiddleware })
+export const clientLens = new GraphQLClient(LENS_API_URL as string, {
+  //@ts-ignore
+  requestMiddleware: lensMiddleware,
+  // enable resolving partial data, see documentation https://www.npmjs.com/package/graphql-request#ignore
+  errorPolicy: 'all',
+})
 //@ts-ignore
 export const clientStoredat = new GraphQLClient(STOREDAT_API_URL as string, { requestMiddleware: storedatMiddleware })
 export const clientSubgraphRally = new GraphQLClient(API_URL_SUBGRAPH_RALLY as string)

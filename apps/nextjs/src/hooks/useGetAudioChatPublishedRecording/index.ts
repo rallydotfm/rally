@@ -47,22 +47,28 @@ export function useGetAudioChatPublishedRecording(audioChatId: string, recording
   )
 
   const mutationDecryptMetadata = useMutation(async () => {
-    const recordingMetadataArweave = base64ToJson(recordingMetadataArweaveAsBase64)
-    const { access_control_conditions, arweave_transaction_id, encrypted_symmetric_key } = recordingMetadataArweave
-
-    const decrypted = await mutationDecryptText.mutateAsync({
-      encryptedText: arweave_transaction_id,
-      encryptedSymmetricKey: encrypted_symmetric_key,
-      accessControlConditions: access_control_conditions,
-    })
-    return decrypted
+    try {
+      const recordingMetadataArweave = base64ToJson(recordingMetadataArweaveAsBase64)
+      const { access_control_conditions, arweave_transaction_id, encrypted_symmetric_key } = recordingMetadataArweave
+      const decrypted = await mutationDecryptText.mutateAsync({
+        encryptedText: arweave_transaction_id,
+        encryptedSymmetricKey: encrypted_symmetric_key,
+        accessControlConditions: access_control_conditions,
+      })
+      return decrypted
+    } catch (error) {
+      console.error(error)
+    }
   })
 
   const queryDecryptPublishedRecording = useQuery(
     ['decrypt-published-recording-metadata', audioChatId, recordingMetadataArweaveAsBase64],
     async () => {
-      const metadata = await getRecordingMetadata(mutationDecryptMetadata?.data?.decryptedString)
-      return metadata
+      const decrypted = JSON.parse(mutationDecryptMetadata?.data?.decryptedString)
+      return {
+        ...decrypted,
+        recording_file: decrypted?.media?.[0]?.item,
+      }
     },
     {
       refetchOnWindowFocus: false,

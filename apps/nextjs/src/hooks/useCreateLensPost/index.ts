@@ -13,12 +13,9 @@ import { utils, BigNumber } from 'ethers'
 import createPostViaDispatcherRequest from '@services/lens/publications/postViaDispatcher'
 import { CreatePublicPostRequest } from '@graphql/lens/generated'
 import { useMutation } from '@tanstack/react-query'
-import { LensGatedSDK, LensEnvironment } from '@lens-protocol/sdk-gated'
 
 export function useCreateLensPost() {
   const account = useAccount()
-  const { data: signer } = useSigner()
-  const provider = useProvider()
   const queryLensProfile: any = useWalletAddressDefaultLensProfile(account?.address as `0x${string}`, {
     enabled: account?.address ? true : false,
   })
@@ -48,7 +45,6 @@ export function useCreateLensPost() {
   async function publishPost(contentURI: string, values: any, encrypted: any) {
     let collectModule: any = {}
     let referenceModule: any = {}
-
     try {
       const profileId = queryLensProfile?.data?.id
       const feeCollectParams = {
@@ -136,12 +132,10 @@ export function useCreateLensPost() {
         collectModule,
         referenceModule,
       }
-
       //@ts-ignore
       if (gated?.encryptedSymmetricKey) {
         //@ts-ignore
         createPostRequest.gated = gated
-        createPostRequest.contentURI = encrypted?.contentURI
       }
 
       if (queryLensProfile?.data?.dispatcher && queryLensProfile?.data?.dispatcher !== null) {
