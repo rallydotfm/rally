@@ -25,6 +25,7 @@ export function useIndexedAudioChats(args: any, options: any) {
           const state = DICTIONARY_STATES_AUDIO_CHATS[audioChat?.state]
           return {
             ...audioChat,
+            ...audioChat.metadata,
             id: audioChat?.id,
             cid: audioChat?.cid_metadata,
             state,

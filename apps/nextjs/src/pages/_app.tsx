@@ -16,6 +16,9 @@ import { toastOptions } from '@config/react-hot-toast'
 import { SessionProvider } from 'next-auth/react'
 import { RainbowKitSiweNextAuthProvider } from '@rainbow-me/rainbowkit-siwe-next-auth'
 import { getSiweMessageOptions } from '@config/siwe'
+import { livepeerClient, livepeerTheme } from '@config/livepeer'
+import { LivepeerConfig } from '@livepeer/react'
+
 import '@vidstack/player/hydrate.js'
 function MyApp({ Component, pageProps }: AppProps) {
   //@ts-ignore
@@ -57,7 +60,9 @@ function MyApp({ Component, pageProps }: AppProps) {
           <WagmiConfig client={wagmiClient}>
             <RainbowKitSiweNextAuthProvider getSiweMessageOptions={getSiweMessageOptions}>
               <RainbowKitProvider theme={theme} chains={chains}>
-                {getLayout(<Component {...pageProps} />)}
+                <LivepeerConfig theme={livepeerTheme} client={livepeerClient}>
+                  {getLayout(<Component {...pageProps} />)}
+                </LivepeerConfig>
               </RainbowKitProvider>
             </RainbowKitSiweNextAuthProvider>
           </WagmiConfig>

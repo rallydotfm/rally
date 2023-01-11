@@ -16,7 +16,7 @@ import { useRouter } from 'next/router'
 import { useStoreCurrentLiveRally } from '@hooks/useVoiceChat'
 import { trpc } from '@utils/trpc'
 import { useEndLiveAudioChat, useStoreTxUiEndLiveRally } from '@hooks/useEndLiveAudioChat'
-import { Listbox, Menu } from '@headlessui/react'
+import { Listbox } from '@headlessui/react'
 import DialogEndLive from '@components/DialogEndLive'
 import DialogModalSpeakerInvitation from '@components/pages/rally/[idRally]/DialogModalSpeakerInvitation'
 import { useAccount } from 'wagmi'
@@ -24,6 +24,7 @@ import { RoomEvent } from 'livekit-client'
 import Link from 'next/link'
 import type { Participant, Track } from 'livekit-client'
 import DialogManageLive from '@components/DialogManageLive'
+import button from '@components/Button/styles'
 
 export const ToolbarAudioRoom = () => {
   const { address } = useAccount()
@@ -187,10 +188,11 @@ export const ToolbarAudioRoom = () => {
               horizontal
             >
               <Listbox.Button
-                as={Button}
-                intent="neutral-ghost"
-                scale="sm"
-                className="aspect-square w-auto max-w-12 !p-2"
+                className={button({
+                  intent: 'neutral-ghost',
+                  class: 'aspect-square w-auto max-w-12 !p-2',
+                  scale: 'sm',
+                })}
               >
                 {<HeartIcon className="w-[1.35rem] pointer-events-none" />}
               </Listbox.Button>

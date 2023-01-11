@@ -11,19 +11,20 @@ export const ListLanguages = () => {
     (state: any) => state.saveLanguagesSelection,
   )
   const storedPreferences = useStorePersistedPreferences((state: any) => state.preferences)
+
   return (
     <>
-      {storedPreferences?.[account?.address as `0x${string}`]?.languages.map(
+      {storedPreferences?.[account?.address as `0x${string}`]?.languagess?.map(
         //@ts-ignore
         (language: string) => DICTIONARY_LOCALES[language],
       )?.length > 0 && (
         <div className="animate-appear text-xs">
           <p className="font-medium">Current selection:</p>
           <ul className="mb-6 mt-1 flex flex-wrap gap-3">
-            {storedPreferences?.[account?.address as `0x${string}`]?.languages.map((language: string) => (
+            {storedPreferences?.[account?.address as `0x${string}`]?.languages?.map((language: string) => (
               <li
                 className="font-semibold text-2xs px-1ex py-1 bg-neutral-1 text-white rounded-md"
-                key={`selected-list-${language}`}
+                key={`preferences-list-languagesselected-list-${language}`}
               >
                 {/* @ts-ignore */}
                 {DICTIONARY_LOCALES[language]}
@@ -54,7 +55,7 @@ export const ListLanguages = () => {
                   ? 'neutral-on-dark-layer'
                   : 'neutral-outline',
               })}
-              key={`selection-language-${language}`}
+              key={`preferences-list-languagesselection-language-${language}`}
               value={language}
             >
               {storedPreferences?.[account?.address as `0x${string}`]?.languages?.includes(language) && (

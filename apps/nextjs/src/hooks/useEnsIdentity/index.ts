@@ -6,7 +6,7 @@ export function useEnsIdentity(address: `0x${string}`, options: any) {
     ['ens-name', address],
     async () => {
       try {
-        const provider = new ethers.providers.JsonRpcProvider('https://1rpc.io/eth')
+        const provider = new ethers.providers.JsonRpcProvider('https://rpc.ankr.com/eth')
 
         const name = await provider.lookupAddress(address)
         const avatar = await provider.getAvatar(address)

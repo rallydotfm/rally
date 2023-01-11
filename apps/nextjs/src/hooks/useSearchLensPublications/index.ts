@@ -13,8 +13,8 @@ export function useSearchLensPublications(options?: any) {
       setDebouncedSearchQuery(inputSearchPublicationsValue)
     },
     [inputSearchPublicationsValue],
-    1200,
-    2000,
+    500,
+    2500,
   )
   const querySearchLensPublications = useQuery(
     ['search-lens-publications', debouncedSearchQuery],

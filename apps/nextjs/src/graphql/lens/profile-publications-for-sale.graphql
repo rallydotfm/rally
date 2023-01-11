@@ -1,4 +1,4 @@
-query ProfilePublicationsForSale($request: ProfilePublicationsForSaleRequest!) {
+query ProfilePublicationsForSale($request: ProfilePublicationsForSaleRequest!, $profileId: ProfileId) {
   profilePublicationsForSale(request: $request) {
     items {
       __typename

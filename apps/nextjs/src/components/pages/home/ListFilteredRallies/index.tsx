@@ -29,7 +29,7 @@ export const ListFilteredRallies = (props: ListFilteredRalliesProps) => {
                     ? 'opacity-50'
                     : ''
                 } w-full h-[inherit] min-w-max-content 2xs:max-w-72 animate-appear snap-center`}
-                key={`${audioChat.cid}`}
+                key={`filtered-rallies-home${audioChat.cid}`}
               >
                 <CardRally data={audioChat} />
               </li>

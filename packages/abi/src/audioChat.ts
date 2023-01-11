@@ -79,7 +79,7 @@ export const audioChatABI = [
       { internalType: 'string', name: 'cid_metadata', type: 'string' },
       { internalType: 'address', name: 'creator', type: 'address' },
       { internalType: 'bool', name: 'is_indexed', type: 'bool' },
-      { internalType: 'string', name: 'recording_arweave_transaction_id', type: 'string' },
+      { internalType: 'string', name: 'published_recording_access_control_arweave_transaction_id', type: 'string' },
       { internalType: 'string', name: 'lens_publication_id', type: 'string' },
     ],
     name: 'createNewAudioChat',

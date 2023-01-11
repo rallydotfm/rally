@@ -1,0 +1,41 @@
+import { UNLOCK_SUBGRAPH_API_URL } from '@config/unlock'
+
+/**
+ * Retrieve locks from subgraph - filtered by lock manager eth address
+ * @param chainId - id of the chain we need to retrieve the locks info from
+ * @param address - Ethereum address of the lock manager
+ */
+export async function getLockById(args: { chainId: number; address: `0x${string}` }) {
+  //@ts-ignore
+  const result = await fetch(UNLOCK_SUBGRAPH_API_URL[args.chainId], {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+    },
+    body: JSON.stringify({
+      query: `
+        query LockByAddress($id: String!) {
+          lock(id: $id)
+           {
+            id
+            address
+            name
+            price 
+            tokenAddress
+            expirationDuration    
+            maxNumberOfKeys
+          }
+        }
+      
+      `,
+      variables: {
+        id: args.address,
+      },
+    }),
+  })
+
+  return result
+}
+
+export default getLockById

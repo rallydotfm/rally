@@ -38,7 +38,7 @@ export const credentialsRouter = router({
         })
 
         // get the information of the rally by fetching the JSON with all its data
-        const response = await fetch(`https://${cid_rally}.ipfs.w3s.link/data.json`)
+        const response = await fetch(`https://ipfs.io/ipfs/${cid_rally}`)
         const result = await response.json()
 
         const {

@@ -26,9 +26,6 @@ import { useStoreTxUiCommentRecording } from '@hooks/useCommentRecording'
 import { useAccount } from 'wagmi'
 import { useStoreHasSignedInWithLens } from '@hooks/useSignInWithLens'
 import useWalletAddressDefaultLensProfile from '@hooks/useWalletAddressDefaultLensProfile'
-import { useStoreBundlr } from '@hooks/useBundlr'
-import { useMutation } from '@tanstack/react-query'
-import toast from 'react-hot-toast'
 import { useMountEffect, useUnmountEffect, useUpdateEffect } from '@react-hookz/web'
 
 export const ToolbarAudioPlayer = () => {
@@ -47,12 +44,8 @@ export const ToolbarAudioPlayer = () => {
   const queryUserProfileLens = useWalletAddressDefaultLensProfile(account?.address as `0x${string}`, {
     enabled: account?.address ? true : false,
   })
-  const initialize = useStoreBundlr((state: any) => state.initialize)
-  const bundlr = useStoreBundlr((state: any) => state.bundlr)
-  const mutationPrepareBundlr = useMutation(async () => await initialize())
   const audioPlayer = useMediaContext(media)
   const goToTimestampRef = useRef(null)
-
   useUpdateEffect(() => {
     if (rally?.timestamp) {
       //@ts-ignore
@@ -156,27 +149,27 @@ export const ToolbarAudioPlayer = () => {
                 <PauseIcon className="w-6 media-playing:block media-can-play:hidden media-paused:hidden" />
                 <span className="sr-only">Toggle play</span>
               </PlayButton>
-              <button
-                className="disabled:opacity-50 disabled:cursor-not-allowed"
-                disabled={!isSignedIn || !account?.address || (isSignedIn && !queryUserProfileLens?.data?.id)}
-                onClick={async () => {
-                  try {
-                    if (!bundlr) {
-                      await mutationPrepareBundlr.mutateAsync()
-                    }
+              {rally?.lensPublicationId && (
+                <button
+                  className="disabled:opacity-50 disabled:cursor-not-allowed"
+                  disabled={
+                    !isSignedIn ||
+                    !account?.address ||
+                    (isSignedIn && !queryUserProfileLens?.data?.id) ||
+                    queryUserProfileLens?.data?.ownedBy !== account?.address
+                  }
+                  onClick={() => {
                     selectPublicationToComment(
                       //@ts-ignore
                       rally?.lensPublicationId as string,
                       new Date(audioPlayer.currentTime * 1000).toISOString().slice(11, 19),
                     )
-                  } catch (e) {
-                    toast.error('Connect to Bundlr to post a comment on this recording.')
-                  }
-                }}
-                type="button"
-              >
-                <ChatBubbleLeftRightIcon className="w-5" />
-              </button>
+                  }}
+                  type="button"
+                >
+                  <ChatBubbleLeftRightIcon className="w-5" />
+                </button>
+              )}
             </div>
 
             <MuteButton className="text-neutral-11 hover:text-neutral-12 focus:text-white">

@@ -4,6 +4,7 @@ import { CheckCircleIcon } from '@heroicons/react/20/solid'
 import useAddProfileInterest from '@hooks/useAddProfileInterest'
 import { useStorePersistedInterests } from '@hooks/usePersistedInterests'
 import useRemoveProfileInterest from '@hooks/useRemoveProfileInterest'
+
 import { useAccount } from 'wagmi'
 
 interface ListInterestsProps {
@@ -25,7 +26,7 @@ export const ListInterests = (props: ListInterestsProps) => {
         {list
           .filter((label) => !label.includes('__'))
           .map((category) => (
-            <li key={category}>
+            <li key={`list-interests-browsing-preferences${category}`}>
               {/* @ts-ignore */}
               <span className="font-bold">{DICTIONARY_PROFILE_INTERESTS_CATEGORIES[category]}</span>
               <ul className="flex flex-wrap gap-3 pt-2">
@@ -66,7 +67,7 @@ export const ListInterests = (props: ListInterestsProps) => {
                       .filter((label) => label.includes('__') && label.includes(category))
                       .map((interest) => {
                         return (
-                          <li key={interest}>
+                          <li key={`interest-${interest}`}>
                             <Button
                               className={`${
                                 source?.includes(interest) ? '!pis-1ex' : '!pis-[2ex]'

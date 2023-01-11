@@ -23,7 +23,7 @@ export const ListFilteredRallies = (props: ListFilteredRalliesProps) => {
                 className={`${
                   [DICTIONARY_STATES_AUDIO_CHATS.CANCELLED.label].includes(audioChat.state) ? 'opacity-50' : ''
                 } animate-appear`}
-                key={`${audioChat.cid}`}
+                key={`profile-list-filtered-ralliescard-rally-${audioChat.cid}`}
               >
                 <CardRally data={audioChat} />
               </li>

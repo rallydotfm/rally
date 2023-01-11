@@ -10,6 +10,7 @@ interface InputTagsProps extends SystemUiInputProps {
 
 export const InputTags = (props: InputTagsProps) => {
   const { api, disabled, className, intent, scale, appearance, placeholder } = props
+
   return (
     <div {...api?.rootProps}>
       <input
@@ -25,7 +26,7 @@ export const InputTags = (props: InputTagsProps) => {
       />
       <div className="mt-2 flex gap-2 flex-wrap">
         {api.value.map((value: string, index: number) => (
-          <span key={`tag-${index}`}>
+          <span key={`tag${index}`}>
             <div
               className="text-xs font-medium inline-flex rounded-md bg-interactive-10 py-0.5 pis-2 pie-3"
               {...api.getTagProps({ index, value })}

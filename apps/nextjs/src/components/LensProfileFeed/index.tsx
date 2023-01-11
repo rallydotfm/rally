@@ -3,24 +3,35 @@ import LensPublicationContent from '@components/LensPublicationContent'
 import { ROUTE_PROFILE } from '@config/routes'
 import { PublicationTypes } from '@graphql/lens/generated'
 import { ArrowsRightLeftIcon } from '@heroicons/react/20/solid'
+import useWalletAddressDefaultLensProfile from '@hooks/useWalletAddressDefaultLensProfile'
 import getPublicationsRequest from '@services/lens/publications/getPublications'
 import { useQuery } from '@tanstack/react-query'
 import { formatRelative } from 'date-fns'
 import Link from 'next/link'
+
+import { useAccount } from 'wagmi'
 
 interface LensProfileFeedProps {
   profileId: string
 }
 export const LensProfileFeed = (props: LensProfileFeedProps) => {
   const { profileId } = props
+
+  const account = useAccount()
+  const queryLensProfile = useWalletAddressDefaultLensProfile(account?.address as `0x${string}`, {
+    enabled: account?.address ? true : false,
+  })
   const queryProfileFeed = useQuery(
     ['profile-publications', profileId],
     async () => {
-      const result = await getPublicationsRequest({
-        profileId,
-        publicationTypes: [PublicationTypes.Post, PublicationTypes.Mirror],
-        limit: 50,
-      })
+      const result = await getPublicationsRequest(
+        {
+          profileId,
+          publicationTypes: [PublicationTypes.Post, PublicationTypes.Mirror],
+          limit: 50,
+        },
+        queryLensProfile?.data?.id,
+      )
       return result
     },
     {
@@ -51,7 +62,7 @@ export const LensProfileFeed = (props: LensProfileFeedProps) => {
                   //@ts-ignore
                   publication?.indexed === false ? 'animate-pulse' : 'animate-appear'
                 } px-3 md:px-6 py-4 text-sm`}
-                key={publication?.id}
+                key={`${publication?.id}`}
               >
                 {' '}
                 {publication?.__typename === 'Mirror' && (

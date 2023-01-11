@@ -100,12 +100,12 @@ export const FormComment = (props: any) => {
             isLoading={isLoading}
             disabled={
               !isSignedIn ||
-              disabled ||
+              disabled === true ||
               !account?.address ||
               chain?.unsupported === true ||
               chain?.id === 1 ||
               !isValid() ||
-              isLoading ||
+              isLoading === true ||
               (data()?.publish_on_lens === true &&
                 (![0, 1, 2].includes(data()?.collect_module) ||
                   ![-1, 0, 1, 2, 3, 4].includes(data()?.reference_module) ||

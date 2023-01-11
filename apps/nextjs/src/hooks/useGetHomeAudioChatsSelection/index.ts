@@ -1,10 +1,13 @@
+import { PublicationTypes } from '@graphql/lens/generated'
 import { DICTIONARY_STATES_AUDIO_CHATS } from '@helpers/mappingAudioChatState'
-import useIndexedAudioChatsRest from '@hooks/useGetIndexedAudioChatREST'
 import useGetProfilesInterests from '@hooks/useGetProfileInterests'
 import useIndexedAudioChats from '@hooks/useIndexedAudioChats'
 import { useStorePersistedInterests } from '@hooks/usePersistedInterests'
 import { createStoreIndexedAudioChatsFilters } from '@hooks/useStoreIndexedAudioChatsFilters'
 import useWalletAddressDefaultLensProfile from '@hooks/useWalletAddressDefaultLensProfile'
+import { explorePublications } from '@services/lens/explore/explorePublications'
+import getPublicationsRequest from '@services/lens/publications/getPublications'
+import { useQuery } from '@tanstack/react-query'
 import { addYears, endOfToday, getUnixTime, startOfToday } from 'date-fns'
 import { useAccount } from 'wagmi'
 
@@ -62,7 +65,7 @@ export function useGetHomeAudioChatsSelection() {
       nsfw: [true, false],
       gated: [true, false],
       states: [DICTIONARY_STATES_AUDIO_CHATS.READY.value],
-      orderBy: 'name',
+      orderBy: 'metadata_name',
       orderDirection: 'asc',
       start_at_min: getUnixTime(startOfToday()),
       start_at_max: getUnixTime(endOfToday()),
@@ -107,7 +110,22 @@ export function useGetHomeAudioChatsSelection() {
     },
   )
 
+  /*
+  const queryGetLatestPosts = useQuery(
+    ['home-latest-post', queryLensProfile?.data?.id],
+    async () => {
+      const result = await explorePublications({
+        sources: ['Rally'],
+      })
+      return result
+    },
+    {
+      refetchOnWindowFocus: false,
+    },
+  )*/
+
   return {
+    // queryGetLatestPosts,
     queryAudioChatsHappeningSoon,
     queryAudioChatsHappeningLater,
     queryAudioChatsHappeningNow,
@@ -128,7 +146,7 @@ export function useGetHomeAudioChatsSelectionFromRESTIndexer() {
   const order = useStoreFiltersAudioChatsHomePage((state: any) => state.order)
   const queryListInterests = useGetProfilesInterests()
 
-  const queryAudioChatsHappeningLater = useIndexedAudioChatsRest(
+  const queryAudioChatsHappeningLater = useIndexedAudioChats(
     {
       address: account?.address ?? '',
       first: PER_PAGE,
@@ -154,7 +172,7 @@ export function useGetHomeAudioChatsSelectionFromRESTIndexer() {
       enabled: queryListInterests?.data?.length ?? [].length > 0 ? true : false,
     },
   )
-  const queryAudioChatsHappeningNow = useIndexedAudioChatsRest(
+  const queryAudioChatsHappeningNow = useIndexedAudioChats(
     {
       address: account?.address ?? '',
       first: PER_PAGE,
@@ -181,7 +199,7 @@ export function useGetHomeAudioChatsSelectionFromRESTIndexer() {
       enabled: queryListInterests?.data?.length ?? [].length > 0 ? true : false,
     },
   )
-  const queryAudioChatsHappeningSoon = useIndexedAudioChatsRest(
+  const queryAudioChatsHappeningSoon = useIndexedAudioChats(
     {
       address: account?.address ?? '',
       first: PER_PAGE,
@@ -208,33 +226,24 @@ export function useGetHomeAudioChatsSelectionFromRESTIndexer() {
     },
   )
 
-  const queryAudioChatsHostedByCurrentUserToday = useIndexedAudioChatsRest(
-    {
-      address: account?.address ?? '',
-      first: PER_PAGE,
-      skip,
-      categories: queryListInterests.data,
-      creator: account?.address,
-      name: '',
-      nsfw: [true, false],
-      gated: [true, false],
-      states: [
-        DICTIONARY_STATES_AUDIO_CHATS.PLANNED.value,
-        DICTIONARY_STATES_AUDIO_CHATS.READY.value,
-        DICTIONARY_STATES_AUDIO_CHATS.LIVE.value,
-      ],
-      orderBy: order[0],
-      orderDirection: order[1],
-      start_at_min: getUnixTime(startOfToday()),
-      start_at_max: getUnixTime(endOfToday()),
+  const queryGetLatestPosts = useQuery(
+    ['home-latest-post'],
+    async () => {
+      const result = await getPublicationsRequest(
+        {
+          sources: ['Rally'],
+        },
+        queryLensProfile?.data?.id ?? null,
+      )
+      return result
     },
     {
-      enabled: account?.address ? true : false,
+      refetchOnWindowFocus: false,
     },
   )
 
   return {
-    queryAudioChatsHostedByCurrentUserToday,
+    queryGetLatestPosts,
     queryAudioChatsHappeningLater,
     queryAudioChatsHappeningNow,
     queryAudioChatsHappeningSoon,

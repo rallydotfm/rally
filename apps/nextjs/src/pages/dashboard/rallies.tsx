@@ -100,7 +100,11 @@ const Page: NextPage = () => {
                 .map((audioChat) => {
                   return (
                     //@ts-ignore
-                    <li className={`animate-appear focus-within:z-10 relative`} key={audioChat.data.id}>
+                    <li
+                      className={`animate-appear focus-within:z-10 relative`}
+                      //@ts-ignore
+                      key={`dashboard-rallies-${audioChat.data.id}`}
+                    >
                       <CardRally
                         data={audioChat.data}
                         onClickGoLive={async () => {

@@ -12,6 +12,7 @@ import { MagnifyingGlassIcon } from '@heroicons/react/24/outline'
 const Page: NextPage = () => {
   const queryRecommendedLensProfiles = useRecommendedLensProfiles()
   const { querySearchLensProfile, inputSearchLensProfileValue, setInputSearchLensProfileValue } = useSearchLensProfiles(
+    false,
     {},
   )
 

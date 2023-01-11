@@ -41,6 +41,7 @@ const RequirementNFT = (props: any) => {
 }
 export const GuildRequirement = (props: any) => {
   const { requirement } = props
+
   const queryGuild = useGetGuildById({
     id: requirement?.data?.guildId,
     options: { enabled: requirement?.data?.guildId ? true : false },
@@ -318,7 +319,7 @@ export const GuildRequirement = (props: any) => {
             </thead>
             <tbody>
               {Object.entries(requirement.data?.strategy?.params || {})?.map(([name, value]) => (
-                <tr key={name}>
+                <tr key={`${name}`}>
                   <td>{name}</td>
                   <td>{value?.toString()}</td>
                 </tr>
