@@ -376,11 +376,11 @@ const Page: NextPage = () => {
                                               <>
                                                 <Button
                                                   disabled={
-                                                    stateVoiceChat?.room.state === 'connected' ||
+                                                    stateVoiceChat?.room?.state === 'connected' ||
                                                     playedRally?.id === idRally
                                                   }
                                                   intent={
-                                                    stateVoiceChat?.room.state === 'connected' ||
+                                                    stateVoiceChat?.room?.state === 'connected' ||
                                                     playedRally?.id === idRally
                                                       ? 'neutral-ghost'
                                                       : 'interactive-outline'

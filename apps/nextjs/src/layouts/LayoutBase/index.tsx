@@ -16,6 +16,7 @@ import { useSession } from 'next-auth/react'
 import { useUpdateEffect } from '@react-hookz/web'
 import Cookies from 'js-cookie'
 import { COOKIE_LENS_ACCESS_TOKEN, COOKIE_LENS_REFRESH_TOKEN } from '@config/storage'
+import { MediaProvider } from '@vidstack/react'
 
 const NoSSRToolbarAudioPlayer = dynamic(() => import('./ToolbarAudioPlayer'), {
   ssr: false,
@@ -53,7 +54,7 @@ export const LayoutBase = (props: LayoutProps) => {
     Cookies.remove(COOKIE_LENS_REFRESH_TOKEN)
 
     if (session?.data?.user !== address) {
-      if (stateVoiceChat?.room.state === 'connected' && stateVoiceChat?.room?.sid !== '')
+      if (stateVoiceChat?.room?.state === 'connected' && stateVoiceChat?.room?.sid !== '')
         stateVoiceChat.room.disconnect()
     }
   }, [session?.data?.user, address])
@@ -66,12 +67,12 @@ export const LayoutBase = (props: LayoutProps) => {
         <MobileTopMenu address={address} />
         <div
           className={`pt-5  ${
-            ((stateVoiceChat?.room.state === 'connected' || isPlayerReady) &&
+            ((stateVoiceChat?.room?.state === 'connected' || isPlayerReady) &&
               !isSignedIn &&
               queryCurrentUserLensProfile?.data?.handle) ||
             isPlayerReady
               ? 'pb-64'
-              : stateVoiceChat?.room.state === 'connected'
+              : stateVoiceChat?.room?.state === 'connected'
               ? 'pb-48'
               : 'pb-32'
           } md:border-x flex flex-col md:border-neutral-4 md:border-solid md:col-span-8 px-3 md:px-6 flex-grow`}
@@ -90,7 +91,11 @@ export const LayoutBase = (props: LayoutProps) => {
           } fixed bottom-12 md:bottom-0 w-full`}
         >
           <div className="transition-all pointer-events-auto min-h-[6.895rem] border-transparent flex pb-1 pt-2 bg-neutral-1 md:bg-black border-y-neutral-4 border">
-            {isPlayerOpen && <NoSSRToolbarAudioPlayer />}
+            {isPlayerOpen && (
+              <MediaProvider>
+                <NoSSRToolbarAudioPlayer />
+              </MediaProvider>
+            )}
           </div>
         </div>
         <div
@@ -115,7 +120,7 @@ export const LayoutBase = (props: LayoutProps) => {
               </div>
             </div>
           )}
-          {stateVoiceChat?.room.state === 'connected' && stateVoiceChat?.room?.sid !== '' && (
+          {stateVoiceChat?.room?.state === 'connected' && stateVoiceChat?.room?.sid !== '' && (
             <div
               className={`transition-all pointer-events-auto border-transparent flex pt-1 bg-neutral-1 md:bg-black border-y-neutral-4 border`}
             >

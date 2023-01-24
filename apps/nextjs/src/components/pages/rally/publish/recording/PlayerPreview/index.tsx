@@ -1,5 +1,5 @@
 import { PauseIcon, PlayIcon, PlayPauseIcon } from '@heroicons/react/20/solid'
-import { Audio, Media, PlayButton, Time } from '@vidstack/player-react'
+import { Audio, Media, PlayButton, Time } from '@vidstack/react'
 
 export const PlayerPreview = (props: any) => {
   const { src } = props

@@ -36,13 +36,13 @@ export function useGetAudioChatPublishedRecording(audioChatId: string, recording
     {
       refetchOnWindowFocus: false,
       enabled:
-        !audioChatId ||
-        audioChatId === '' ||
-        recordingMetadataArweaveAsBase64 === null ||
-        !recordingMetadataArweaveAsBase64 ||
-        recordingMetadataArweaveAsBase64 === ''
-          ? false
-          : true,
+        audioChatId &&
+        audioChatId !== '' &&
+        recordingMetadataArweaveAsBase64 !== null &&
+        recordingMetadataArweaveAsBase64 &&
+        recordingMetadataArweaveAsBase64 !== ''
+          ? true
+          : false,
     },
   )
 

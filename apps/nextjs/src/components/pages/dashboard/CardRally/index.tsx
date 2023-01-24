@@ -183,9 +183,9 @@ export const CardRally = (props: CardRallyProps) => {
                           queryDecryptPublishedRecording?.data?.recording_file ? (
                             <>
                               <Button
-                                disabled={stateVoiceChat?.room.state === 'connected' || playedRally?.id === data?.id}
+                                disabled={stateVoiceChat?.room?.state === 'connected' || playedRally?.id === data?.id}
                                 intent={
-                                  stateVoiceChat?.room.state === 'connected' || playedRally?.id === data?.id
+                                  stateVoiceChat?.room?.state === 'connected' || playedRally?.id === data?.id
                                     ? 'neutral-ghost'
                                     : 'interactive-outline'
                                 }

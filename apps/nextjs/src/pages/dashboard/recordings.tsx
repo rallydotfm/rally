@@ -40,8 +40,17 @@ const Page: NextPage = () => {
           <>
             <div className="mb-6 animate-appear flex justify-between">
               <h2 className="font-medium text-xs text-neutral-11">
-                {queriesAudioChatsByAddressMetadata.filter((query) => query?.status === 'success')?.length} recording
-                {queriesAudioChatsByAddressMetadata.filter((query) => query?.status === 'success')?.length > 1 && 's'}
+                {
+                  //@ts-ignore
+                  queriesAudioChatsByAddressMetadata.filter((query) => query?.data?.id && query?.data?.recording !== '')
+                    ?.length
+                }{' '}
+                recording
+                {
+                  //@ts-ignore
+                  queriesAudioChatsByAddressMetadata.filter((query) => query?.data?.id && query?.data?.recording !== '')
+                    ?.length > 1 && 's'
+                }
               </h2>
             </div>
             <ul
@@ -51,7 +60,10 @@ const Page: NextPage = () => {
             >
               {queriesAudioChatsByAddressMetadata
                 //@ts-ignore
-                .filter((query) => query?.data?.id)
+                .filter((query) => {
+                  //@ts-ignore
+                  return query?.data?.id && query?.data?.recording !== ''
+                })
                 /* @ts-ignore */
                 .sort((a, b) => {
                   if (sortOrder === SORT_ORDER.START_CLOSEST)

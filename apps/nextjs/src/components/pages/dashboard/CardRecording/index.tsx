@@ -85,7 +85,7 @@ export const CardRecording = (props: CardRecordingProps) => {
             </h1>
             {queryPublishedRecording?.data?.encrypted === true && !queryDecryptPublishedRecording?.isSuccess && (
               <p className="text-[0.85rem] text-neutral-11">
-                This data of this recording are encrypted. <br /> Click on "Decrypt" to display them and play the audio
+                The data of this recording are encrypted. <br /> Click on "Decrypt" to display them and play the audio
                 file.
               </p>
             )}
@@ -99,9 +99,9 @@ export const CardRecording = (props: CardRecordingProps) => {
                 queryDecryptPublishedRecording?.data?.recording_file ? (
                   <>
                     <Button
-                      disabled={stateVoiceChat?.room.state === 'connected' || playedRally?.id === data?.id}
+                      disabled={stateVoiceChat?.room?.state === 'connected' || playedRally?.id === data?.id}
                       intent={
-                        stateVoiceChat?.room.state === 'connected' || playedRally?.id === data?.id
+                        stateVoiceChat?.room?.state === 'connected' || playedRally?.id === data?.id
                           ? 'neutral-ghost'
                           : 'interactive-outline'
                       }

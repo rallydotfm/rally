@@ -8,8 +8,6 @@ import { WagmiConfig } from 'wagmi'
 import queryClient from '@config/react-query'
 import { wagmiClient, chains } from '@config/wagmi'
 import { getLayout as getBaseLayout } from '@layouts/LayoutBase'
-import '@styles/globals.css'
-import '@rainbow-me/rainbowkit/styles.css'
 import { theme } from '@config/rainbowkit'
 import { Toaster } from 'react-hot-toast'
 import { toastOptions } from '@config/react-hot-toast'
@@ -18,8 +16,10 @@ import { RainbowKitSiweNextAuthProvider } from '@rainbow-me/rainbowkit-siwe-next
 import { getSiweMessageOptions } from '@config/siwe'
 import { livepeerClient, livepeerTheme } from '@config/livepeer'
 import { LivepeerConfig } from '@livepeer/react'
+import '@styles/globals.css'
+import '@rainbow-me/rainbowkit/styles.css'
+import 'vidstack/styles/base.css'
 
-import '@vidstack/player/hydrate.js'
 function MyApp({ Component, pageProps }: AppProps) {
   //@ts-ignore
   const getLayout = Component.getLayout ?? getBaseLayout

@@ -45,6 +45,7 @@ export async function getIndexedAudioChats(audioChatsRequest: any) {
             start_at
             creator
             cid_metadata
+            recording_arweave_transaction_id
             metadata {
               name
               category

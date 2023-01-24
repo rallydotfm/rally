@@ -1,24 +1,22 @@
-import { ScalarOperator } from '@lens-protocol/sdk-gated'
-
 export function formatTokenAmountWithComparator(amount: string, comparator: string, text?: string) {
   const formatted = new Intl.NumberFormat().format(parseFloat(amount))
   switch (comparator) {
-    case ScalarOperator.LessThan:
+    case 'LESS_THAN':
       return `less than ${formatted} ${text}`
       break
-    case ScalarOperator.GreaterThan:
+    case 'GREATER_THAN':
       return `more than ${formatted} ${text}`
       break
-    case ScalarOperator.LessThanOrEqual:
+    case 'LESS_THAN_OR_EQUAL':
       return `${formatted} ${text} or less`
       break
-    case ScalarOperator.GreaterThanOrEqual:
+    case 'GREATER_THAN_OR_EQUAL':
       return `${formatted} ${text} or more`
       break
-    case ScalarOperator.Equal:
+    case 'EQUAL':
       return `exactly ${formatted} ${text}`
       break
-    case ScalarOperator.NotEqual:
+    case 'NOT_EQUAL':
       return `an amount different from ${formatted} ${text}`
       break
     default:

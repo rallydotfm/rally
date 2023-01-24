@@ -100,7 +100,7 @@ export const CardRally = (props: CardRallyProps) => {
           {queryPublishedRecording?.isSuccess && queryPublishedRecording?.data?.recording_file && (
             <div>
               <Button
-                disabled={stateVoiceChat?.room.state === 'connected' || playedRally?.id === data?.id}
+                disabled={stateVoiceChat?.room?.state === 'connected' || playedRally?.id === data?.id}
                 intent="interactive-outline"
                 onClick={() => {
                   setAudioPlayer({

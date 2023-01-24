@@ -7,7 +7,6 @@ import { useGetErc20Token } from '@hooks/useGetErc20Token'
 import { IconSpinner } from '@components/Icons'
 import { CheckIcon, XMarkIcon } from '@heroicons/react/20/solid'
 import Erc20ContractSuggestions from '@components/Erc20ContractSuggestions'
-import { ScalarOperator } from '@lens-protocol/sdk-gated'
 
 export const Token = (props: any) => {
   const { index, chains, ...formProps } = props
@@ -184,12 +183,12 @@ export const Token = (props: any) => {
                 id={`access_control_conditions.${index}.condition`}
                 hasError={false}
               >
-                <option value={ScalarOperator.Equal}>Exactly equal to</option>
-                <option value={ScalarOperator.GreaterThanOrEqual}>Greater than or equal to</option>
-                <option value={ScalarOperator.GreaterThanOrEqual}>Greater than</option>
-                <option value={ScalarOperator.LessThanOrEqual}>Less than or equal to</option>
-                <option value={ScalarOperator.LessThan}>Lower than</option>
-                <option value={ScalarOperator.NotEqual}>Not equal to</option>
+                <option value={'EQUAL'}>Exactly equal to</option>
+                <option value={'GREATER_THAN'}>Greater than or equal to</option>
+                <option value={'GREATER_THAN_OR_EQUAL'}>Greater than</option>
+                <option value={'LESS_THAN_OR_EQUAL'}>Less than or equal to</option>
+                <option value={'LESS_THAN'}>Lower than</option>
+                <option value={'NOT_EQUAL'}>Not equal to</option>
               </FormSelect>
               <FormInput
                 scale="sm"

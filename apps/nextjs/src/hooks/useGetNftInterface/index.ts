@@ -1,6 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
 import { providers, Contract } from 'ethers'
-import { ContractType } from '@lens-protocol/sdk-gated'
 import { chainRPC } from '@config/wagmi'
 
 const erc165ABI: any = [
@@ -37,10 +36,10 @@ export function useGetNftInterface(args: { contract: `0x${string}`; chainId: num
         const provider = new providers.JsonRpcProvider(`${chainRPC?.[parseInt(args?.chainId)]}`)
         const nftContract = new Contract(args?.contract, erc165ABI, provider)
         const supportsErc1155 = await nftContract.supportsInterface(erc1155InterfaceId)
-        if (supportsErc1155 === true) return ContractType.Erc1155
+        if (supportsErc1155 === true) return 'ERC1155'
 
         const supportsErc721 = await nftContract.supportsInterface(erc721InterfaceId)
-        if (supportsErc721 === true) return ContractType.Erc721
+        if (supportsErc721 === true) return 'ERC721'
 
         throw new Error('This contract is not a valid ERC-721 or ERC-1155 NFT on this chain')
       } catch (e) {

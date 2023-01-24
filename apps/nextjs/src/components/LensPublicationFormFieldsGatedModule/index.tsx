@@ -6,7 +6,6 @@ import { useAccount, useNetwork } from 'wagmi'
 import { PhotoIcon, PlusIcon, UserCircleIcon } from '@heroicons/react/20/solid'
 import Button from '@components/Button'
 import { Criteria } from './Criteria'
-import { ContractType, ScalarOperator } from '@lens-protocol/sdk-gated'
 import { CurrencyDollarIcon } from '@heroicons/react/24/outline'
 import { IconLensProtocol, IconUnlockProtocol } from '@components/Icons'
 import { chainId } from '@config/wagmi'
@@ -161,7 +160,7 @@ export const LensPublicationFormFieldsGatedModule = (props: LensPublicationFormF
                                 chainId === 137
                                   ? '0xdb46d1dc155634fbc732f92e853b10b288ad5a1d'
                                   : '0xe00dc8cb3a7c3f8e5ab5286afabb0c2d1054187b',
-                              contractType: ContractType.Erc721,
+                              contractType: 'ERC721',
                               tokenIds: [],
                             })
                             return
@@ -240,7 +239,7 @@ export const LensPublicationFormFieldsGatedModule = (props: LensPublicationFormF
                         type: 'unlock',
                         chainID: 1,
                         contractAddress: '',
-                        contractType: ContractType.Erc721,
+                        contractType: 'ERC721',
                         tokenIds: [],
                       })
                     }}
@@ -277,7 +276,7 @@ export const LensPublicationFormFieldsGatedModule = (props: LensPublicationFormF
                         type: 'nft',
                         chainID: 1,
                         contractAddress: '',
-                        contractType: ContractType.Erc721,
+                        contractType: 'ERC721',
                         tokenIds: [],
                       })
                     }}
@@ -299,7 +298,7 @@ export const LensPublicationFormFieldsGatedModule = (props: LensPublicationFormF
                         contractAddress: '',
                         amount: 0, // the amount of the ERC20 token that grants access to the metadata
                         decimals: 18, // the decimals of the ERC20 token that grants access to the metadata
-                        condition: ScalarOperator.GreaterThanOrEqual, // the condition that must be met to grant access to the metadata, supported conditions are: '==', '!=', '>', '<', '>=', '<='
+                        condition: 'GREATER_THAN_OR_EQUAL', // the condition that must be met to grant access to the metadata, supported conditions are: '==', '!=', '>', '<', '>=', '<='
                       })
                     }}
                     className="disabled:opacity-50 flex items-center gap-x-7 cursor-pointer w-full text-neutral-12 p-3 font-bold bg-neutral-5 border hover:bg-neutral-6 focus:bg-neutral-2 border-neutral-4 rounded-md ui-active:bg-neutral-8"
