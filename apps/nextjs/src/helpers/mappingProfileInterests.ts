@@ -16,6 +16,54 @@ export const DICTIONARY_PROFILE_INTERESTS_CATEGORIES = {
   NSFW: 'NSFW',
 }
 export const DICTIONARY_PROFILE_INTERESTS = {
+  TECHNOLOGY: {
+    label: 'Technology',
+    emoji: '💻',
+  },
+  ART_ENTERTAINMENT: {
+    label: 'Art & Entertainment',
+    emoji: '🎨',
+  },
+  BUSINESS: {
+    label: 'Business',
+    emoji: '💳',
+  },
+  HEALTH_FITNESS: {
+    label: 'Health & Fitness',
+    emoji: '🏋️',
+  },
+  FOOD_DRINK: {
+    label: 'Food & Drink',
+    emoji: '🍜',
+  },
+  HOBBIES_INTERESTS: {
+    label: 'Hobbies & Interests',
+    emoji: '🧶',
+  },
+  HOME_GARDEN: {
+    label: 'Home & Garden',
+    emoji: '🏡',
+  },
+  LAW_GOVERNMENT_POLITICS: {
+    label: 'Law, Government & Politics',
+    emoji: '⚖️',
+  },
+  NEWS: {
+    label: 'News',
+    emoji: '🗞️',
+  },
+  LENS: {
+    label: 'Lens',
+    emoji: '🌿',
+  },
+  CRYPTO: {
+    label: 'Crypto',
+    emoji: '💰',
+  },
+  NSFW: {
+    label: 'NSFW',
+    emoji: '🔞',
+  },
   ART_ENTERTAINMENT__BOOKS: {
     label: 'Book',
     emoji: '📚',
@@ -168,14 +216,6 @@ export const DICTIONARY_PROFILE_INTERESTS = {
     label: 'Regulation',
     emoji: '⚖️',
   },
-  NEWS: {
-    label: 'News',
-    emoji: '📰',
-  },
-  LENS: {
-    label: 'Lens',
-    emoji: '🌿',
-  },
   CRYPTO__NFT: {
     label: 'NFT',
     emoji: '🖼️',
@@ -235,9 +275,5 @@ export const DICTIONARY_PROFILE_INTERESTS = {
   CRYPTO__SCALING: {
     label: 'Scaling',
     emoji: '🛰️',
-  },
-  NSFW: {
-    label: 'NSFW',
-    emoji: '🔞',
   },
 }

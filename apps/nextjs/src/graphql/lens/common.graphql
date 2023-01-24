@@ -170,6 +170,10 @@ fragment PostFields on Post {
   reaction(request: null)
   hasCollectedByMe
   isGated
+  canDecrypt(profileId: $profileId) {
+    result
+    reasons
+  }
 }
 
 fragment MirrorBaseFields on Mirror {
@@ -195,6 +199,10 @@ fragment MirrorBaseFields on Mirror {
   reaction(request: null)
   hasCollectedByMe
   isGated
+  canDecrypt(profileId: $profileId) {
+    result
+    reasons
+  }
 }
 
 fragment MirrorFields on Mirror {
@@ -232,6 +240,10 @@ fragment CommentBaseFields on Comment {
   reaction(request: null)
   hasCollectedByMe
   isGated
+  canDecrypt(profileId: $profileId) {
+    result
+    reasons
+  }
 }
 
 fragment CommentFields on Comment {

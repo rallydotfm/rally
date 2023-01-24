@@ -8,15 +8,18 @@ import { WagmiConfig } from 'wagmi'
 import queryClient from '@config/react-query'
 import { wagmiClient, chains } from '@config/wagmi'
 import { getLayout as getBaseLayout } from '@layouts/LayoutBase'
-import '@styles/globals.css'
-import '@rainbow-me/rainbowkit/styles.css'
 import { theme } from '@config/rainbowkit'
 import { Toaster } from 'react-hot-toast'
 import { toastOptions } from '@config/react-hot-toast'
 import { SessionProvider } from 'next-auth/react'
 import { RainbowKitSiweNextAuthProvider } from '@rainbow-me/rainbowkit-siwe-next-auth'
 import { getSiweMessageOptions } from '@config/siwe'
-import '@vidstack/player/hydrate.js'
+import { livepeerClient, livepeerTheme } from '@config/livepeer'
+import { LivepeerConfig } from '@livepeer/react'
+import '@styles/globals.css'
+import '@rainbow-me/rainbowkit/styles.css'
+import 'vidstack/styles/base.css'
+
 function MyApp({ Component, pageProps }: AppProps) {
   //@ts-ignore
   const getLayout = Component.getLayout ?? getBaseLayout
@@ -57,7 +60,9 @@ function MyApp({ Component, pageProps }: AppProps) {
           <WagmiConfig client={wagmiClient}>
             <RainbowKitSiweNextAuthProvider getSiweMessageOptions={getSiweMessageOptions}>
               <RainbowKitProvider theme={theme} chains={chains}>
-                {getLayout(<Component {...pageProps} />)}
+                <LivepeerConfig theme={livepeerTheme} client={livepeerClient}>
+                  {getLayout(<Component {...pageProps} />)}
+                </LivepeerConfig>
               </RainbowKitProvider>
             </RainbowKitSiweNextAuthProvider>
           </WagmiConfig>

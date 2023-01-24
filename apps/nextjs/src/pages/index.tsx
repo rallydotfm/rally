@@ -1,10 +1,9 @@
 import button from '@components/Button/styles'
 import { IconSpinner } from '@components/Icons'
 import { ListFilteredRallies } from '@components/pages/home/ListFilteredRallies'
-import { ROUTE_PREFERENCES_BROWSING, ROUTE_RALLY_NEW, ROUTE_SEARCH_RALLIES } from '@config/routes'
+import { ROUTE_PREFERENCES_BROWSING, ROUTE_PROFILE, ROUTE_RALLY_NEW, ROUTE_SEARCH_RALLIES } from '@config/routes'
 import { ArrowRightIcon } from '@heroicons/react/20/solid'
-import { useGetHomeAudioChatsSelectionFromRESTIndexer } from '@hooks/useGetHomeAudioChatsSelection'
-import useGetProfileFeed from '@hooks/useGetProfileFeed'
+import useGetHomeAudioChatsSelection from '@hooks/useGetHomeAudioChatsSelection'
 import { useStorePersistedInterests } from '@hooks/usePersistedInterests'
 import useWalletAddressDefaultLensProfile from '@hooks/useWalletAddressDefaultLensProfile'
 import type { NextPage } from 'next'
@@ -12,6 +11,8 @@ import { useSession } from 'next-auth/react'
 import Head from 'next/head'
 import Link from 'next/link'
 import { useAccount } from 'wagmi'
+import LensPublicationContent from '@components/LensPublicationContent'
+import { formatRelative } from 'date-fns'
 
 const Page: NextPage = () => {
   const account = useAccount()
@@ -21,11 +22,11 @@ const Page: NextPage = () => {
     enabled: account?.address ? true : false,
   })
   const {
-    queryAudioChatsHostedByCurrentUserToday,
+    //  queryGetLatestPosts,
     queryAudioChatsHappeningLater,
     queryAudioChatsHappeningNow,
     queryAudioChatsHappeningSoon,
-  } = useGetHomeAudioChatsSelectionFromRESTIndexer()
+  } = useGetHomeAudioChatsSelection()
 
   return (
     <>
@@ -76,50 +77,6 @@ const Page: NextPage = () => {
             </div>
           )}
           <div className="grid grid-cols-1 gap-6 animate-appear">
-            {account?.address && (
-              <section className=" animate-appear pb-8 border-b border-neutral-4">
-                <h2 className="text-md font-bold">🗣️🎙️ Hosting</h2>
-                {queryAudioChatsHostedByCurrentUserToday?.isLoading && (
-                  <div className="mb-6 pt-12 animate-appear flex items-center justify-center space-i-1ex">
-                    <IconSpinner className="text-lg animate-spin" />
-                    <p className="font-bold animate-pulse">Loading rallies...</p>
-                  </div>
-                )}
-                {queryAudioChatsHostedByCurrentUserToday?.data && (
-                  <>
-                    {queryAudioChatsHostedByCurrentUserToday?.data?.length === 0 ? (
-                      <>
-                        <section className="mt-6 p-6 bg-neutral-1 w-full rounded-lg  animate-appear min-w-max-content 2xs:max-w-72">
-                          <p className="text-xs text-neutral-11 mb-3">You aren't hosting any rally today.</p>
-
-                          <Link href={ROUTE_SEARCH_RALLIES}>
-                            <a className="text-2xs link">Browse all rallies happening now</a>
-                          </Link>
-                        </section>
-                      </>
-                    ) : (
-                      <div className="gap-2 flex flex-col mt-4">
-                        <ListFilteredRallies
-                          skip={0}
-                          perPage={8}
-                          isLoading={queryAudioChatsHostedByCurrentUserToday?.isLoading}
-                          isError={queryAudioChatsHostedByCurrentUserToday?.isError}
-                          list={queryAudioChatsHostedByCurrentUserToday?.data}
-                          setSkip={() => console.log('')}
-                        />
-
-                        <Link href={ROUTE_SEARCH_RALLIES}>
-                          <a className="text-2xs flex items-center link">
-                            Go to your dahsboard
-                            <ArrowRightIcon className="w-4 mis-2" />
-                          </a>
-                        </Link>
-                      </div>
-                    )}
-                  </>
-                )}
-              </section>
-            )}
             <section className="pb-8 border-b border-neutral-4">
               <h2 className="text-md font-bold">🔴🗣️ Happening now</h2>
               {queryAudioChatsHappeningNow?.isLoading && (
@@ -266,7 +223,6 @@ const Page: NextPage = () => {
               <a className={button({ scale: 'sm', intent: 'primary-outline' })}>Create my rally now</a>
             </Link>
           </section>
-          <section></section>
         </main>
       </>
     </>

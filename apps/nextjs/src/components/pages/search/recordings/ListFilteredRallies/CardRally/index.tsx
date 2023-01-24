@@ -27,7 +27,7 @@ interface CardRallyProps {
 }
 export const CardRally = (props: CardRallyProps) => {
   const { data } = props
-  const queryPublishedRecording = useGetAudioChatPublishedRecording(data.id, data.recording_arweave_transaction_id)
+  const { queryPublishedRecording } = useGetAudioChatPublishedRecording(data.id, data.recording_arweave_transaction_id)
   const setAudioPlayer = useAudioPlayer((state: any) => state.setAudioPlayer)
   const playedRally = useAudioPlayer((state: any) => state.rally)
   const stateVoiceChat: any = useStoreLiveVoiceChat()
@@ -43,7 +43,7 @@ export const CardRally = (props: CardRallyProps) => {
               loading="lazy"
               width="128px"
               height="86px"
-              src={`https://ipfs.io/ipfs/${data?.image}`}
+              src={`${data?.image?.replace('ipfs://', 'https://ipfs.io/ipfs/')}`}
               className="relative z-10 block w-full h-full object-cover "
             />
           </div>
@@ -100,7 +100,7 @@ export const CardRally = (props: CardRallyProps) => {
           {queryPublishedRecording?.isSuccess && queryPublishedRecording?.data?.recording_file && (
             <div>
               <Button
-                disabled={stateVoiceChat?.room.state === 'connected' || playedRally?.id === data?.id}
+                disabled={stateVoiceChat?.room?.state === 'connected' || playedRally?.id === data?.id}
                 intent="interactive-outline"
                 onClick={() => {
                   setAudioPlayer({

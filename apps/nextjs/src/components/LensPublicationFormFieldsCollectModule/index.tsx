@@ -19,6 +19,7 @@ export const LensPublicationFormFieldsCollectModule = (props: LensPublicationFor
   const { disabled, data, setData, errors, setFields } = props
   const account = useAccount()
   const { chain } = useNetwork()
+
   return (
     <>
       <FormField>
@@ -39,7 +40,9 @@ export const LensPublicationFormFieldsCollectModule = (props: LensPublicationFor
               disabled ||
               data()?.publish_on_lens !== true ||
               !account?.address ||
+              //@ts-ignore
               chain?.unsupported === true ||
+              //@ts-ignore
               chain?.id === 1
             }
             value={data()?.collect_module}
@@ -76,7 +79,9 @@ export const LensPublicationFormFieldsCollectModule = (props: LensPublicationFor
                 disabled ||
                 data()?.publish_on_lens !== true ||
                 !account?.address ||
+                //@ts-ignore
                 chain?.unsupported === true ||
+                //@ts-ignore
                 chain?.id === 1
               }
               value={data()?.collect_module_has_fee}
@@ -131,6 +136,7 @@ export const LensPublicationFormFieldsCollectModule = (props: LensPublicationFor
                           placeholder="0"
                           step="0.01"
                           required={true}
+                          //@ts-ignore
                           disabled={!account?.address || chain?.unsupported === true || chain?.id === 1}
                           hasError={errors()?.collect_module_fee_amount?.length ? true : false}
                           name="collect_module_fee_amount"
@@ -170,7 +176,7 @@ export const LensPublicationFormFieldsCollectModule = (props: LensPublicationFor
                           <option disabled={true}>Select a currency</option>
                           {/* @ts-ignore */}
                           {Object.keys(TOKENS_WHITELIST[process.env.NEXT_PUBLIC_CHAIN]).map((tokenAddress) => (
-                            <option value={tokenAddress} key={tokenAddress}>
+                            <option value={tokenAddress} key={`whitelisted-list${tokenAddress}`}>
                               {/* @ts-ignore */}
                               {TOKENS_WHITELIST[process.env.NEXT_PUBLIC_CHAIN][tokenAddress]}
                             </option>
@@ -236,7 +242,9 @@ export const LensPublicationFormFieldsCollectModule = (props: LensPublicationFor
                   disabled ||
                   data()?.publish_on_lens !== true ||
                   !account?.address ||
+                  //@ts-ignore
                   chain?.unsupported === true ||
+                  //@ts-ignore
                   chain?.id === 1
                 }
                 value={data()?.collect_module_is_limited_amount}
@@ -299,7 +307,9 @@ export const LensPublicationFormFieldsCollectModule = (props: LensPublicationFor
                   disabled ||
                   data()?.publish_on_lens !== true ||
                   !account?.address ||
+                  //@ts-ignore
                   chain?.unsupported === true ||
+                  //@ts-ignore
                   chain?.id === 1
                 }
                 label="Flash collect"

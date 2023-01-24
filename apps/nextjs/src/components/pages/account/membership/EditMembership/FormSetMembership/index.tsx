@@ -82,7 +82,7 @@ export const FormSetMembership = (props: FormSetMembershipProps) => {
                       <option disabled={true}>Select a currency</option>
                       {/* @ts-ignore */}
                       {Object.keys(TOKENS_WHITELIST[process.env.NEXT_PUBLIC_CHAIN]).map((tokenAddress) => (
-                        <option value={tokenAddress} key={tokenAddress}>
+                        <option value={tokenAddress} key={`form-set-membership-${tokenAddress}`}>
                           {/* @ts-ignore */}
                           {TOKENS_WHITELIST[process.env.NEXT_PUBLIC_CHAIN][tokenAddress]}
                         </option>

@@ -18,16 +18,14 @@ export const ListFilteredRallies = (props: ListFilteredRalliesProps) => {
       <ul className="animate-appear grid grid-cols-1 xs:grid-cols-2 xl:grid-cols-3 gap-8">
         {list.map((audioChat: any, i: number) => {
           return (
-            <>
-              <li
-                className={`${
-                  [DICTIONARY_STATES_AUDIO_CHATS.CANCELLED.label].includes(audioChat.state) ? 'opacity-50' : ''
-                } animate-appear`}
-                key={`${audioChat.cid}`}
-              >
-                <CardRally data={audioChat} />
-              </li>
-            </>
+            <li
+              className={`${
+                [DICTIONARY_STATES_AUDIO_CHATS.CANCELLED.label].includes(audioChat.state) ? 'opacity-50' : ''
+              } animate-appear`}
+              key={`profile-list-filtered-rallies-card-rally-${audioChat.cid}`}
+            >
+              <CardRally data={audioChat} />
+            </li>
           )
         })}
       </ul>

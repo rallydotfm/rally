@@ -1,4 +1,4 @@
-import { chain, useAccount, useContractWrite, useSignTypedData } from 'wagmi'
+import { chain, useAccount, useContractWrite, useProvider, useSigner, useSignTypedData } from 'wagmi'
 import omit from '@helpers/omit'
 import splitSignature from '@helpers/splitSignature'
 import { CONTRACT_LENS_HUB_PROXY } from '@config/contracts'
@@ -42,10 +42,9 @@ export function useCreateLensPost() {
     async (request: CreatePublicPostRequest) => await createPostViaDispatcherRequest(request),
   )
 
-  async function publishPost(contentURI: string, values: any) {
+  async function publishPost(contentURI: string, values: any, encrypted: any) {
     let collectModule: any = {}
     let referenceModule: any = {}
-
     try {
       const profileId = queryLensProfile?.data?.id
       const feeCollectParams = {
@@ -119,11 +118,24 @@ export function useCreateLensPost() {
         }
       }
 
-      const createPostRequest = {
+      let gated = {}
+      if (values.gated_module === true && values?.access_control_conditions?.length > 0) {
+        gated = {
+          encryptedSymmetricKey: encrypted.encryptedMetadata.encryptionParams.providerSpecificParams.encryptionKey,
+          ...encrypted.accessControl,
+        }
+      }
+
+      let createPostRequest = {
         profileId,
         contentURI,
         collectModule,
         referenceModule,
+      }
+      //@ts-ignore
+      if (gated?.encryptedSymmetricKey) {
+        //@ts-ignore
+        createPostRequest.gated = gated
       }
 
       if (queryLensProfile?.data?.dispatcher && queryLensProfile?.data?.dispatcher !== null) {

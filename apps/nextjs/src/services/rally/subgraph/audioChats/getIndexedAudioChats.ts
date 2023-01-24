@@ -16,7 +16,6 @@ export async function getIndexedAudioChats(audioChatsRequest: any) {
         $states: [Int]!
         $categories: [String]!
         $creator: String!
-        $orderBy: String!
         $orderDirection: String!
         $start_at_min: Int!
         $start_at_max: Int!
@@ -24,34 +23,40 @@ export async function getIndexedAudioChats(audioChatsRequest: any) {
         audioChats(
             first: $first
             skip: $skip
-            orderBy: $orderBy
             orderDirection: $orderDirection
             where: {
+              creator_contains: $creator                
+              state_in: $states
+              start_at_gte: $start_at_min
+              start_at_lte: $start_at_max            
+              is_indexed: true
+
+              metadata_: {
                 name_contains_nocase: $name
-                creator_contains: $creator
                 is_gated_in: $gated
                 is_nsfw_in: $nsfw
                 category_in: $categories
-                state_in: $states
-                start_at_gte: $start_at_min
-                start_at_lte: $start_at_max            
-                is_indexed: true
+              }
+
             }
         ) {
             id
-            name
             state
-            category
             start_at
             creator
             cid_metadata
-            is_nsfw
-            is_gated
-            will_be_recorded
-            has_cohosts
-            max_attendees
-            image
-            description
+            recording_arweave_transaction_id
+            metadata {
+              name
+              category
+              is_nsfw
+              is_gated
+              will_be_recorded
+              has_cohosts
+              max_attendees
+              image
+              description
+          }
         }
       }
   `,

@@ -12,6 +12,11 @@ import { useStoreHasSignedInWithLens } from '@hooks/useSignInWithLens'
 import DialogModalStageGuide from '@components/pages/rally/[idRally]/DialogModalStageGuide'
 import dynamic from 'next/dynamic'
 import useAudioPlayer from '@hooks/usePersistedAudioPlayer'
+import { useSession } from 'next-auth/react'
+import { useUpdateEffect } from '@react-hookz/web'
+import Cookies from 'js-cookie'
+import { COOKIE_LENS_ACCESS_TOKEN, COOKIE_LENS_REFRESH_TOKEN } from '@config/storage'
+import { MediaProvider } from '@vidstack/react'
 
 const NoSSRToolbarAudioPlayer = dynamic(() => import('./ToolbarAudioPlayer'), {
   ssr: false,
@@ -25,20 +30,34 @@ interface LayoutProps {
 
 export const LayoutBase = (props: LayoutProps) => {
   const { children } = props
+  const isSignedIn = useStoreHasSignedInWithLens((state) => state.isSignedIn)
+  const setIsSignedIn = useStoreHasSignedInWithLens((state) => state.setIsSignedIn)
+
+  const session = useSession()
   const stateVoiceChat: any = useStoreLiveVoiceChat()
   const { address, isConnecting } = useAccount({
     async onDisconnect() {
       await stateVoiceChat?.room?.disconnect()
+      setIsSignedIn(false)
     },
   })
 
   const queryCurrentUserLensProfile = useWalletAddressDefaultLensProfile(address as `0x${string}`, {
     enabled: address ? true : false,
   })
-  const isSignedIn = useStoreHasSignedInWithLens((state) => state.isSignedIn)
   const isPlayerOpen = useAudioPlayer((state) => state.isOpen)
   const isPlayerReady = useAudioPlayer((state) => state.isReady)
 
+  useUpdateEffect(() => {
+    setIsSignedIn(false)
+    Cookies.remove(COOKIE_LENS_ACCESS_TOKEN)
+    Cookies.remove(COOKIE_LENS_REFRESH_TOKEN)
+
+    if (session?.data?.user !== address) {
+      if (stateVoiceChat?.room?.state === 'connected' && stateVoiceChat?.room?.sid !== '')
+        stateVoiceChat.room.disconnect()
+    }
+  }, [session?.data?.user, address])
   return (
     <div className="relative flex-grow flex flex-col">
       {!isConnecting && !address && <BannerConnectWallet />}
@@ -48,12 +67,12 @@ export const LayoutBase = (props: LayoutProps) => {
         <MobileTopMenu address={address} />
         <div
           className={`pt-5  ${
-            ((stateVoiceChat?.room.state === 'connected' || isPlayerReady) &&
+            ((stateVoiceChat?.room?.state === 'connected' || isPlayerReady) &&
               !isSignedIn &&
               queryCurrentUserLensProfile?.data?.handle) ||
             isPlayerReady
               ? 'pb-64'
-              : stateVoiceChat?.room.state === 'connected'
+              : stateVoiceChat?.room?.state === 'connected'
               ? 'pb-48'
               : 'pb-32'
           } md:border-x flex flex-col md:border-neutral-4 md:border-solid md:col-span-8 px-3 md:px-6 flex-grow`}
@@ -72,7 +91,11 @@ export const LayoutBase = (props: LayoutProps) => {
           } fixed bottom-12 md:bottom-0 w-full`}
         >
           <div className="transition-all pointer-events-auto min-h-[6.895rem] border-transparent flex pb-1 pt-2 bg-neutral-1 md:bg-black border-y-neutral-4 border">
-            {isPlayerOpen && <NoSSRToolbarAudioPlayer />}
+            {isPlayerOpen && (
+              <MediaProvider>
+                <NoSSRToolbarAudioPlayer />
+              </MediaProvider>
+            )}
           </div>
         </div>
         <div
@@ -97,7 +120,7 @@ export const LayoutBase = (props: LayoutProps) => {
               </div>
             </div>
           )}
-          {stateVoiceChat?.room.state === 'connected' && stateVoiceChat?.room?.sid !== '' && (
+          {stateVoiceChat?.room?.state === 'connected' && stateVoiceChat?.room?.sid !== '' && (
             <div
               className={`transition-all pointer-events-auto border-transparent flex pt-1 bg-neutral-1 md:bg-black border-y-neutral-4 border`}
             >

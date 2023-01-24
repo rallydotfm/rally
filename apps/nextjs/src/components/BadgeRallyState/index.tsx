@@ -12,7 +12,7 @@ export const BadgeRallyState = (props: BadgeRallyStateProps) => {
       className={badge({
         state: state,
         scale: scale,
-        class: `${className ? className : ''}`,
+        class: `h-fit-content ${className ? className : ''}`,
       })}
     >
       {state}

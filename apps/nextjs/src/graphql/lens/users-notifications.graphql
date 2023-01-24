@@ -1,4 +1,4 @@
-query notifications($request: NotificationRequest!) {
+query notifications($request: NotificationRequest!, $profileId: ProfileId) {
   notifications(request: $request) {
     items {
       ... on NewFollowerNotification {

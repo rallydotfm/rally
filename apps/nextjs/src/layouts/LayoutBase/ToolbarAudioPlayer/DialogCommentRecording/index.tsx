@@ -34,6 +34,8 @@ export const DialogCommentLensPublication = (props: DialogCommentLensPublication
     initialValues: {
       publication_comment_content: `${stateTxUi?.timestamp}`,
       publish_on_lens: true,
+      gated_module: false,
+      gated_module_condition_operator: 'and',
       collect_module_has_fee: false,
       reference_module: -1,
       collect_module: 1,

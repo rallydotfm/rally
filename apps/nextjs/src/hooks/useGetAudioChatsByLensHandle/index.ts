@@ -1,5 +1,5 @@
 import { DICTIONARY_STATES_AUDIO_CHATS } from '@helpers/mappingAudioChatState'
-import useIndexedAudioChatsRest from '@hooks/useGetIndexedAudioChatREST'
+import useIndexedAudioChats from '@hooks/useIndexedAudioChats'
 import useGetLensProfileByHandle from '@hooks/useGetLensProfileByHandle'
 import useGetProfilesInterests from '@hooks/useGetProfileInterests'
 import { createStoreIndexedAudioChatsFilters } from '@hooks/useStoreIndexedAudioChatsFilters'
@@ -19,7 +19,7 @@ export function useGetAudioChatsByLensHandle(handle: string) {
   })
   const queryListInterests = useGetProfilesInterests()
 
-  const queryAudioChatsByLensHandle = useIndexedAudioChatsRest(
+  const queryAudioChatsByLensHandle = useIndexedAudioChats(
     {
       address: '',
       first: PER_PAGE,
@@ -39,7 +39,7 @@ export function useGetAudioChatsByLensHandle(handle: string) {
       orderBy: order[0],
       orderDirection: order[1],
       start_at_min: 0,
-      start_at_max: getUnixTime(addYears(new Date(), 100)),
+      start_at_max: getUnixTime(addYears(new Date(), 5)),
     },
     {
       enabled:

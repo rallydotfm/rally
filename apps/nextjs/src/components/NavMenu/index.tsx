@@ -34,7 +34,7 @@ export const NavMenu = (props: NavMenuProps) => {
   return (
     <nav className="pb-3 xs:pb-0 text-xs justify-center bg-black mt-4 -mx-3 md:-mx-6 min-w-screen md:min-w-unset flex flex-col xs:flex-row w-auto gap-y-2 overflow-x-auto md:overflow-x-hidden border-y border-neutral-4">
       {routes.map((route) => (
-        <Link key={route.href} href={route.href}>
+        <Link key={`navmenu-${route.href}`} href={route.href}>
           <a className={tabLinkNavigation({ state: asPath === route.href ? 'active' : 'default' })}>{route.label}</a>
         </Link>
       ))}

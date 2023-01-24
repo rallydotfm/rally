@@ -1,7 +1,7 @@
 # Rally
 
 Rally is an open-source alternative to Twitter Space/Clubhouse for web3 communities.
-Built with Polygon, Livekit, Lens Protocol, Storj, Bundlr and Guild.
+Built with Polygon, Livekit, Lens Protocol, Lit Protocol, The Graph, Storj, Bundlr and Guild.
 
 ## Overview
 
@@ -32,6 +32,15 @@ Rally is a web application at the cross-road of web2 and web3, a social audio pl
 
 | **Pre-requisite**: `node` version `>=16`and `pnpm` installed
 
+### 3rd parties
+
+- Infura
+- Alchemy
+- Livekit
+- S3-compatible storage solution (for instance Storj)
+- Supabase (optional)
+- NFTPort (optional)
+
 ```diff
 # Install dependencies
 pnpm i
@@ -49,9 +58,6 @@ NEXT_PUBLIC_CONTRACT_LENS_HUB_PROXY=0x60Ae865ee4C725cd04353b5AAb364553f56ceF82
 
 # Lens Periphery contract address. This is the contract address on Mumbai testnet.
 NEXT_PUBLIC_CONTRACT_LENS_PERIPHERY=0xD5037d72877808cdE7F669563e9389930AF404E8
-
-# Web3 Storage key. Replace with yours !
-NEXT_PUBLIC_WEB3_STORAGE=
 
 # Audio chat management smart contract. This is the contract address on Mumbai testnet
 NEXT_PUBLIC_CONTRACT_AUDIOCHAT=0xC9047698C519486106Cbabb160000e0f46FFd160
@@ -110,8 +116,23 @@ S3_ENDPOINT=
 # S3-compatible service bucket name. Replace with yours !
 S3_BUCKET_NAME=
 
-# Base path used to store recordings in the S3 bucket (eg: /sessions/recordings/). Replace with yours !
+# Base path used to store recordings in the S3 bucket (eg: rallies/sessions/recordings/). Replace with yours !
 S3_RECORDINGS_BASE_KEY=
+
+# Infura project id. Replace with yours ! (https://www.infura.io/)
+NEXT_PUBLIC_INFURA_PROJECT_ID=
+
+# Infura secret. Replace with yours !  (https://www.infura.io/)
+NEXT_PUBLIC_INFURA_API_SECRET=
+
+NEXT_PUBLIC_INFURA_ENDPOINT=https://ipfs.infura.io:5001
+
+# Infura gateway. Replace with yours !  (https://www.infura.io/)
+NEXT_PUBLIC_INFURA_GATEWAY=
+
+# NFTPort API key. Replace with yours ! (https://www.nftport.xyz/)
+NEXT_PUBLIC_NFTPORT_API_KEY=
+
 
 # Start the project by running this command in the root folder.
 pnpm dev
@@ -168,15 +189,19 @@ Root directory: apps/nextjs
 ## Tech Stack
 
 - Solidity: Smart contracts for audio chat creation.
+- IPFS: Storage ; Used to store audio chats metadata
+- Lit Protocol: Access control protocol ; used to gate access to published recordings ;
+- Guild API : Access control and interoperability ; Platformless membership ; used to gate access to audio rooms ;
+- Bundlr: Storage ; used to store recordings
 - Livekit: Open-source and scalable WebRTC stack ; used for real-time audio chats
 - Lens Protocol: Decentralized social graph ; used to publish recordings, highlights and other publication related to audio chats ; display user profiles (for Lens users)
-- Lit Protocol: Access control protocol ; used to gate access to rooms and publications ;
-- Guild API : Access control and interoperability ; Platformless membership
-- Web3 storage: Storage ; Used to store audio chats metadata
-- Bundlr: Storage ; used to store recordings
-- The Graph: Indexer
+- The Graph: Indexer ; used to display indexed audio chats and recordings ;
 - Polygon/Mumbai: blockchain we will build on
 - NextJS: Meta framework
 - Rainbowkit: Wallet UI built on React/wagmi
 - tRPC : end-to-end type safe API
 - StorJ: decentralized S3 compatible storage solution
+- ENS
+- NFTPort
+- Alchemy (RPC Provider)
+- Infura (IPFS)
