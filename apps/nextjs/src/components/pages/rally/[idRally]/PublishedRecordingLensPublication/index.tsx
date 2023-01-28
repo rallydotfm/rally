@@ -10,12 +10,12 @@ import { ArrowsRightLeftIcon, Square2StackIcon as SolidSquare2StackIcon } from '
 import { useGetLinkedLensPublicationById } from '@hooks/useGetLinkedLensPublicationById'
 import { useStoreHasSignedInWithLens } from '@hooks/useSignInWithLens'
 import useWalletAddressDefaultLensProfile from '@hooks/useWalletAddressDefaultLensProfile'
-import getPublicationsRequest from '@services/lens/publications/getPublications'
-import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { useQueryClient } from '@tanstack/react-query'
 import { formatRelative } from 'date-fns'
 import Link from 'next/link'
 import { useAccount } from 'wagmi'
 import PostComment from './PostComment'
+import useGetLensPublicationCommentFeed from '@hooks/useGetLensPublicationCommentFeed'
 
 interface PublishedRecordingLensPublicationProps {
   idLensPublication: string
@@ -38,23 +38,9 @@ export const PublishedRecordingLensPublication = (props: PublishedRecordingLensP
       enabled: idLensPublication && idLensPublication !== '' ? true : false,
     },
   })
-  const queryCommentFeed = useQuery(
-    ['publication-comment-feed', idLensPublication, queryLensProfile?.data?.id ?? null],
-    async () => {
-      const result = await getPublicationsRequest(
-        {
-          commentsOf: idLensPublication,
-          limit: 50,
-        },
-        queryLensProfile?.data?.id,
-      )
-      return result
-    },
-    {
-      enabled: true,
-      refetchOnWindowFocus: false,
-    },
-  )
+  const { queryCommentFeed } = useGetLensPublicationCommentFeed(idLensPublication, {
+    enabled: queryLinkedLensPublication?.data?.publication?.id ? true : false,
+  })
 
   if (queryLinkedLensPublication?.isLoading)
     return (
@@ -153,7 +139,7 @@ export const PublishedRecordingLensPublication = (props: PublishedRecordingLensP
                   queryLensProfile?.data?.ownedBy === account?.address ? (
                     <div className="animate-appear border-neutral-4 bg-neutral-1 border w-full rounded-md p-3">
                       <Disclosure>
-                        <Disclosure.Button className="flex items-center text-sm font-bold text-neutral-12">
+                        <Disclosure.Button className="flex w-full items-center text-sm font-bold text-neutral-12">
                           <ChatBubbleLeftRightIcon className="mis-2 w-5 text-neutral-11 mie-1ex" />
                           Comment
                         </Disclosure.Button>

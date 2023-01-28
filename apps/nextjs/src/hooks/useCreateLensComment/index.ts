@@ -9,7 +9,6 @@ import { usePollTransaction } from '@hooks/usePollTransaction'
 import useWalletAddressDefaultLensProfile from '@hooks/useWalletAddressDefaultLensProfile'
 import { v4 as uuidv4 } from 'uuid'
 import { PublicationMainFocus } from '@graphql/lens/generated'
-import { useStoreBundlr } from '@hooks/useBundlr'
 import { useQueryClient } from '@tanstack/react-query'
 import { formatISO } from 'date-fns'
 import createCommentViaDispatcher from '@services/lens/publications/commentViaDispatcher'
@@ -20,7 +19,6 @@ import { ipfsClient } from '@config/ipfs'
 export function useCreateLensComment() {
   const queryClient = useQueryClient()
   const account = useAccount()
-  const bundlr = useStoreBundlr((state: any) => state.bundlr)
 
   const queryLensProfile: any = useWalletAddressDefaultLensProfile(account?.address as `0x${string}`, {
     enabled: account?.address ? true : false,

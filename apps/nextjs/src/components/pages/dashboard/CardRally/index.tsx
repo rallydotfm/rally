@@ -13,6 +13,7 @@ import {
   PencilIcon,
   PlayCircleIcon,
   PlayIcon,
+  StopCircleIcon,
   TrashIcon,
 } from '@heroicons/react/20/solid'
 import useAudioPlayer from '@hooks/usePersistedAudioPlayer'
@@ -25,6 +26,7 @@ import { IconSpinner } from '@components/Icons'
 import { trpc } from '@utils/trpc'
 import { useStoreLiveVoiceChat } from '@hooks/useVoiceChat'
 import { useAccount } from 'wagmi'
+import { useState } from 'react'
 
 interface CardRallyProps {
   data: any
@@ -63,21 +65,7 @@ export const CardRally = (props: CardRallyProps) => {
   )
 
   const setAudioPlayer = useAudioPlayer((state) => state.setAudioPlayer)
-  const mutationPlaySessionRecording = useGetRecordingPresignedUrl({
-    onSuccess(mutationData: any) {
-      setAudioPlayer({
-        isOpen: true,
-        trackSrc: mutationData,
-        rally: {
-          clickedAt: new Date(),
-          timestamp: 0,
-          name: data?.name,
-          imageSrc: data?.image,
-          id: data?.id,
-        },
-      })
-    },
-  })
+  const mutationPlaySessionRecording = useGetRecordingPresignedUrl({})
 
   const mutationDownloadRecording = useGetRecordingPresignedUrl({
     onSuccess(mutationData: any) {
@@ -91,7 +79,7 @@ export const CardRally = (props: CardRallyProps) => {
       link.parentNode.removeChild(link)
     },
   })
-
+  const [isPlayingRoomSession, setIsPlayingRoomSession] = useState(false)
   return (
     <div
       className={`focus-within:ring-4 focus-within:ring-interactive-11 xs:pt-2 pb-3 md:pb-4 xs:pis-2 xs:pie-4 rounded-md bg-neutral-1`}
@@ -268,33 +256,25 @@ export const CardRally = (props: CardRallyProps) => {
 
               <div className="mx-auto 2xs:mie-0 flex items-center flex-wrap gap-2">
                 <>
-                  {[
-                    DICTIONARY_STATES_AUDIO_CHATS.LIVE.label,
-                    DICTIONARY_STATES_AUDIO_CHATS.FINISHED.label,
-                    //@ts-ignore
-                  ].includes(data.state) &&
-                    data.will_be_recorded &&
-                    isFuture(data.datetime_start_at) &&
-                    //@ts-ignore
-                    querySessionRecordings?.data?.length > 0 && (
-                      <>
-                        <Disclosure.Button
-                          className={button({
-                            intent: 'primary-ghost',
-                            scale: 'xs',
-                            class: 'animate-appear md:!pis-2 md:!pie-4  w-auto space-i-2 inline-flex',
-                          })}
-                        >
-                          <ArrowDownTrayIcon className="w-5 mie-2" />
-                          {querySessionRecordings?.data?.length}&nbsp;
-                          <span className="sr-only xs:not-sr-only md:sr-only lg:not-sr-only">
-                            available file
-                            {/* @ts-ignore */}
-                            {querySessionRecordings?.data?.length > 1 ? 's' : ''}
-                          </span>
-                        </Disclosure.Button>
-                      </>
-                    )}
+                  {querySessionRecordings?.data?.length > 0 && (
+                    <>
+                      <Disclosure.Button
+                        className={button({
+                          intent: 'primary-ghost',
+                          scale: 'xs',
+                          class: 'animate-appear md:!pis-2 md:!pie-4  w-auto space-i-2 inline-flex',
+                        })}
+                      >
+                        <ArrowDownTrayIcon className="w-5 mie-2" />
+                        {querySessionRecordings?.data?.length}&nbsp;
+                        <span className="sr-only xs:not-sr-only md:sr-only lg:not-sr-only">
+                          available file
+                          {/* @ts-ignore */}
+                          {querySessionRecordings?.data?.length > 1 ? 's' : ''}
+                        </span>
+                      </Disclosure.Button>
+                    </>
+                  )}
                   {/** @ts-ignore */}
                   {(![DICTIONARY_STATES_AUDIO_CHATS.LIVE.label].includes(data.state) ||
                     ([
@@ -387,10 +367,37 @@ export const CardRally = (props: CardRallyProps) => {
                             <button
                               type="button"
                               onClick={async () => {
-                                mutationPlaySessionRecording.mutateAsync({
-                                  id_rally: data?.id,
-                                  filename: recording?.name,
-                                })
+                                if (!isPlayingRoomSession) {
+                                  mutationPlaySessionRecording.mutateAsync(
+                                    {
+                                      id_rally: data?.id,
+                                      filename: recording?.name,
+                                    },
+                                    {
+                                      onSuccess(recordingUrl) {
+                                        setIsPlayingRoomSession(true)
+                                        setAudioPlayer({
+                                          isOpen: true,
+                                          trackSrc: recordingUrl,
+                                          rally: {
+                                            clickedAt: new Date(),
+                                            timestamp: 0,
+                                            name: `${data?.name} - ${recording?.name}`,
+                                            imageSrc: data?.image,
+                                            id: data?.id,
+                                          },
+                                        })
+                                      },
+                                    },
+                                  )
+                                } else {
+                                  setIsPlayingRoomSession(false)
+                                  setAudioPlayer({
+                                    isOpen: false,
+                                    trackSrc: undefined,
+                                    rally: undefined,
+                                  })
+                                }
                               }}
                               disabled={mutationPlaySessionRecording?.isLoading}
                               className="disabled:opacity-50 disabled:cursor-not-allowed text-white"
@@ -398,7 +405,13 @@ export const CardRally = (props: CardRallyProps) => {
                               {mutationPlaySessionRecording?.isLoading ? (
                                 <IconSpinner className="animate-spin mie-2" />
                               ) : (
-                                <PlayCircleIcon className="mie-2 w-7" />
+                                <>
+                                  {!isPlayingRoomSession ? (
+                                    <PlayCircleIcon className="mie-2 w-7" />
+                                  ) : (
+                                    <StopCircleIcon className="mie-2 w-7" />
+                                  )}
+                                </>
                               )}
                               <span className="sr-only">Play</span>
                             </button>

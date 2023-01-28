@@ -247,7 +247,7 @@ module.exports = {
       })
       addUtilities(utilities)
     }),
-    require('@vidstack/player/tailwind.cjs'),
+    require('vidstack/tailwind.cjs'),
     require('@headlessui/tailwindcss'),
     require('tailwindcss-logical'),
     require('@tailwindcss/typography'),
