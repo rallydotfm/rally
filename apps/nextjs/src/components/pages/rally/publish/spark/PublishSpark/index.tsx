@@ -307,8 +307,8 @@ export const PublishSpark = (props: any) => {
               )}
 
               <div className="flex flex-col space-y-3 xs:space-y-0 xs:space-i-3 xs:flex-row ">
-                <Link href={ROUTE_DASHBOARD}>
-                  <a className={button({ intent: 'primary-outline' })}>Go to my dashboard</a>
+                <Link className={button({ intent: 'primary-outline' })} href={ROUTE_DASHBOARD}>
+                  Go to my dashboard
                 </Link>
               </div>
             </div>

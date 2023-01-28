@@ -34,6 +34,7 @@ export const LayoutBase = (props: LayoutProps) => {
   const setIsSignedIn = useStoreHasSignedInWithLens((state) => state.setIsSignedIn)
 
   const session = useSession()
+  console.log(session)
   const stateVoiceChat: any = useStoreLiveVoiceChat()
   const { address, isConnecting } = useAccount({
     async onDisconnect() {

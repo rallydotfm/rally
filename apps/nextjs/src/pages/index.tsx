@@ -47,15 +47,14 @@ const Page: NextPage = () => {
                     !interests?.[account?.address as `0x${string}`]) && (
                     <aside className="border flex flex-wrap gap-3 items-center justify-between border-neutral-4 p-4 text-2xs text-white font-semibold rounded-md animate-appear mb-12">
                       <p>Want to see more content that match your interests ?</p>
-                      <Link href={ROUTE_PREFERENCES_BROWSING}>
-                        <a
-                          className={button({
-                            intent: 'primary-outline',
-                            scale: 'xs',
-                          })}
-                        >
-                          Setup profile interests
-                        </a>
+                      <Link
+                        className={button({
+                          intent: 'primary-outline',
+                          scale: 'xs',
+                        })}
+                        href={ROUTE_PREFERENCES_BROWSING}
+                      >
+                        Setup profile interests
                       </Link>
                     </aside>
                   ))}
@@ -63,6 +62,7 @@ const Page: NextPage = () => {
           )}
         </div>
         <main className="pt-8">
+          {/* @ts-ignore */}
           {!session?.data?.address && (
             <div className="animate-appear pb-24 text-center mx-auto md:max-w-3/4">
               <h1 className="text-xl font-semibold">
@@ -94,8 +94,8 @@ const Page: NextPage = () => {
                           It seems there's currently no rally happening now that matches your interests.
                         </p>
 
-                        <Link href={ROUTE_SEARCH_RALLIES}>
-                          <a className="text-2xs link">Browse all rallies happening now</a>
+                        <Link className="text-2xs link" href={ROUTE_SEARCH_RALLIES}>
+                          Browse all rallies happening now
                         </Link>
                       </section>
                     </>
@@ -110,11 +110,12 @@ const Page: NextPage = () => {
                         setSkip={() => null}
                       />
 
-                      <Link href={ROUTE_SEARCH_RALLIES}>
-                        <a className="text-2xs flex items-center font-semibold text-neutral-12">
-                          Browse more rallies happening now
-                          <ArrowRightIcon className="w-4 mis-2" />
-                        </a>
+                      <Link
+                        className="text-2xs flex items-center font-semibold text-neutral-12"
+                        href={ROUTE_SEARCH_RALLIES}
+                      >
+                        Browse more rallies happening now
+                        <ArrowRightIcon className="w-4 mis-2" />
                       </Link>
                     </div>
                   )}
@@ -138,8 +139,8 @@ const Page: NextPage = () => {
                           It seems there's currently no rally happening soon that matches your interests.
                         </p>
 
-                        <Link href={ROUTE_SEARCH_RALLIES}>
-                          <a className="text-2xs link">Browse all rallies happening soon</a>
+                        <Link className="text-2xs link" href={ROUTE_SEARCH_RALLIES}>
+                          Browse all rallies happening soon
                         </Link>
                       </section>
                     </>
@@ -153,11 +154,12 @@ const Page: NextPage = () => {
                         list={queryAudioChatsHappeningSoon?.data}
                         setSkip={() => console.log('')}
                       />
-                      <Link href={ROUTE_SEARCH_RALLIES}>
-                        <a className="px-3 text-2xs font-semibold text-neutral-12 flex items-center">
-                          Browse more rallies happening soon
-                          <ArrowRightIcon className="w-4 mis-2" />
-                        </a>
+                      <Link
+                        className="px-3 text-2xs font-semibold text-neutral-12 flex items-center"
+                        href={ROUTE_SEARCH_RALLIES}
+                      >
+                        Browse more rallies happening soon
+                        <ArrowRightIcon className="w-4 mis-2" />
                       </Link>
                     </div>
                   )}
@@ -182,8 +184,8 @@ const Page: NextPage = () => {
                           It seems there's currently no rally happening later today that matches your interests.
                         </p>
 
-                        <Link href={ROUTE_SEARCH_RALLIES}>
-                          <a className="text-2xs link">Browse all rallies happening later today</a>
+                        <Link className="text-2xs link" href={ROUTE_SEARCH_RALLIES}>
+                          Browse all rallies happening later today
                         </Link>
                       </section>
                     </>
@@ -197,11 +199,12 @@ const Page: NextPage = () => {
                         list={queryAudioChatsHappeningLater?.data}
                         setSkip={() => console.log('')}
                       />
-                      <Link href={ROUTE_SEARCH_RALLIES}>
-                        <a className="px-3 text-2xs font-semibold text-neutral-12 flex items-center">
-                          Browse more rallies happening later today
-                          <ArrowRightIcon className="w-4 mis-2" />
-                        </a>
+                      <Link
+                        className="px-3 text-2xs font-semibold text-neutral-12 flex items-center"
+                        href={ROUTE_SEARCH_RALLIES}
+                      >
+                        Browse more rallies happening later today
+                        <ArrowRightIcon className="w-4 mis-2" />
                       </Link>
                     </div>
                   )}
@@ -219,8 +222,8 @@ const Page: NextPage = () => {
               If you're looking for an alternative to Twitter Space or Clubhouse, give Rally a try and see how it can
               help you connect with your audience.
             </p>
-            <Link href={ROUTE_RALLY_NEW}>
-              <a className={button({ scale: 'sm', intent: 'primary-outline' })}>Create my rally now</a>
+            <Link className={button({ scale: 'sm', intent: 'primary-outline' })} href={ROUTE_RALLY_NEW}>
+              Create my rally now
             </Link>
           </section>
         </main>

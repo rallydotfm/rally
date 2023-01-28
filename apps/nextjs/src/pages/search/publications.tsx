@@ -68,30 +68,30 @@ const Page: NextPage = () => {
                     key={publication?.id}
                   >
                     <div className="flex gap-4">
-                      <Link href={ROUTE_PROFILE.replace('[handleLensProfile]', publication?.id)}>
-                        <a className="shrink-0 w-10 xs:w-12 h-10 xs:h-12 bg-neutral-5 rounded-full overflow-hidden">
-                          <img
-                            className="w-full h-full object-cover"
-                            src={
-                              //@ts-ignore
-                              profile?.picture?.original?.url?.replace(
-                                'ipfs://',
-                                'https://lens.infura-ipfs.io/ipfs/',
-                              ) ?? `https://avatars.dicebear.com/api/identicon/${profile?.ownedBy}.svg`
-                            }
-                            alt=""
-                          />
-                        </a>
+                      <Link
+                        className="shrink-0 w-10 xs:w-12 h-10 xs:h-12 bg-neutral-5 rounded-full overflow-hidden"
+                        href={ROUTE_PROFILE.replace('[handleLensProfile]', publication?.id)}
+                      >
+                        <img
+                          className="w-full h-full object-cover"
+                          src={
+                            //@ts-ignore
+                            profile?.picture?.original?.url?.replace('ipfs://', 'https://lens.infura-ipfs.io/ipfs/') ??
+                            `https://avatars.dicebear.com/api/identicon/${profile?.ownedBy}.svg`
+                          }
+                          alt=""
+                        />
                       </Link>
                       <div className="flex w-full flex-col">
-                        <Link href={ROUTE_PROFILE.replace('[handleLensProfile]', profile?.handle)}>
-                          <a className="inline-flex gap-3 items-baseline">
-                            {profile?.name && <span className="font-semibold">{profile?.name}</span>}
-                            <span className="text-2xs text-neutral-11 font-medium">@{profile?.handle}</span>
-                            <span className="text-neutral-10 text-2xs">
-                              {formatRelative(new Date(publication?.createdAt), new Date())}
-                            </span>
-                          </a>
+                        <Link
+                          className="inline-flex gap-3 items-baseline"
+                          href={ROUTE_PROFILE.replace('[handleLensProfile]', profile?.handle)}
+                        >
+                          {profile?.name && <span className="font-semibold">{profile?.name}</span>}
+                          <span className="text-2xs text-neutral-11 font-medium">@{profile?.handle}</span>
+                          <span className="text-neutral-10 text-2xs">
+                            {formatRelative(new Date(publication?.createdAt), new Date())}
+                          </span>
                         </Link>{' '}
                         <p className="pt-1 pb-2 text-neutral-12">{publication?.metadata?.content}</p>
                       </div>

@@ -84,8 +84,11 @@ export const CardRally = (props: CardRallyProps) => {
     <div
       className={`focus-within:ring-4 focus-within:ring-interactive-11 xs:pt-2 pb-3 md:pb-4 xs:pis-2 xs:pie-4 rounded-md bg-neutral-1`}
     >
-      <Link href={ROUTE_RALLY_VIEW.replace('[idRally]', data.id)}>
-        <a className="absolute z-10 inset-0 w-full h-full opacity-0">View page</a>
+      <Link
+        className="absolute z-10 inset-0 w-full h-full opacity-0"
+        href={ROUTE_RALLY_VIEW.replace('[idRally]', data.id)}
+      >
+        View page
       </Link>
       <div className="xs:pt-2 xs:pis-2 xs:pie-4">
         <article
@@ -151,16 +154,15 @@ export const CardRally = (props: CardRallyProps) => {
                 <>
                   {data?.recording === '' ? (
                     <>
-                      <Link href={ROUTE_RALLY_PUBLISH_RECORDING.replace('[idRally]', data.id)}>
-                        <a
-                          className={button({
-                            intent: 'primary-outline',
-                            scale: 'sm',
-                            class: 'w-auto',
-                          })}
-                        >
-                          Publish recording
-                        </a>
+                      <Link
+                        className={button({
+                          intent: 'primary-outline',
+                          scale: 'sm',
+                          class: 'w-auto',
+                        })}
+                        href={ROUTE_RALLY_PUBLISH_RECORDING.replace('[idRally]', data.id)}
+                      >
+                        Publish recording
                       </Link>
                     </>
                   ) : (
@@ -321,11 +323,13 @@ export const CardRally = (props: CardRallyProps) => {
                             </>
                           )}
                         {data?.recording !== '' && (
-                          <Menu.Item as={Link} href={ROUTE_RALLY_PUBLISH_RECORDING.replace('[idRally]', data.id)}>
-                            <a className="flex items-center space-i-2 px-4 text-start py-2.5 ui-active:bg-neutral-12 ui-active:text-neutral-1 font-bold">
-                              <PencilIcon className="ui-active:text-interactive-9 w-4 mie-1ex" />
-                              Update published recording
-                            </a>
+                          <Menu.Item
+                            className="flex items-center space-i-2 px-4 text-start py-2.5 ui-active:bg-neutral-12 ui-active:text-neutral-1 font-bold"
+                            as={Link}
+                            href={ROUTE_RALLY_PUBLISH_RECORDING.replace('[idRally]', data.id)}
+                          >
+                            <PencilIcon className="ui-active:text-interactive-9 w-4 mie-1ex" />
+                            Update published recording
                           </Menu.Item>
                         )}
                         {/* @ts-ignore */}

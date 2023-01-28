@@ -170,10 +170,11 @@ export const ToolbarAudioPlayer = () => {
           </MuteButton>
         </div>
         {/* @ts-ignore */}
-        <Link href={ROUTE_RALLY_VIEW.replace('[idRally]', rally?.id)}>
-          <a className="text-[0.775rem] font-medium text-interactive-12">
-            <span className="sr-only">Now playing:</span> {rally?.name}
-          </a>
+        <Link
+          className="text-[0.775rem] font-medium text-interactive-12"
+          href={ROUTE_RALLY_VIEW.replace('[idRally]', rally?.id)}
+        >
+          <span className="sr-only">Now playing:</span> {rally?.name}
         </Link>
       </div>
       {isCommentDialogVisible === true && (

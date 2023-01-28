@@ -154,16 +154,14 @@ export const FormEditAudioChat = (props: any) => {
             <Notice>
               🎉 Your rally was updated successfully ! <br />
               <Link href={ROUTE_RALLY_VIEW.replace('[idRally]', stateTxUi.rallyId)}>
-                <a>
-                  Check it <span className="underline hover:no-underline">here</span>
-                </a>
+                Check it <span className="underline hover:no-underline">here</span>
               </Link>
               <br />
               <span>Please note that the changes might take a few seconds to be reflected.</span>
             </Notice>
             <div className="flex flex-col space-y-3 xs:space-y-0 xs:space-i-3 xs:flex-row ">
-              <Link href={ROUTE_DASHBOARD}>
-                <a className={button({ intent: 'primary-outline' })}>Go to my dashboard</a>
+              <Link className={button({ intent: 'primary-outline' })} href={ROUTE_DASHBOARD}>
+                Go to my dashboard
               </Link>
               <Button onClick={() => stateTxUi.setDialogVisibility(false)}>Go back</Button>
             </div>

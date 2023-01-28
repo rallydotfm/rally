@@ -181,27 +181,29 @@ export const PublishedRecordingLensPublication = (props: PublishedRecordingLensP
                         key={comment?.id}
                       >
                         <div className="flex gap-4">
-                          <Link href={ROUTE_PROFILE.replace('[handleLensProfile]', profile?.handle)}>
-                            <a className="shrink-0 w-12 h-12 mie-2 bg-neutral-5 rounded-full overflow-hidden">
-                              <img
-                                className="w-full h-full object-cover"
-                                src={
-                                  //@ts-ignore
-                                  profile?.picture?.original?.url?.replace(
-                                    'ipfs://',
-                                    'https://lens.infura-ipfs.io/ipfs/',
-                                  ) ?? `https://avatars.dicebear.com/api/identicon/${profile?.ownedBy}.svg`
-                                }
-                                alt=""
-                              />
-                            </a>
+                          <Link
+                            className="shrink-0 w-12 h-12 mie-2 bg-neutral-5 rounded-full overflow-hidden"
+                            href={ROUTE_PROFILE.replace('[handleLensProfile]', profile?.handle)}
+                          >
+                            <img
+                              className="w-full h-full object-cover"
+                              src={
+                                //@ts-ignore
+                                profile?.picture?.original?.url?.replace(
+                                  'ipfs://',
+                                  'https://lens.infura-ipfs.io/ipfs/',
+                                ) ?? `https://avatars.dicebear.com/api/identicon/${profile?.ownedBy}.svg`
+                              }
+                              alt=""
+                            />
                           </Link>
                           <div className="flex flex-col">
-                            <Link href={ROUTE_PROFILE.replace('[handleLensProfile]', profile?.handle)}>
-                              <a className="flex gap-3 items-baseline">
-                                {profile?.name && <span className="font-semibold">{profile?.name}</span>}
-                                <span className="text-2xs text-neutral-11 font-medium">@{profile?.handle}</span>
-                              </a>
+                            <Link
+                              className="flex gap-3 items-baseline"
+                              href={ROUTE_PROFILE.replace('[handleLensProfile]', profile?.handle)}
+                            >
+                              {profile?.name && <span className="font-semibold">{profile?.name}</span>}
+                              <span className="text-2xs text-neutral-11 font-medium">@{profile?.handle}</span>
                             </Link>{' '}
                             <span className="text-neutral-10 text-2xs">
                               {/* @ts-ignore */}

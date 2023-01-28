@@ -50,19 +50,19 @@ export const NavLinks = () => {
       {routes.map((route) => {
         const isActive = route?.subpath ? pathname.includes(route?.subpath) : pathname === route.href
         return (
-          <Link key={route.key} href={route.href}>
-            <a
-              className={`py-3 border-b-4 md:border-b-0 w-1/3 lg:px-6 flex justify-center md:items-center md:w-auto lg:justify-start ${
-                isActive ? 'font-bold transition-colors  border-b-primary-10' : 'border-b-transparent'
-              }`}
-            >
-              {isActive ? (
-                <route.activeIcon className="w-6 text-white md:w-8 lg:w-7" />
-              ) : (
-                <route.defaultIcon className="w-6 text-white text-opacity-40 md:w-8 lg:w-7" />
-              )}
-              <span className="sr-only lg:inline-flex lg:pis-3 lg:not-sr-only">{route.label}</span>
-            </a>
+          <Link
+            className={`py-3 border-b-4 md:border-b-0 w-1/3 lg:px-6 flex justify-center md:items-center md:w-auto lg:justify-start ${
+              isActive ? 'font-bold transition-colors  border-b-primary-10' : 'border-b-transparent'
+            }`}
+            key={route.key}
+            href={route.href}
+          >
+            {isActive ? (
+              <route.activeIcon className="w-6 text-white md:w-8 lg:w-7" />
+            ) : (
+              <route.defaultIcon className="w-6 text-white text-opacity-40 md:w-8 lg:w-7" />
+            )}
+            <span className="sr-only lg:inline-flex lg:pis-3 lg:not-sr-only">{route.label}</span>
           </Link>
         )
       })}

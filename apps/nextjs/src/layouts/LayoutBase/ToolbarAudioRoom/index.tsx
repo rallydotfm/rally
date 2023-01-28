@@ -88,26 +88,27 @@ export const ToolbarAudioRoom = () => {
             {new Intl.NumberFormat('en-US', { maximumSignificantDigits: 3 }).format(state.participants.length)}
           </mark>
           {pathname !== ROUTE_RALLY_VIEW && (
-            <Link href={ROUTE_RALLY_VIEW.replace('[idRally]', rally?.id)}>
-              <a className="flex font-bold justify-start items-baseline space-i-1 overflow-hidden text-ellipsis 2xs:space-i-2 xs:space-i-4 self-center text-2xs">
-                {rally?.image && (
-                  <img
-                    alt=""
-                    width="40px"
-                    height="40px"
-                    loading="lazy"
-                    className="hidden xs:block w-10 h-10 rounded-md"
-                    src={`https://ipfs.io/ipfs/${rally?.image}`}
-                  />
-                )}
-                <span
-                  className={`whitespace-nowrap block overflow-hidden text-ellipsis ${
-                    rally?.image ? 'xs:-translate-y-2.5' : ''
-                  }`}
-                >
-                  {rally?.name}
-                </span>
-              </a>
+            <Link
+              className="flex font-bold justify-start items-baseline space-i-1 overflow-hidden text-ellipsis 2xs:space-i-2 xs:space-i-4 self-center text-2xs"
+              href={ROUTE_RALLY_VIEW.replace('[idRally]', rally?.id)}
+            >
+              {rally?.image && (
+                <img
+                  alt=""
+                  width="40px"
+                  height="40px"
+                  loading="lazy"
+                  className="hidden xs:block w-10 h-10 rounded-md"
+                  src={`https://ipfs.io/ipfs/${rally?.image}`}
+                />
+              )}
+              <span
+                className={`whitespace-nowrap block overflow-hidden text-ellipsis ${
+                  rally?.image ? 'xs:-translate-y-2.5' : ''
+                }`}
+              >
+                {rally?.name}
+              </span>
             </Link>
           )}
         </div>

@@ -59,33 +59,32 @@ export const HostProfile = (props: HostProfileProps) => {
     return (
       <article className="flex w-fit-content text-center flex-col">
         <Link
+          className="relative flex flex-col items-center z-20"
           title={`View ${queryUserProfileLens?.data?.name}'s profile page`}
           href={ROUTE_PROFILE.replace('[handleLensProfile]', queryUserProfileLens?.data?.handle)}
         >
-          <a className="relative flex flex-col items-center z-20">
-            {/**@ts-ignore */}
-            {queryUserProfileLens?.data?.picture?.original?.url && (
-              <div className="shrink-0 w-12 h-12 mb-2 bg-neutral-5 rounded-full overflow-hidden">
-                <img
-                  className="w-full h-full object-cover"
-                  //@ts-ignore
-                  src={queryUserProfileLens?.data?.picture?.original?.url?.replace(
-                    'ipfs://',
-                    'https://lens.infura-ipfs.io/ipfs/',
-                  )}
-                  alt=""
-                />
-              </div>
-            )}
+          {/**@ts-ignore */}
+          {queryUserProfileLens?.data?.picture?.original?.url && (
+            <div className="shrink-0 w-12 h-12 mb-2 bg-neutral-5 rounded-full overflow-hidden">
+              <img
+                className="w-full h-full object-cover"
+                //@ts-ignore
+                src={queryUserProfileLens?.data?.picture?.original?.url?.replace(
+                  'ipfs://',
+                  'https://lens.infura-ipfs.io/ipfs/',
+                )}
+                alt=""
+              />
+            </div>
+          )}
 
-            <span className="flex flex-col items-center justify-center">
-              <span className="font-bold w-full">{queryUserProfileLens?.data?.name}&nbsp;</span>
-              <span className="text-[0.9em] font-semibold text-primary-10">@{queryUserProfileLens?.data?.handle} </span>
-              {queryEnsIdentity?.data?.name && (
-                <span className="text-[0.85em] font-medium text-primary-8">{queryEnsIdentity?.data?.name}</span>
-              )}
-            </span>
-          </a>
+          <span className="flex flex-col items-center justify-center">
+            <span className="font-bold w-full">{queryUserProfileLens?.data?.name}&nbsp;</span>
+            <span className="text-[0.9em] font-semibold text-primary-10">@{queryUserProfileLens?.data?.handle} </span>
+            {queryEnsIdentity?.data?.name && (
+              <span className="text-[0.85em] font-medium text-primary-8">{queryEnsIdentity?.data?.name}</span>
+            )}
+          </span>
         </Link>
       </article>
     )

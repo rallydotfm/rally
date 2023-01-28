@@ -105,19 +105,28 @@ export const MenuCurrentUser = (props: MenuCurrentUserProps) => {
           </Menu.Item>
           {queryUserProfileLens?.data?.id && (
             <Menu.Item
+              className="hover:bg-interactive-10 ui-active:bg-interactive-10 px-3 py-2"
               as={Link}
               href={ROUTE_PROFILE.replace('[handleLensProfile]', queryUserProfileLens?.data?.handle)}
             >
-              <a className="hover:bg-interactive-10 ui-active:bg-interactive-10 px-3 py-2">My profile</a>
+              My profile
             </Menu.Item>
           )}
           {queryUserProfileLens?.data?.handle && (
-            <Menu.Item as={Link} href={ROUTE_ACCOUNT}>
-              <a className="hover:bg-interactive-10 ui-active:bg-interactive-10 px-3 py-2">Account</a>
+            <Menu.Item
+              className="hover:bg-interactive-10 ui-active:bg-interactive-10 px-3 py-2"
+              as={Link}
+              href={ROUTE_ACCOUNT}
+            >
+              Account
             </Menu.Item>
           )}
-          <Menu.Item as={Link} href={ROUTE_PREFERENCES_BROWSING}>
-            <a className="hover:bg-interactive-10 ui-active:bg-interactive-10 px-3 py-2">Preferences</a>
+          <Menu.Item
+            className="hover:bg-interactive-10 ui-active:bg-interactive-10 px-3 py-2"
+            as={Link}
+            href={ROUTE_PREFERENCES_BROWSING}
+          >
+            Preferences
           </Menu.Item>
 
           <Menu.Item

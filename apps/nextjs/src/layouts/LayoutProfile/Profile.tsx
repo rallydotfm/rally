@@ -99,10 +99,11 @@ export const Profile = (props: ProfileProps) => {
           <div className="col-span-1 pt-6 justify-self-end">
             {account?.address === data?.ownedBy ? (
               <>
-                <Link href={ROUTE_ACCOUNT}>
-                  <a className={button({ intent: 'neutral-outline', scale: 'sm', class: 'text-center' })}>
-                    Edit &nbsp;<span className="sr-only 2xs:not-sr-only">your profile</span>
-                  </a>
+                <Link
+                  className={button({ intent: 'neutral-outline', scale: 'sm', class: 'text-center' })}
+                  href={ROUTE_ACCOUNT}
+                >
+                  Edit &nbsp;<span className="sr-only 2xs:not-sr-only">your profile</span>
                 </Link>
               </>
             ) : (
