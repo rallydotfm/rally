@@ -36,7 +36,7 @@ export const FormAudioChat = (props: FormAudioChatProps) => {
   const { chain } = useNetwork()
   const account = useAccount()
   const queryProfileInterests = useGetProfilesInterests()
-  const [languageQuery, setLanguageQuery] = useState('')
+  const [languageQuery, setLanguageQuery] = useState(data()?.rally_language ?? 'en')
 
   return (
     <>

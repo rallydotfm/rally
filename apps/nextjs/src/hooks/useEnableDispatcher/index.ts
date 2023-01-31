@@ -1,4 +1,4 @@
-import { chain, useContractWrite, useMutation, useSignTypedData } from 'wagmi'
+import { useContractWrite, useSignTypedData } from 'wagmi'
 import omit from '@helpers/omit'
 import splitSignature from '@helpers/splitSignature'
 import { CONTRACT_LENS_HUB_PROXY } from '@config/contracts'
@@ -8,17 +8,18 @@ import toast from 'react-hot-toast'
 import enableDispatcherWithTypedData from '@services/lens/dispatcher/enable'
 import { useQueryClient } from '@tanstack/react-query'
 import { usePollTransaction } from '@hooks/usePollTransaction'
+import { polygonMumbai, polygon } from 'wagmi/chains'
 
 export function useEnableDispatcher(profile: { id: any; ownedBy: unknown }) {
   const queryClient = useQueryClient()
   const signTypedDataFollow = useSignTypedData()
   const contractWriteEnableDispatcher = useContractWrite({
     mode: 'recklesslyUnprepared',
-    address: CONTRACT_LENS_HUB_PROXY,
+    address: CONTRACT_LENS_HUB_PROXY as `0x${string}`,
     abi: lensHubProxyABI,
     functionName: 'setDispatcherWithSig',
     //@ts-ignore
-    chainId: API_URL.includes('mumbai') ? chain.polygonMumbai.id : chain.polygon.id,
+    chainId: API_URL.includes('mumbai') ? polygonMumbai.id : polygon.id,
     onError(err) {
       console.error(err.message)
     },

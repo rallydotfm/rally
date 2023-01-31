@@ -65,7 +65,7 @@ export function useSmartContract(stateTxUi: TxUi) {
   // Query to edit an existing audio chat
   const contractWriteUpdateAudioChat = useContractWrite({
     mode: 'recklesslyUnprepared',
-    address: CONTRACT_AUDIO_CHATS,
+    address: CONTRACT_AUDIO_CHATS as `0x${string}`,
     abi: audioChatABI,
     functionName: 'updateAudioChat',
     chainId,

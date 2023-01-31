@@ -31,7 +31,7 @@ export const InputTags = (props: InputTagsProps) => {
               {...api.getTagProps({ index, value })}
             >
               <span className="pie-1ex">{value} </span>
-              <button {...api.getTagDeleteButtonProps({ index, value })}>&#x2715;</button>
+              <button {...api.getTagDeleteTriggerProps({ index, value })}>&#x2715;</button>
             </div>
             <input {...api.getTagInputProps({ index, value })} />
           </span>

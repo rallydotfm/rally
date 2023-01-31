@@ -1,5 +1,5 @@
 import createSetProfileMetadataTypedData from '@services/lens/profile/setProfileMetadata'
-import { chain, useContractWrite, useSignTypedData } from 'wagmi'
+import { useContractWrite, useSignTypedData } from 'wagmi'
 import omit from '@helpers/omit'
 import splitSignature from '@helpers/splitSignature'
 import { CONTRACT_LENS_PERIPHERY } from '@config/contracts'
@@ -10,6 +10,7 @@ import { useQueryClient, useMutation } from '@tanstack/react-query'
 import { makeStorageClient } from '@config/web3storage'
 import { v4 as uuidv4 } from 'uuid'
 import { usePollTransaction } from '@hooks/usePollTransaction'
+import { polygonMumbai, polygon } from 'wagmi/chains'
 
 export function useSetProfileMetadata(profile: any) {
   const signTypedDataSetdMetadataProfile = useSignTypedData()
@@ -49,11 +50,11 @@ export function useSetProfileMetadata(profile: any) {
 
   const contractWriteSetProfiledMetadata = useContractWrite({
     mode: 'recklesslyUnprepared',
-    address: CONTRACT_LENS_PERIPHERY,
+    address: CONTRACT_LENS_PERIPHERY as `0x${string}`,
     abi: lensPeripheryABI,
     functionName: 'setProfileMetadataURIWithSig',
     //@ts-ignore
-    chainId: API_URL.includes('mumbai') ? chain.polygonMumbai.id : chain.polygon.id,
+    chainId: API_URL.includes('mumbai') ? polygonMumbai.id : polygon.id,
     onError(e) {
       console.error(e)
       //@ts-ignore

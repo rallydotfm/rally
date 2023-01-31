@@ -4,7 +4,7 @@ import { WebBundlr } from '@bundlr-network/client'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import BigNumber from 'bignumber.js'
 import { chainId } from '@config/wagmi'
-import { chain } from 'wagmi'
+import { polygonMumbai } from 'wagmi/chains'
 
 export const useStoreBundlr = create((set) => ({
   bundlr: undefined,
@@ -17,7 +17,7 @@ export const useStoreBundlr = create((set) => ({
       await provider._ready()
 
       const bundlr = new WebBundlr(
-        chainId === chain.polygonMumbai.id ? 'https://devnet.bundlr.network' : 'https://node1.bundlr.network',
+        chainId === polygonMumbai.id ? 'https://devnet.bundlr.network' : 'https://node1.bundlr.network',
         'matic',
         provider,
         {

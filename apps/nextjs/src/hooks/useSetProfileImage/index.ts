@@ -1,5 +1,6 @@
 import createSetProfileImageUriTypedData from '@services/lens/profile/setProfileImage'
-import { chain, useContractWrite, useSignTypedData } from 'wagmi'
+import { useContractWrite, useSignTypedData } from 'wagmi'
+import { polygonMumbai, polygon } from 'wagmi/chains'
 import omit from '@helpers/omit'
 import splitSignature from '@helpers/splitSignature'
 import { CONTRACT_LENS_HUB_PROXY } from '@config/contracts'
@@ -46,11 +47,11 @@ export function useSetProfileImage(profile: any) {
 
   const contractWriteSetProfileImage = useContractWrite({
     mode: 'recklesslyUnprepared',
-    address: CONTRACT_LENS_HUB_PROXY,
+    address: CONTRACT_LENS_HUB_PROXY as `0x${string}`,
     abi: lensHubProxyABI,
     functionName: 'setProfileImageURIWithSig',
     //@ts-ignore
-    chainId: API_URL.includes('mumbai') ? chain.polygonMumbai.id : chain.polygon.id,
+    chainId: API_URL.includes('mumbai') ? polygonMumbai.id : polygon.id,
     onError(err) {
       console.error('some error here', err.message)
     },

@@ -312,16 +312,24 @@ export const CardRally = (props: CardRallyProps) => {
                                 <PencilIcon className="ui-active:text-interactive-9 w-4 mie-1ex" />
                                 Edit
                               </Menu.Item>
-                              <Menu.Item
-                                className="flex items-center space-i-2 px-4 text-start py-2.5 ui-active:bg-neutral-12 ui-active:text-neutral-1 font-bold"
-                                as="button"
-                                onClick={onSelectRallyToCancel}
-                              >
-                                <ExclamationCircleIcon className="ui-active:text-interactive-9 w-4 mie-1ex" />
-                                Cancel
-                              </Menu.Item>
                             </>
                           )}
+                        {[
+                          DICTIONARY_STATES_AUDIO_CHATS.PLANNED.label,
+                          DICTIONARY_STATES_AUDIO_CHATS.READY.label,
+                          //@ts-ignore
+                        ].includes(data.state) && (
+                          <>
+                            <Menu.Item
+                              className="flex items-center space-i-2 px-4 text-start py-2.5 ui-active:bg-neutral-12 ui-active:text-neutral-1 font-bold"
+                              as="button"
+                              onClick={onSelectRallyToCancel}
+                            >
+                              <ExclamationCircleIcon className="ui-active:text-interactive-9 w-4 mie-1ex" />
+                              Cancel
+                            </Menu.Item>
+                          </>
+                        )}
                         {data?.recording !== '' && (
                           <Menu.Item
                             className="flex items-center space-i-2 px-4 text-start py-2.5 ui-active:bg-neutral-12 ui-active:text-neutral-1 font-bold"
