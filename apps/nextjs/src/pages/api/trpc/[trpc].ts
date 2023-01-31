@@ -4,6 +4,7 @@ import { appRouter, createContext } from '@rally/api'
 
 // export API handler
 export default createNextApiHandler({
+  //@ts-ignore
   router: appRouter,
   createContext: createContext,
 })

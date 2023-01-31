@@ -36,7 +36,7 @@ export function useGoLiveAudioChat(stateTxUiRallyGoLive: TxUiGoLiveRally) {
   // Query to create a new audio chat
   const contractWriteAudioChatGoLive = useContractWrite({
     mode: 'recklesslyUnprepared',
-    address: CONTRACT_AUDIO_CHATS,
+    address: CONTRACT_AUDIO_CHATS as `0x${string}`,
     abi: audioChatABI,
     functionName: 'changeState',
     chainId,

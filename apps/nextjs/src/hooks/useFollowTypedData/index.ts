@@ -1,4 +1,4 @@
-import { chain, useAccount, useContractWrite, useSignTypedData } from 'wagmi'
+import { useAccount, useContractWrite, useSignTypedData } from 'wagmi'
 import omit from '@helpers/omit'
 import splitSignature from '@helpers/splitSignature'
 import { CONTRACT_LENS_HUB_PROXY } from '@config/contracts'
@@ -9,6 +9,7 @@ import toast from 'react-hot-toast'
 import createFollowTypedData from '@services/lens/follow/follow'
 import { useQueryClient } from '@tanstack/react-query'
 import { usePollTransaction } from '@hooks/usePollTransaction'
+import { polygonMumbai, polygon } from 'wagmi/chains'
 
 export function useFollowTypedData() {
   const account = useAccount()
@@ -19,11 +20,11 @@ export function useFollowTypedData() {
   const signTypedDataFollow = useSignTypedData()
   const contractWriteFollow = useContractWrite({
     mode: 'recklesslyUnprepared',
-    address: CONTRACT_LENS_HUB_PROXY,
+    address: CONTRACT_LENS_HUB_PROXY as `0x${string}`,
     abi: lensHubProxyABI,
     functionName: 'followWithSig',
     //@ts-ignore
-    chainId: API_URL.includes('mumbai') ? chain.polygonMumbai.id : chain.polygon.id,
+    chainId: API_URL.includes('mumbai') ? polygonMumbai.id : polygon.id,
     onError(err) {
       console.error(err.message)
     },

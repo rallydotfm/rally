@@ -36,6 +36,7 @@ export function useEndLiveAudioChat(stateTxUiEndLiveRally: TxUiEndLiveRally) {
 
   const rally = useStoreCurrentLiveRally((currentLiveRallyState: any) => currentLiveRallyState.rally)
   const resetState = useStoreCurrentLiveRally((currentLiveRallyState: any) => currentLiveRallyState.resetState)
+  //@ts-ignore
   const mutationEndRoom = trpc.room.end_room.useMutation({
     onSuccess() {
       resetState()
@@ -46,7 +47,7 @@ export function useEndLiveAudioChat(stateTxUiEndLiveRally: TxUiEndLiveRally) {
   // Query to create a new audio chat
   const contractWriteAudioChatEnd = useContractWrite({
     mode: 'recklesslyUnprepared',
-    address: CONTRACT_AUDIO_CHATS,
+    address: CONTRACT_AUDIO_CHATS as `0x${string}`,
     abi: audioChatABI,
     functionName: 'changeState',
     chainId,

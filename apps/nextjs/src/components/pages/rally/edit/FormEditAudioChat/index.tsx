@@ -10,6 +10,9 @@ import Notice from '@components/Notice'
 import button from '@components/Button/styles'
 import DeploymentStep from '@components/DeploymentStep'
 
+function toDatetimeLocal(datetime: Date) {
+  return new Date(datetime.getTime() + datetime.getTimezoneOffset() * -60 * 1000).toISOString().slice(0, 19)
+}
 export const FormEditAudioChat = (props: any) => {
   const { values } = props
   const stateTxUi = useStoreTxUi()
@@ -38,7 +41,7 @@ export const FormEditAudioChat = (props: any) => {
       rally_language: values?.language ?? 'en',
       rally_is_nsfw: values?.is_nsfw ?? false,
       rally_description: values.description,
-      rally_start_at: values.datetime_start_at.toISOString().substring(0, 16),
+      rally_start_at: toDatetimeLocal(values.datetime_start_at),
       rally_image_src: values?.image,
       rally_access_control_guilds:
         values.access_control?.guilds.map((guild: any) => ({
@@ -48,6 +51,7 @@ export const FormEditAudioChat = (props: any) => {
       rally_access_control_whitelist: values.access_control.whitelist,
     },
   })
+
   useMountEffect(() => {
     stateTxUi.setRallyId(values.id)
     stateTxUi.setFileRallyCID(values.cid)
@@ -57,7 +61,7 @@ export const FormEditAudioChat = (props: any) => {
     stateTxUi.resetState()
   })
   return (
-    <>
+    <div className="animate-appear">
       <FormAudioChat
         storeForm={formAudioChat}
         apiInputRallyTags={apiInputRallyTags}
@@ -154,23 +158,21 @@ export const FormEditAudioChat = (props: any) => {
             <Notice>
               🎉 Your rally was updated successfully ! <br />
               <Link href={ROUTE_RALLY_VIEW.replace('[idRally]', stateTxUi.rallyId)}>
-                <a>
-                  Check it <span className="underline hover:no-underline">here</span>
-                </a>
+                Check it <span className="underline hover:no-underline">here</span>
               </Link>
               <br />
               <span>Please note that the changes might take a few seconds to be reflected.</span>
             </Notice>
             <div className="flex flex-col space-y-3 xs:space-y-0 xs:space-i-3 xs:flex-row ">
-              <Link href={ROUTE_DASHBOARD}>
-                <a className={button({ intent: 'primary-outline' })}>Go to my dashboard</a>
+              <Link className={button({ intent: 'primary-outline' })} href={ROUTE_DASHBOARD}>
+                Go to my dashboard
               </Link>
               <Button onClick={() => stateTxUi.setDialogVisibility(false)}>Go back</Button>
             </div>
           </div>
         )}
       </DialogModal>
-    </>
+    </div>
   )
 }
 

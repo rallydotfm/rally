@@ -13,7 +13,9 @@ const Page: NextPage = () => {
   const session = useSession()
   const interests = useStorePersistedInterests((state: any) => state.interests)
   const queryListInterests = useGetProfilesInterests()
+  //@ts-ignore
   const queryLensProfile = useWalletAddressDefaultLensProfile(session?.data?.address as `0x${string}`, {
+    //@ts-ignore
     enabled: session?.data?.address ? true : false,
   })
   return (

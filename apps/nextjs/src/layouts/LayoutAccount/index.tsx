@@ -67,6 +67,7 @@ export const LayoutAccount = (props: LayoutProps) => {
 
       {queryLensProfile?.data && (
         <div className="flex flex-col pt-8 animate-appear">
+          {/** @ts-ignore */}
           {session?.data?.address && account?.address && isSignedIn ? (
             <>
               {children}

@@ -164,8 +164,11 @@ export default function CalendarWeek(props: CalendarWeekProps) {
                                   </p>
                                 </div>
                               </article>
-                              <Link href={ROUTE_RALLY_VIEW.replace('[idRally]', audioChat?.id)}>
-                                <a className="absolute z-10 opacity-0 inset-0 w-full h-full">View rally page</a>
+                              <Link
+                                className="absolute z-10 opacity-0 inset-0 w-full h-full"
+                                href={ROUTE_RALLY_VIEW.replace('[idRally]', audioChat?.id)}
+                              >
+                                View rally page
                               </Link>
                             </li>
                           )
@@ -198,8 +201,8 @@ export default function CalendarWeek(props: CalendarWeekProps) {
           If you're looking for an alternative to Twitter Space or Clubhouse, give Rally a try and see how it can help
           you connect with your audience.
         </p>
-        <Link href={ROUTE_RALLY_NEW}>
-          <a className={button({ scale: 'sm', intent: 'primary-outline' })}>Create my rally now</a>
+        <Link className={button({ scale: 'sm', intent: 'primary-outline' })} href={ROUTE_RALLY_NEW}>
+          Create my rally now
         </Link>
       </section>
     </>

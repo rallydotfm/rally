@@ -19,11 +19,12 @@ export function usePinMessageToRoom(idRally: string) {
     //@ts-ignore
   } = useRoom(stateLiveVoiceChat?.room)
 
+  //@ts-ignore
   const mutation = trpc.room.pin_message.useMutation({
-    onSuccess(data) {
+    onSuccess() {
       toast('Your message was pinned successfully !')
     },
-    onError(e) {
+    onError(e: Error) {
       toast.error(`Something went wrong and your message couldn't be pinned to the room. Please try again.`)
       console.error(e)
     },

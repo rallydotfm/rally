@@ -1,4 +1,4 @@
-import { chain, useAccount, useContractWrite, useMutation, useSignTypedData } from 'wagmi'
+import { useAccount, useContractWrite, useMutation, useSignTypedData } from 'wagmi'
 import omit from '@helpers/omit'
 import splitSignature from '@helpers/splitSignature'
 import { CONTRACT_LENS_HUB_PROXY } from '@config/contracts'
@@ -11,6 +11,7 @@ import { createMirrorViaDispatcherRequest } from '@services/lens/publications/mi
 import { createMirrorTypedData } from '@services/lens/publications/mirror'
 import type { CreateMirrorRequest } from '@graphql/lens/generated'
 import useWalletAddressDefaultLensProfile from '@hooks/useWalletAddressDefaultLensProfile'
+import { polygonMumbai, polygon } from 'wagmi/chains'
 
 export function useCreateLensMirror(mirrorMutationOptions: any) {
   const queryClient = useQueryClient()
@@ -22,11 +23,11 @@ export function useCreateLensMirror(mirrorMutationOptions: any) {
   const signTypedDataMirror = useSignTypedData()
   const contractWriteMirror = useContractWrite({
     mode: 'recklesslyUnprepared',
-    address: CONTRACT_LENS_HUB_PROXY,
+    address: CONTRACT_LENS_HUB_PROXY as `0x${string}`,
     abi: lensHubProxyABI,
     functionName: 'mirrorWithSig',
     //@ts-ignore
-    chainId: API_URL.includes('mumbai') ? chain.polygonMumbai.id : chain.polygon.id,
+    chainId: API_URL.includes('mumbai') ? polygonMumbai.id : polygon.id,
     onError(err) {
       console.error(err.message)
     },

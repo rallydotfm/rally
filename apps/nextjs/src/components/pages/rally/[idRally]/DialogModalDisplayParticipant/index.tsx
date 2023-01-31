@@ -208,10 +208,11 @@ export const DialogModalDisplayParticipant = () => {
             )}
           <li>
             {queryPickedParticipantLensProfile?.data?.handle ? (
-              <Link href={ROUTE_PROFILE.replace('[handleLensProfile]', queryPickedParticipantLensProfile.data.handle)}>
-                <a className="text-start block px-6 py-3 w-full focus:bg-neutral-12 hover:bg-neutral-3 focus:text-positive-9">
-                  View profile
-                </a>
+              <Link
+                className="text-start block px-6 py-3 w-full focus:bg-neutral-12 hover:bg-neutral-3 focus:text-positive-9"
+                href={ROUTE_PROFILE.replace('[handleLensProfile]', queryPickedParticipantLensProfile.data.handle)}
+              >
+                View profile
               </Link>
             ) : (
               <span className="text-start block px-6 py-3 w-full text-neutral-11">

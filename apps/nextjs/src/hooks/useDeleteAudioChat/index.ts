@@ -39,7 +39,7 @@ export function useDeleteAudioChat(stateTxUiDeleteRally: TxUiDeleteRally, refetc
   // Query to delete an audio chat
   const contractWriteDeleteAudioChat = useContractWrite({
     mode: 'recklesslyUnprepared',
-    address: CONTRACT_AUDIO_CHATS,
+    address: CONTRACT_AUDIO_CHATS as `0x${string}`,
     abi: audioChatABI,
     functionName: 'deleteAudioChat',
     chainId,

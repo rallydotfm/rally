@@ -15,6 +15,7 @@ export const FormInput = (props: FormInputProps) => {
         scale: scale ?? 'default',
         //@ts-ignore
         variant: hasError === true ? 'error' : 'default',
+        //@ts-ignore
         class: className ?? '',
       })}
       {...rest}

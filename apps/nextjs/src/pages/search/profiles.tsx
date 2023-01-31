@@ -90,10 +90,11 @@ const Page: NextPage = () => {
                           </span>
                         </div>
                       </div>
-                      <Link href={ROUTE_PROFILE.replace('[handleLensProfile]', profile.handle)}>
-                        <a className="absolute inset-0 z-10 w-full h-full cursor-pointer opacity-0">
-                          Visit {profile?.name ?? profile.handle} profile
-                        </a>
+                      <Link
+                        className="absolute inset-0 z-10 w-full h-full cursor-pointer opacity-0"
+                        href={ROUTE_PROFILE.replace('[handleLensProfile]', profile.handle)}
+                      >
+                        Visit {profile?.name ?? profile.handle} profile
                       </Link>
                     </li>
                   ))}
@@ -156,10 +157,11 @@ const Page: NextPage = () => {
                         </span>
                       </div>
                     </div>
-                    <Link href={ROUTE_PROFILE.replace('[handleLensProfile]', profile.handle)}>
-                      <a className="absolute inset-0 z-10 w-full h-full cursor-pointer opacity-0">
-                        Visit {profile?.name ?? profile.handle} profile
-                      </a>
+                    <Link
+                      className="absolute inset-0 z-10 w-full h-full cursor-pointer opacity-0"
+                      href={ROUTE_PROFILE.replace('[handleLensProfile]', profile.handle)}
+                    >
+                      Visit {profile?.name ?? profile.handle} profile
                     </Link>
                   </li>
                 ))}

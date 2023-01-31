@@ -27,9 +27,9 @@ export function useLiveVoiceChatRecordRoom(options?: {
   mutationStopRecordingOptions: any
 }) {
   const setOngoingRecordingId = useStorePersistedOngoingRecording((state) => state.setOngoingRecordingId)
-
+  //@ts-ignore
   const mutationStartRecording = trpc?.room.start_recording.useMutation({
-    onSuccess(data) {
+    onSuccess(data: { egressID: string }) {
       if (data?.egressID) {
         setOngoingRecordingId(data?.egressID)
         toast('Recording in progress...')
@@ -39,8 +39,9 @@ export function useLiveVoiceChatRecordRoom(options?: {
       }
     },
   })
+  //@ts-ignore
   const mutationStopRecording = trpc?.room.stop_recording.useMutation({
-    onSuccess(data) {
+    onSuccess() {
       setOngoingRecordingId(undefined)
       toast('Recording stopped and saved.')
     },

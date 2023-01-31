@@ -74,8 +74,11 @@ export const CardRally = (props: CardRallyProps) => {
           </p>
         </div>
       </div>
-      <Link href={ROUTE_RALLY_VIEW.replace('[idRally]', data.id)}>
-        <a className="absolute z-10 opacity-0 inset-0 w-full h-full">View rally page</a>
+      <Link
+        className="absolute z-10 opacity-0 inset-0 w-full h-full"
+        href={ROUTE_RALLY_VIEW.replace('[idRally]', data.id)}
+      >
+        View rally page
       </Link>
     </article>
   )

@@ -18,6 +18,7 @@ export const FormSelect = (props: FormSelectProps) => {
           scale: scale ?? 'default',
           //@ts-ignore
           variant: hasError === true ? 'error' : 'default',
+          //@ts-ignore
           class: `pie-10 ${classNameInput ?? ''}`,
         })} [&>option]:bg-neutral-5 &[>option]:p-2 `}
         {...rest}

@@ -27,16 +27,15 @@ export const MainNavBar = (props: MainNavBarProps) => {
         <NavLinks />
       </div>
       <div className="hidden md:mx-auto md:block lg:mx-6">
-        <Link href={ROUTE_RALLY_NEW}>
-          <a
-            className={button({
-              scale: 'sm',
-              class: 'aspect-auto md:aspect-square md:w-12 md:px-0 lg:px-[3ex] lg:w-full lg:aspect-auto',
-            })}
-          >
-            <PlusIcon className="shrink-0 w-5" />
-            <span className="sr-only lg:px-2 lg:not-sr-only lg:whitespace-nowrap">New rally</span>
-          </a>
+        <Link
+          className={button({
+            scale: 'sm',
+            class: 'aspect-auto md:aspect-square md:w-12 md:px-0 lg:px-[3ex] lg:w-full lg:aspect-auto',
+          })}
+          href={ROUTE_RALLY_NEW}
+        >
+          <PlusIcon className="shrink-0 w-5" />
+          <span className="sr-only lg:px-2 lg:not-sr-only lg:whitespace-nowrap">New rally</span>
         </Link>
       </div>
       {address && address !== null && (

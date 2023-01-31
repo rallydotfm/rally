@@ -9,6 +9,7 @@ export const LayoutWalletRequired = (props: LayoutProps) => {
   const { children } = props
   const session = useSession()
   const account = useAccount()
+  //@ts-ignore
   if (!session?.data?.address || !account?.address)
     return (
       <Notice intent="primary-outline" className="mt-9 max-w-screen-xs mx-auto text-center">

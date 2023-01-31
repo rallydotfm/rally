@@ -42,7 +42,7 @@ export function useCancelAudioChat(stateTxUiCancelRally: TxUiCancelRally) {
   // Query to create a new audio chat
   const contractWriteCancelAudioChat = useContractWrite({
     mode: 'recklesslyUnprepared',
-    address: CONTRACT_AUDIO_CHATS,
+    address: CONTRACT_AUDIO_CHATS as `0x${string}`,
     abi: audioChatABI,
     functionName: 'changeState',
     chainId,

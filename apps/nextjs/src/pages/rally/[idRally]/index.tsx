@@ -80,11 +80,9 @@ const Page: NextPage = () => {
       <>
         <div className="overflow-hidden px-6 pb-8 pt-1 -mt-8 -mx-6">
           <nav>
-            <Link href={ROUTE_HOME}>
-              <a className={button({ intent: 'neutral-ghost', scale: 'sm' })}>
-                <ArrowLeftIcon className="w-5 mie-1ex" />
-                Back
-              </a>
+            <Link className={button({ intent: 'neutral-ghost', scale: 'sm' })} href={ROUTE_HOME}>
+              <ArrowLeftIcon className="w-5 mie-1ex" />
+              Back
             </Link>
           </nav>
         </div>
@@ -107,8 +105,8 @@ const Page: NextPage = () => {
               <main className="animate-appear">
                 <h2 className="text-3xl mb-4 font-bold">Rally not found.</h2>
                 <p className="mb-8">This rally doesn't exist or was deleted by its creator.</p>
-                <Link href={ROUTE_HOME}>
-                  <a className={button({ scale: 'sm', intent: 'neutral-outline' })}>Go back to the homepage</a>
+                <Link className={button({ scale: 'sm', intent: 'neutral-outline' })} href={ROUTE_HOME}>
+                  Go back to the homepage
                 </Link>
               </main>
             )}
@@ -331,19 +329,16 @@ const Page: NextPage = () => {
                                         {queryAudioChatMetadata?.data?.creator === address ? (
                                           <>
                                             <Link
+                                              className={button({
+                                                intent: 'primary-ghost',
+                                                scale: 'sm',
+                                              })}
                                               href={ROUTE_RALLY_PUBLISH_RECORDING.replace(
                                                 '[idRally]',
                                                 queryAudioChatMetadata.data.id,
                                               )}
                                             >
-                                              <a
-                                                className={button({
-                                                  intent: 'primary-ghost',
-                                                  scale: 'sm',
-                                                })}
-                                              >
-                                                Update recording
-                                              </a>
+                                              Update recording
                                             </Link>
                                           </>
                                         ) : (

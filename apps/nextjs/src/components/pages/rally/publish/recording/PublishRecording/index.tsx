@@ -356,9 +356,7 @@ export const PublishRecording = (props: any) => {
               <Notice>
                 🎉 Your recording was published successfully ! <br />
                 <Link href={ROUTE_RALLY_VIEW.replace('[idRally]', values?.id)}>
-                  <a>
-                    Check it <span className="underline hover:no-underline">here</span>
-                  </a>
+                  Check it <span className="underline hover:no-underline">here</span>
                 </Link>
               </Notice>
               <p className="flex flex-col gap-4 text-2xs mt-6">
@@ -391,8 +389,8 @@ export const PublishRecording = (props: any) => {
               </p>
 
               <div className="flex flex-col space-y-3 xs:space-y-0 xs:space-i-3 xs:flex-row ">
-                <Link href={ROUTE_DASHBOARD}>
-                  <a className={button({ intent: 'primary-outline' })}>Go to my dashboard</a>
+                <Link className={button({ intent: 'primary-outline' })} href={ROUTE_DASHBOARD}>
+                  Go to my dashboard
                 </Link>
               </div>
             </div>

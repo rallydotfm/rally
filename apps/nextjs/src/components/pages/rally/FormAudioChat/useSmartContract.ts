@@ -56,7 +56,7 @@ export function useSmartContract(stateTxUi: TxUi) {
   // Query to create a new audio chat
   const contractWriteNewAudioChat = useContractWrite({
     mode: 'recklesslyUnprepared',
-    address: CONTRACT_AUDIO_CHATS,
+    address: CONTRACT_AUDIO_CHATS as `0x${string}`,
     abi: audioChatABI,
     functionName: 'createNewAudioChat',
     chainId,
@@ -117,7 +117,7 @@ export function useSmartContract(stateTxUi: TxUi) {
   // Query to edit an existing audio chat
   const contractWriteEditAudioChat = useContractWrite({
     mode: 'recklesslyUnprepared',
-    address: CONTRACT_AUDIO_CHATS,
+    address: CONTRACT_AUDIO_CHATS as `0x${string}`,
     abi: audioChatABI,
     functionName: 'updateAudioChat',
     chainId,

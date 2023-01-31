@@ -58,6 +58,7 @@ export function getAuthOptions(req: IncomingMessage): NextAuthOptions {
   return {
     callbacks: {
       async session({ session, token }) {
+        //@ts-ignore
         session.address = token.sub
         session.user = {
           name: token.sub,
