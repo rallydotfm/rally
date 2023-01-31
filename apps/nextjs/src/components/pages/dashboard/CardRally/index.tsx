@@ -48,6 +48,7 @@ export const CardRally = (props: CardRallyProps) => {
     mutationDecryptMetadata,
     queryDecryptPublishedRecording,
   } = useGetAudioChatPublishedRecording(data.id, data.recording)
+  //@ts-ignore
   const querySessionRecordings: any = trpc.recordings.rally_available_recordings.useQuery(
     {
       id_rally: data?.id,
@@ -386,7 +387,7 @@ export const CardRally = (props: CardRallyProps) => {
                                       filename: recording?.name,
                                     },
                                     {
-                                      onSuccess(recordingUrl) {
+                                      onSuccess(recordingUrl: string) {
                                         setIsPlayingRoomSession(true)
                                         setAudioPlayer({
                                           isOpen: true,

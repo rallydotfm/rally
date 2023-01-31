@@ -43,7 +43,9 @@ export const ToolbarAudioRoom = () => {
   )
   const localUserPermissions: any = useStoreCurrentLiveRally((state: any) => state.localUserPermissions)
   const setLocalUserPermissions: any = useStoreCurrentLiveRally((state: any) => state.setLocalUserPermissions)
+  //@ts-ignore
   const mutationReaction: any = trpc.room.react.useMutation()
+  //@ts-ignore
   const mutationRaiseHand = trpc.room.raise_hand.useMutation({
     onSuccess(data: any) {
       setIsHandRaised(data)

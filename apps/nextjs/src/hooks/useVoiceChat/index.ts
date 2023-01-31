@@ -32,6 +32,7 @@ export function useConnectToVoiceChat(rally) {
   const setAudioPlayer = useAudioPlayer((state) => state.setAudioPlayer)
   const setLiveRally = useStoreCurrentLiveRally((currentLiveRallyState: any) => currentLiveRallyState.setLiveRally)
   const resetState = useStoreCurrentLiveRally((currentLiveRallyState: any) => currentLiveRallyState.resetState)
+  //@ts-ignore
   const mutationJoinRoom = trpc.credentials.getRoomCredential.useMutation({
     onMutate() {
       setAudioPlayer({
@@ -40,7 +41,7 @@ export function useConnectToVoiceChat(rally) {
         trackSrc: undefined,
       })
     },
-    async onSuccess(data) {
+    async onSuccess(data: any) {
       try {
         //@ts-ignore
         this.roomService = data?.token

@@ -36,6 +36,7 @@ export function useEndLiveAudioChat(stateTxUiEndLiveRally: TxUiEndLiveRally) {
 
   const rally = useStoreCurrentLiveRally((currentLiveRallyState: any) => currentLiveRallyState.rally)
   const resetState = useStoreCurrentLiveRally((currentLiveRallyState: any) => currentLiveRallyState.resetState)
+  //@ts-ignore
   const mutationEndRoom = trpc.room.end_room.useMutation({
     onSuccess() {
       resetState()
