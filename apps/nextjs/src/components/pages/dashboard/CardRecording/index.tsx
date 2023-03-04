@@ -58,9 +58,15 @@ export const CardRecording = (props: CardRecordingProps) => {
                 width="128px"
                 height="86px"
                 src={`${
-                  queryPublishedRecording?.data?.image?.replace('ipfs://', 'https://ipfs.io/ipfs/') ??
-                  queryDecryptPublishedRecording?.data?.image?.replace('ipfs://', 'https://ipfs.io/ipfs/') ??
-                  data?.image?.replace('ipfs://', 'https://ipfs.io/ipfs/')
+                  queryPublishedRecording?.data?.image?.replace(
+                    'ipfs://',
+                    'https://demo-letsrally.infura-ipfs.io/ipfs/',
+                  ) ??
+                  queryDecryptPublishedRecording?.data?.image?.replace(
+                    'ipfs://',
+                    'https://demo-letsrally.infura-ipfs.io/ipfs/',
+                  ) ??
+                  data?.image?.replace('ipfs://', 'https://demo-letsrally.infura-ipfs.io/ipfs/')
                 }`}
                 className="relative z-10 block w-full h-full object-cover "
               />

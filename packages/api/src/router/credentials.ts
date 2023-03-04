@@ -27,7 +27,6 @@ export const credentialsRouter = router({
         if (!sub) throw Error('Not connected')
 
         const user_ethereum_address = sub
-
         // generate basic access token from their wallet address
         const at = new AccessToken(process.env.LIVEKIT_API_KEY, process.env.LIVEKIT_SECRET_KEY, {
           identity: sub,
@@ -38,9 +37,8 @@ export const credentialsRouter = router({
         })
 
         // get the information of the rally by fetching the JSON with all its data
-        const response = await fetch(`https://ipfs.io/ipfs/${cid_rally}`)
+        let response: any = await fetch(`https://gateway.pinata.cloud/ipfs/${cid_rally}`)
         const result = await response.json()
-
         const {
           access_control: { whitelist, guilds },
         } = result

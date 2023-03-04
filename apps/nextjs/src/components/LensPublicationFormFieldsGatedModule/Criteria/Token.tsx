@@ -135,12 +135,13 @@ export const Token = (props: any) => {
             }
             id={`access_control_conditions.${index}.contractAddress-validity-helpblock`}
           >
-            {queryToken?.isLoading === true && isAddress(data()?.access_control_conditions?.[index]?.contractAddress) && (
-              <span className="flex items-center space-i-1ex">
-                <IconSpinner className="text-xs animate-spin" />
-                <span className="block font-bold animate-pulse">Checking contract validity...</span>
-              </span>
-            )}
+            {queryToken?.isLoading === true &&
+              isAddress(data()?.access_control_conditions?.[index]?.contractAddress) && (
+                <span className="flex items-center space-i-1ex">
+                  <IconSpinner className="text-xs animate-spin" />
+                  <span className="block font-bold animate-pulse">Checking contract validity...</span>
+                </span>
+              )}
             {queryToken?.isError === true &&
               data()?.access_control_conditions?.[index]?.contractAddress?.trim() !== '' && (
                 <span className="flex items-center animate-appear text-negative-11">

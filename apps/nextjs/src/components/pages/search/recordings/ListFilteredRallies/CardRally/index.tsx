@@ -43,7 +43,7 @@ export const CardRally = (props: CardRallyProps) => {
               loading="lazy"
               width="128px"
               height="86px"
-              src={`${data?.image?.replace('ipfs://', 'https://ipfs.io/ipfs/')}`}
+              src={`${data?.image?.replace('ipfs://', 'https://demo-letsrally.infura-ipfs.io/ipfs/')}`}
               className="relative z-10 block w-full h-full object-cover "
             />
           </div>

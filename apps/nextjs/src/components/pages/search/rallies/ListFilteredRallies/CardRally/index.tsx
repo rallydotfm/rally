@@ -31,7 +31,7 @@ export const CardRally = (props: CardRallyProps) => {
               loading="lazy"
               width="128px"
               height="86px"
-              src={`https://ipfs.io/ipfs/${data?.image}`}
+              src={`https://demo-letsrally.infura-ipfs.io/ipfs/${data?.image}`}
               className="relative z-10 block w-full h-full object-cover "
             />
           </div>

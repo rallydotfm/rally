@@ -119,7 +119,7 @@ export default function CalendarWeek(props: CalendarWeekProps) {
                                       loading="lazy"
                                       width="128px"
                                       height="86px"
-                                      src={`https://ipfs.io/ipfs/${audioChat?.image}`}
+                                      src={`https://demo-letsrally.infura-ipfs.io/ipfs/${audioChat?.image}`}
                                       className="relative z-10 block w-full h-full object-cover "
                                     />
                                   </div>

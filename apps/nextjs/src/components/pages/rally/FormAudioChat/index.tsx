@@ -280,7 +280,7 @@ export const FormAudioChat = (props: FormAudioChatProps) => {
                           className="absolute w-full h-full object-cover block z-10 inset-0"
                           src={
                             !data()?.rally_image_file
-                              ? `https://ipfs.io/ipfs/${data()?.rally_image_src}`
+                              ? `https://demo-letsrally.infura-ipfs.io/ipfs/${data()?.rally_image_src}`
                               : data()?.rally_image_src
                           }
                         />

@@ -125,7 +125,7 @@ const Page: NextPage = () => {
                         loading="lazy"
                         width="128px"
                         height="128px"
-                        src={`https://ipfs.io/ipfs/${queryAudioChatMetadata.data.image}`}
+                        src={`https://demo-letsrally.infura-ipfs.io/ipfs/${queryAudioChatMetadata.data.image}`}
                         className="relative z-10 block w-full h-full object-cover "
                       />
                     </div>
@@ -183,7 +183,7 @@ const Page: NextPage = () => {
                               loading="lazy"
                               width="128px"
                               height="128px"
-                              src={`https://ipfs.io/ipfs/${queryAudioChatMetadata.data.image}`}
+                              src={`https://demo-letsrally.infura-ipfs.io/ipfs${queryAudioChatMetadata.data.image}`}
                               className="relative z-10 block w-full h-full object-cover "
                             />
                           </div>

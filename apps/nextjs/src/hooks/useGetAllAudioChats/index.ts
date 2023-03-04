@@ -29,7 +29,7 @@ export function useGetAllAudioChats(options?: any) {
               queryFn: async () => {
                 const cid = audioChat?.cid_metadata
                 try {
-                  const response = await fetch(`https://ipfs.io/ipfs/${cid}`)
+                  const response = await fetch(`https://demo-letsrally.infura-ipfs.io/ipfs/${cid}`)
                   const result = await response.json()
 
                   const rally = {

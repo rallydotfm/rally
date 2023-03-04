@@ -101,7 +101,7 @@ export const ToolbarAudioRoom = () => {
                   height="40px"
                   loading="lazy"
                   className="hidden xs:block w-10 h-10 rounded-md"
-                  src={`https://ipfs.io/ipfs/${rally?.image}`}
+                  src={`https://demo-letsrally.infura-ipfs.io/ipfs/${rally?.image}`}
                 />
               )}
               <span

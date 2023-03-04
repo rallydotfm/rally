@@ -49,15 +49,15 @@ export const LayoutBase = (props: LayoutProps) => {
   const isPlayerReady = useAudioPlayer((state) => state.isReady)
 
   useUpdateEffect(() => {
-    setIsSignedIn(false)
-    Cookies.remove(COOKIE_LENS_ACCESS_TOKEN)
-    Cookies.remove(COOKIE_LENS_REFRESH_TOKEN)
+    if (!session?.data?.user?.name || session?.data?.user?.name !== address) {
+      setIsSignedIn(false)
+      Cookies.remove(COOKIE_LENS_ACCESS_TOKEN)
+      Cookies.remove(COOKIE_LENS_REFRESH_TOKEN)
 
-    if (session?.data?.user !== address) {
       if (stateVoiceChat?.room?.state === 'connected' && stateVoiceChat?.room?.sid !== '')
         stateVoiceChat.room.disconnect()
     }
-  }, [session?.data?.user, address])
+  }, [session?.data?.user?.name, address])
   return (
     <div className="relative flex-grow flex flex-col">
       {!isConnecting && !address && <BannerConnectWallet />}
