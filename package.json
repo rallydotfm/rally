@@ -1,5 +1,6 @@
 {
   "name": "rally",
+  "license": "GPL-3.0",
   "private": true,
   "packageManager": "pnpm@7.13.0",
   "scripts": {
