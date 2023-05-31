@@ -3,6 +3,9 @@
   "license": "GPL-3.0",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": ">=18"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -23,7 +26,7 @@
     "@lit-protocol/sdk-browser": "^1.1.242",
     "@livekit/react-core": "^1.1.0",
     "@livepeer/react": "^1.5.6",
-    "@rainbow-me/rainbowkit": "^0.8.1",
+    "@rainbow-me/rainbowkit": "^0.12.14",
     "@rainbow-me/rainbowkit-siwe-next-auth": "^0.1.5",
     "@rally/abi": "*",
     "@rally/api": "*",
@@ -58,7 +61,7 @@
     "react-html-props": "^2.0.2",
     "siwe": "^1.1.6",
     "vidstack": "^0.1.5",
-    "wagmi": "^0.11.2",
+    "wagmi": "^0.12.13",
     "web3.storage": "^4.4.0",
     "zod": "^3.20.2"
   },
