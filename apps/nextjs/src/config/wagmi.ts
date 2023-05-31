@@ -1,8 +1,20 @@
-import { connectorsForWallets, getDefaultWallets } from '@rainbow-me/rainbowkit'
+import { connectorsForWallets } from '@rainbow-me/rainbowkit'
 import { configureChains, createClient } from 'wagmi'
 import { publicProvider } from 'wagmi/providers/public'
 import { alchemyProvider } from 'wagmi/providers/alchemy'
-import { polygonMumbai, polygon, mainnet } from 'wagmi/chains'
+import { polygonMumbai, polygon } from 'wagmi/chains'
+import {
+  okxWallet,
+  safeWallet,
+  tahoWallet,
+  rabbyWallet,
+  phantomWallet,
+  rainbowWallet,
+  metaMaskWallet,
+  coinbaseWallet,
+  injectedWallet,
+} from '@rainbow-me/rainbowkit/wallets'
+
 export const chainId = process?.env?.NEXT_PUBLIC_CHAIN === 'mumbai' ? polygonMumbai?.id : polygon?.id
 export const { chains, provider } = configureChains(
   // for now we just want to support Mumbai testnet
@@ -13,12 +25,22 @@ export const { chains, provider } = configureChains(
   [publicProvider(), alchemyProvider({ apiKey: process.env.NEXT_PUBLIC_ALCHEMY_KEY as string })],
 )
 
-const { wallets } = getDefaultWallets({
-  appName: 'Rally',
-  chains,
-})
-
-const connectors = connectorsForWallets([...wallets])
+const connectors = connectorsForWallets([
+  {
+    groupName: 'Suggested',
+    wallets: [
+      injectedWallet({ chains }),
+      rainbowWallet({ chains }),
+      metaMaskWallet({ chains }),
+      phantomWallet({ chains }),
+      safeWallet({ chains }),
+      tahoWallet({ chains }),
+      rabbyWallet({ chains }),
+      okxWallet({ chains }),
+      coinbaseWallet({ chains, appName: 'Rally' }),
+    ],
+  },
+])
 
 export const wagmiClient = createClient({
   autoConnect: false,
